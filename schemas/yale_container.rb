@@ -11,15 +11,15 @@
       "indicator" => {"type" => "string", "maxLength" => 255, "minLength" => 1, "ifmissing" => "error" },
 
       "parent" => {
-        "type" => "object",
-        "subtype" => "ref",
-        "properties" => {
-          "ref" => {"type" => "JSONModel(:yale_container) uri"},
-          "_resolved" => {
-            "type" => "object",
-            "readonly" => "true"
+          "type" => "object",
+          "subtype" => "ref",
+          "properties" => {
+            "ref" => {"type" => "JSONModel(:yale_container) uri"},
+            "_resolved" => {
+              "type" => "object",
+              "readonly" => "true"
+            }
           }
-        }
       },
 
       "metadata" => {"type" => "JSONModel(:yale_container_metadata) object"},
