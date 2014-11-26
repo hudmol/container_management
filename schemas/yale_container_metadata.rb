@@ -3,7 +3,6 @@
     "$schema" => "http://www.archivesspace.org/archivesspace.json",
     "version" => 1,
     "type" => "object",
-    "uri" => "/repositories/:repo_id/yale_containers/:id",
     "properties" => {
 
       "barcode" => {"type" => "string", "maxLength" => 255, "minLength" => 1},
