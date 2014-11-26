@@ -15,7 +15,14 @@
           <div class="record-toolbar">
             <div class="pull-right">
               <%= link_to I18n.t("yale_container._frontend.action.create"), {:controller => :yale_containers, :action => :new}, :class => "btn btn-small" %>
-              <%= button_delete_multiple_action(:yale_containers) %>
+              <%= button_delete_action(url_for(:controller => :yale_containers, :action => :batch_delete), {
+                :class => "btn btn-small btn-danger multiselect-enabled",
+                :"data-multiselect" => "#tabledSearchResults",
+                :"data-title" => I18n.t("actions.delete_multiple_confirm_title"),
+                :"data-message" => I18n.t("actions.delete_multiple_confirm_message"),
+                :"data-confirm-btn-label" => "#{I18n.t("actions.delete_multiple")}",
+                :disabled => "disabled"
+              }) %>
             </div>
           </div>
         </div>
@@ -32,3 +39,5 @@
     </div>
   </div>
 </div>
+
+<script src="<%= "#{AppConfig[:frontend_prefix]}assets/yale_containers.index.js" %>"></script>
