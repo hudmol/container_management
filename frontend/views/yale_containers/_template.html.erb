@@ -1,0 +1,5 @@
+<% define_template "yale_container", jsonmodel_definition(:yale_container) do |form| %>
+  <div>
+    <%= render_aspace_partial :partial => "yale_containers/linker", :locals => {:form => form} %>
+  </div>
+<% end %>

@@ -1,0 +1,11 @@
+en:
+  yale_container:
+    type: Type
+    indicator: Indicator
+
+    _singular: Yale Container
+    _plural: Yale Containers
+
+    _frontend:
+      action:
+        add: Add Yale Container
