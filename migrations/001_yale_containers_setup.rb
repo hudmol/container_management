@@ -37,21 +37,37 @@ Sequel.migration do
     end
 
 
-    create_table(:yale_container_rlshp) do
+    create_table(:yale_container_instance_rlshp) do
       primary_key :id
 
       Integer :yale_container_id
       Integer :instance_id
 
-      String :jsonmodel_type, :null => false
       Integer :aspace_relationship_position
 
-      apply_mtime_columns
+      apply_mtime_columns(false)
+    end
+
+    alter_table(:yale_container_instance_rlshp) do
+      add_foreign_key([:yale_container_id], :yale_container, :key => :id)
+      add_foreign_key([:instance_id], :instance, :key => :id)
+    end
+
+
+    create_table(:yale_container_rlshp) do
+      primary_key :id
+
+      Integer :yale_container_id_0
+      Integer :yale_container_id_1
+
+      Integer :aspace_relationship_position
+
+      apply_mtime_columns(false)
     end
 
     alter_table(:yale_container_rlshp) do
-      add_foreign_key([:yale_container_id], :yale_container, :key => :id)
-      add_foreign_key([:instance_id], :instance, :key => :id)
+      add_foreign_key([:yale_container_id_0], :yale_container, :key => :id)
+      add_foreign_key([:yale_container_id_1], :yale_container, :key => :id)
     end
 
   end
