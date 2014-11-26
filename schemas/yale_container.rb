@@ -7,8 +7,8 @@
     "properties" => {
       "uri" => {"type" => "string", "required" => false},
 
-      "type" => {"type" => "string", "dynamic_enum" => "container_type", "required" => true},
-      "indicator" => {"type" => "string", "maxLength" => 255, "minLength" => 1, "required" => true },
+      "type" => {"type" => "string", "dynamic_enum" => "container_type", "ifmissing" => "error"},
+      "indicator" => {"type" => "string", "maxLength" => 255, "minLength" => 1, "ifmissing" => "error" },
 
       "parent" => {
         "type" => "object",
