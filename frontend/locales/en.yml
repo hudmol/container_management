@@ -9,3 +9,4 @@ en:
     _frontend:
       action:
         add: Add Yale Container
+        create: Create a Yale Container
