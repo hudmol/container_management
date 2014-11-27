@@ -10,6 +10,7 @@ class YaleContainersController < ApplicationController
 
 
   def new
+    @yale_container = JSONModel(:yale_container).new._always_valid!
   end
 
 

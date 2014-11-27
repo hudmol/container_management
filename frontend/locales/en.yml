@@ -1,12 +1,33 @@
 en:
-  yale_container:
+  plugins:
+    yale_containers:
+      label: Manage Yale Containers
+
+  yale_container: &yale_container_attributes
     type: Type
     indicator: Indicator
+    barcode: Barcode
+    voyager_id: Voyager ID
+    exported_to_voyager: Exported to Voyager?
+    restricted: Restricted?
 
     _singular: Yale Container
     _plural: Yale Containers
 
     _frontend:
+      section:
+        existing_container: Inside an Existing Container
+        container_1: Container 1
+        container_2: Container 2
+        container_3: Container 3
       action:
         add: Add Yale Container
         create: Create a Yale Container
+        save: Save Yale Container
+
+  yale_container_1:
+    <<: *yale_container_attributes
+  yale_container_2:
+    <<: *yale_container_attributes
+  yale_container_3:
+    <<: *yale_container_attributes

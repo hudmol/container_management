@@ -7,9 +7,11 @@
 
   exclude_ids = [] if exclude_ids.blank?
 
+  required = true if required.nil?
+
   linkable_types = ["yale_containers"]
 %>
-<div class="control-group required">
+<div class="control-group <% if required %>required<% end %>">
   <label class="control-label"><%= I18n.t("yale_container._singular") %></label>
   <div class="controls">
     <div class="input-append linker-wrapper">
