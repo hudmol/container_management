@@ -25,8 +25,13 @@ class YaleContainersController < ApplicationController
 
       if @yale_container_hierarchy._exceptions.blank?
         # save it
+        render :action => :new
       else
         @exceptions = @yale_container_hierarchy._exceptions
+        @yale_container_hierarchy.to_hash(:trusted)
+        @yale_container_hierarchy["ref"] = params["yale_container_hierarchy"]["ref"]
+        @yale_container_hierarchy["_resolved"] = ASUtils.json_parse(params["yale_container_hierarchy"]["_resolved"])
+
         render :action => :new
       end
     end

@@ -29,9 +29,6 @@ $(document).ready(function() {
   };
 
   function setupForms(yaleContainer) {
-    // Clean slate...
-    resetAllForms();
-
     // Find out what containers we have to work with...
     var container_1, container_2, container_3;
 
@@ -87,16 +84,25 @@ $(document).ready(function() {
     }
   };
 
-
   var $linker = $("#yale_container_hierarchy_ref_");
-  $linker.on("change", function(event) {
-    if ($linker.val() == "") {
-      resetAllForms()
-    } else {
+
+  function setupFormsFromLinker() {
+    if ($linker.val() != "") {
       var selectedYaleContainerJSON = $linker.tokenInput("get")[0];
       var recordJSON = JSON.parse(selectedYaleContainerJSON.json.json)
 
       setupForms(recordJSON);
     }
+  }
+
+
+  $linker.on("change", function(event) {
+    resetAllForms();
+
+    setupFormsFromLinker();
+  });
+
+  setTimeout(function() {
+    setupFormsFromLinker();
   });
 });
