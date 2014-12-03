@@ -1,6 +1,6 @@
 class YaleContainersController < ApplicationController
 
-  set_access_control  "view_repository" => [:index],
+  set_access_control  "view_repository" => [:index, :show],
                       "manage_yale_container" => [:new, :create, :batch_delete]
 
 
@@ -35,6 +35,11 @@ class YaleContainersController < ApplicationController
         render :action => :new
       end
     end
+  end
+
+
+  def show
+    @yale_container = JSONModel(:yale_container).find(params[:id])
   end
 
 

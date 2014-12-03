@@ -1,0 +1,23 @@
+<%= setup_context(:object => @yale_container, :title => @yale_container.display_string) %>
+
+<div class="row-fluid">
+  <div class="span3"></div>
+  <div class="span9">
+    <div class="record-pane">
+      <%= readonly_context :yale_container, @yale_container do |readonly| %>
+        <h2><%= @yale_container.display_string %> <span class="label label-info"><%= I18n.t("yale_container._singular") %></span></h2>
+
+        <%= render_aspace_partial :partial => "shared/flash_messages" %>
+
+        <% define_template "yale_container", jsonmodel_definition(:yale_container) do |form| %>
+          <%= readonly.label_and_select "type", readonly.possible_options_for("type", true) %>
+          <%= readonly.label_and_textarea "indicator" %>
+
+          <%= display_audit_info(@yale_container) %>
+        <% end %>
+
+        <% readonly.emit_template("yale_container") %>
+      <% end %>
+    </div>
+  </div>
+</div>
