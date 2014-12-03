@@ -17,9 +17,9 @@ en:
     _frontend:
       section:
         existing_container: Inside an Existing Container
-        container_1: Container 1
-        container_2: Container 2
-        container_3: Container 3
+        yale_container_1: Container 1
+        yale_container_2: Container 2
+        yale_container_3: Container 3
       action:
         add: Add Yale Container
         create: Create a Yale Container

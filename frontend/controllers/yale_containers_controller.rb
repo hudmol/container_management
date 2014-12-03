@@ -1,7 +1,7 @@
 class YaleContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:index],
-                      "manage_yale_container" => [:new, :batch_delete]
+                      "manage_yale_container" => [:new, :create, :batch_delete]
 
 
   def index
@@ -10,11 +10,26 @@ class YaleContainersController < ApplicationController
 
 
   def new
-    @yale_container = JSONModel(:yale_container).new._always_valid!
+    @yale_container_hierarchy = JSONModel(:yale_container_hierarchy).new._always_valid!
+    @yale_container_hierarchy["yale_container_1"] = JSONModel(:yale_container).new._always_valid!
+    @yale_container_hierarchy["yale_container_2"] = JSONModel(:yale_container).new._always_valid!
+    @yale_container_hierarchy["yale_container_2"] = JSONModel(:yale_container).new._always_valid!
   end
 
 
   def create
+    begin
+      values = cleanup_params_for_schema(params["yale_container_hierarchy"], JSONModel(:yale_container_hierarchy).schema)
+
+      @yale_container_hierarchy = JSONModel(:yale_container_hierarchy).from_hash(values, false)
+
+      if @yale_container_hierarchy._exceptions.blank?
+        # save it
+      else
+        @exceptions = @yale_container_hierarchy._exceptions
+        render :action => :new
+      end
+    end
   end
 
 

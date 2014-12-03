@@ -1,14 +1,14 @@
 <%= render(:layout => '/shared/sidebar',
            :locals => {
              :record_type => 'yale_container',
-             :record => @yale_container,
+             :record => @yale_container_hierarchy,
              :suppress_basic_information => true
            }) do |sidebar| %>
 
   <%= render_aspace_partial :partial => '/shared/sidebar_entry', :locals => {:anchor => "existing_container", :record_type => "yale_container", :subrecord_type => "existing_container"} %>
-  <%= render_aspace_partial :partial => '/shared/sidebar_entry', :locals => {:anchor => "container_1", :record_type => "yale_container", :subrecord_type => "container_1"} %>
-  <%= render_aspace_partial :partial => '/shared/sidebar_entry', :locals => {:anchor => "container_2", :record_type => "yale_container", :subrecord_type => "container_2"} %>
-  <%= render_aspace_partial :partial => '/shared/sidebar_entry', :locals => {:anchor => "container_3", :record_type => "yale_container", :subrecord_type => "container_3"} %>
+  <%= render_aspace_partial :partial => '/shared/sidebar_entry', :locals => {:anchor => "container_1", :record_type => "yale_container", :subrecord_type => "yale_container_1"} %>
+  <%= render_aspace_partial :partial => '/shared/sidebar_entry', :locals => {:anchor => "container_2", :record_type => "yale_container", :subrecord_type => "yale_container_2"} %>
+  <%= render_aspace_partial :partial => '/shared/sidebar_entry', :locals => {:anchor => "container_3", :record_type => "yale_container", :subrecord_type => "yale_container_3"} %>
 
 
 <% end %>
