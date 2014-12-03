@@ -24,15 +24,15 @@ class YaleContainersController < ApplicationController
       @yale_container_hierarchy = JSONModel(:yale_container_hierarchy).from_hash(values, false)
 
       if @yale_container_hierarchy._exceptions.blank?
-        # save it
-        render :action => :new
-      else
-        @exceptions = @yale_container_hierarchy._exceptions
-        @yale_container_hierarchy.to_hash(:trusted)
-        @yale_container_hierarchy["ref"] = params["yale_container_hierarchy"]["ref"]
-        @yale_container_hierarchy["_resolved"] = ASUtils.json_parse(params["yale_container_hierarchy"]["_resolved"])
+        begin
+          @yale_container_hierarchy.save
+        rescue JSONModel::ValidationException => ex
+          handle_error
+        end
 
-        render :action => :new
+        redirect_to(:controller => :yale_containers, :action => :index)
+      else
+        handle_error
       end
     end
   end
@@ -40,6 +40,19 @@ class YaleContainersController < ApplicationController
 
   def show
     @yale_container = JSONModel(:yale_container).find(params[:id])
+  end
+
+
+  def handle_error
+    @exceptions = @yale_container_hierarchy._exceptions
+
+    @yale_container_hierarchy["ref"] = params["yale_container_hierarchy"]["ref"]
+
+    if params["yale_container_hierarchy"] && params["yale_container_hierarchy"]["_resolved"]
+      @yale_container_hierarchy["_resolved"] = ASUtils.json_parse(params["yale_container_hierarchy"]["_resolved"])
+    end
+
+    render :action => :new
   end
 
 
