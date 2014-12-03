@@ -48,4 +48,33 @@ class YaleContainer < Sequel::Model(:yale_container)
     end
   end
 
+
+  def self.from_hierarchy(hierarchy)
+    created = []
+    parent_uri = nil
+
+    (1..3).each do |container_number|
+      prop = :"yale_container_#{container_number}"
+
+      break unless hierarchy[prop]
+      new_container_definition = hierarchy[prop]
+
+      if new_container_definition.is_a?(String)
+        # A reference to an existing container
+        parent_uri = new_container_definition
+      else
+        # Set the parent
+        parent_ref = parent_uri ? {'parent' => {'ref' => parent_uri}} : {}
+
+        json = JSONModel(:yale_container).from_hash(new_container_definition.merge(parent_ref))
+        new_container = self.create_from_json(json)
+
+        parent_uri = new_container.uri
+        created << new_container
+      end
+    end
+
+    created
+  end
+
 end

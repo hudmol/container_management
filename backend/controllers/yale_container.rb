@@ -1,5 +1,23 @@
 class ArchivesSpaceService < Sinatra::Base
 
+
+  Endpoint.post('/repositories/:repo_id/yale_containers/hierarchy')
+    .description("Create a yale container hierarchy")
+    .params(["hierarchy", JSONModel(:yale_container_hierarchy), "The hierarchy of records to create", :body => true],
+            ["repo_id", :repo_id])
+    .permissions([:manage_yale_container])
+    .returns([200, :created]) \
+  do
+    created = YaleContainer.from_hierarchy(params[:hierarchy])
+
+    [
+      200,
+      {'Content-Type' => 'application/json'},
+      {:status => 'Created', :uris => created.map {|yc| yc.uri}}.to_json + "\n"
+    ]
+  end
+
+
   Endpoint.post('/repositories/:repo_id/yale_containers/:id')
     .description("Update a yale container")
     .params(["id", :id],
@@ -57,5 +75,6 @@ class ArchivesSpaceService < Sinatra::Base
   do
     handle_delete(YaleContainer, params[:id])
   end
+
 
 end

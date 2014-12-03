@@ -27,4 +27,53 @@ describe 'Yale Container model' do
   end
 
 
+  it "can create a container from a hierarchy" do
+    hierarchy = JSONModel(:yale_container_hierarchy).from_hash(
+      :yale_container_1 => build(:json_yale_container),
+      :yale_container_2 => build(:json_yale_container),
+      :yale_container_3 => build(:json_yale_container)
+    )
+
+    created = YaleContainer.from_hierarchy(hierarchy)
+
+    created.length.should eq(3)
+
+    created.map(&:class).uniq.should eq([YaleContainer])
+  end
+
+
+  it "can reuse existing Yale Containers as required (create only the missing ones)" do
+    yale_box_container = build(:json_yale_container, {})
+    box = YaleContainer.create_from_json(yale_box_container, :repo_id => $repo_id)
+
+
+    hierarchy = JSONModel(:yale_container_hierarchy).from_hash(
+      :yale_container_1 => box.uri,
+      :yale_container_2 => build(:json_yale_container),
+      :yale_container_3 => build(:json_yale_container)
+    )
+
+    created = YaleContainer.from_hierarchy(hierarchy)
+
+    created.length.should eq(2)
+    created[0].parent_id.should eq(box.id)
+  end
+
+
+  it "can deal with creating under three containers" do
+    yale_box_container = build(:json_yale_container, {})
+    box = YaleContainer.create_from_json(yale_box_container, :repo_id => $repo_id)
+
+
+    hierarchy = JSONModel(:yale_container_hierarchy).from_hash(
+      :yale_container_1 => box.uri,
+      :yale_container_2 => build(:json_yale_container),
+    )
+
+    created = YaleContainer.from_hierarchy(hierarchy)
+
+    created.length.should eq(1)
+  end
+
+
 end
