@@ -1,0 +1,8 @@
+<%= form_for @yale_container_hierarchy, :as => "yale_container_hierarchy", :url => {:action => :create}, :html => {:class => 'form-horizontal aspace-record-form', :id => "new_yale_container_form"} do |f| %>
+  <%= form_context :yale_container_hierarchy, @yale_container_hierarchy do |form| %>
+    <%= hidden_field "inline", "true" %>
+    <%= render_aspace_partial :partial => "hierarchy_form", :locals => {:form => form} %>
+  <% end %>
+<% end %>
+
+<script src="<%= "#{AppConfig[:frontend_prefix]}assets/yale_containers.new.js" %>"></script>
