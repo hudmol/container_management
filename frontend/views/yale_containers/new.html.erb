@@ -22,7 +22,7 @@
           </section>
 
           <% define_template("yale_container_ref", jsonmodel_definition(:yale_container)) do |form| %>
-            <%= form.hidden_input "yale_container_${index}" %>
+            <%= form.hidden_input "yale_container_${index}", "${yale_container.uri}" %>
             <div class="control-group token-list">
               <label class="control-label">Yale Container</label>
               <div class="controls">
