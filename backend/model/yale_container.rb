@@ -25,6 +25,17 @@ class YaleContainer < Sequel::Model(:yale_container)
     super(json, opts.merge(:parent_id => parent_id))
   end
 
+  def display_string
+    display_string = "#{I18n.t("enumerations.container_type.#{self.type}")} #{self.indicator}"
+
+    if self.parent_id
+      parent = YaleContainer[self.parent_id]
+      display_string << " / #{parent.display_string}"
+    end
+
+    display_string
+  end
+
 
   def self.sequel_to_jsonmodel(objs, opts = {})
     jsons = super
@@ -33,6 +44,7 @@ class YaleContainer < Sequel::Model(:yale_container)
       if obj.parent_id
         json['parent'] = {'ref' => uri_for(:yale_container, obj.parent_id)}
       end
+      json['display_string'] = obj.display_string
     end
 
     jsons

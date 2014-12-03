@@ -1,6 +1,6 @@
 <%= setup_context(:object => @yale_container_hierarchy, :controller => :yale_containers, :type => :yale_container) %>
 
-<%= form_for @yale_container_hierarchy, :as => "yale_container_hierarchy", :url => {:controller => :yale_containers, :action => :create}, :html => {:class => 'form-horizontal aspace-record-form', :id => "yale_container_form"} do |f| %>
+<%= form_for @yale_container_hierarchy, :as => "yale_container_hierarchy", :url => {:controller => :yale_containers, :action => :create}, :html => {:class => 'form-horizontal aspace-record-form', :id => "new_yale_container_form"} do |f| %>
   <%= form_context :yale_container_hierarchy, @yale_container_hierarchy do |form| %>
     <div class="row-fluid">
       <div class="span3">
@@ -21,49 +21,69 @@
             </div>
           </section>
 
+          <% define_template("yale_container_ref", jsonmodel_definition(:yale_container)) do |form| %>
+            <%= form.hidden_input "yale_container_${index}" %>
+            <div class="control-group token-list">
+              <label class="control-label">Yale Container</label>
+              <div class="controls">
+                <%= render_token :object => {},
+                                 :label => "${yale_container.display_string}",
+                                 :type => "yale_container",
+                                 :uri => "${yale_container.uri}" %>
+              </div>
+            </div>
+          <% end %>
+
           <% define_template("yale_container_top_level", jsonmodel_definition(:yale_container)) do |form| %>
+            <%= form.label_and_select "type", form.possible_options_for('type', true), :required => false %>
+            <%= form.label_and_textfield("indicator", :required => false) %>
+            <% form.push("metadata", form.obj["metadata"] || {}) do %>
+              <%= form.label_and_textfield("barcode") %>
+              <%= form.label_and_textfield("voyager_id") %>
+              <%= form.label_and_boolean("exported_to_voyager") %>
+              <%= form.label_and_boolean("restricted") %>
+              <div class="subrecord-form-container">
+                <%= render_aspace_partial :partial => "shared/subrecord_form", :locals => {:form => form, :name => "container_locations", :heading_size => "h5"} %>
+              </div>
+            <% end %>
+          <% end %>
+
+          <% define_template("yale_container_child", jsonmodel_definition(:yale_container)) do |form| %>
+            <%= form.label_and_select "type", form.possible_options_for('type', true), :required => false %>
+            <%= form.label_and_textfield("indicator", :required => false) %>
+          <% end %>
+
+          <% form.push("yale_container_1", form.obj["yale_container_1"] || {}) do %>
             <section id="container_top_level" class="subrecord-form-dummy">
               <h3><%= I18n.t "yale_container._frontend.section.yale_container_1" %></h3>
               <div class="subrecord-form-container">
                 <div class="subrecord-form-fields">
-                  <%= form.label_and_select "type", form.possible_options_for('type', true), :required => false %>
-                  <%= form.label_and_textfield("indicator", :required => false) %>
-                  <% form.push("metadata", form.obj["metadata"] || {}) do %>
-                    <%= form.label_and_textfield("barcode") %>
-                    <%= form.label_and_textfield("voyager_id") %>
-                    <%= form.label_and_boolean("exported_to_voyager") %>
-                    <%= form.label_and_boolean("restricted") %>
-                    <div class="subrecord-form-container">
-                      <%= render_aspace_partial :partial => "shared/subrecord_form", :locals => {:form => form, :name => "container_locations", :heading_size => "h5"} %>
-                    </div>
-                  <% end %>
+                  <% form.emit_template("yale_container_top_level") %>
                 </div>
               </div>
             </section>
-          <% end %>
-
-          <% define_template("yale_container_child", jsonmodel_definition(:yale_container)) do |form, opts = {}| %>
-            <section id="container_child_<%= opts[:index] %>" class="subrecord-form-dummy">
-              <h3><%= I18n.t "yale_container._frontend.section.yale_container_#{opts[:index]}" %></h3>
-              <div class="subrecord-form-container">
-                <div class="subrecord-form-fields">
-                  <%= form.label_and_select "type", form.possible_options_for('type', true), :required => false %>
-                  <%= form.label_and_textfield("indicator", :required => false) %>
-                </div>
-              </div>
-            </section>
-          <% end %>
-
-          <% form.push("yale_container_1", form.obj["yale_container_1"] || {}) do %>
-            <% form.emit_template("yale_container_top_level") %>
           <% end %>
 
           <% form.push("yale_container_2", form.obj["yale_container_2"] || {}) do %>
-            <% form.emit_template("yale_container_child", :index => 1) %>
+            <section id="container_child_1" class="subrecord-form-dummy">
+              <h3><%= I18n.t "yale_container._frontend.section.yale_container_2" %></h3>
+              <div class="subrecord-form-container">
+                <div class="subrecord-form-fields">
+                  <% form.emit_template("yale_container_child", :index => 1) %>
+                </div>
+              </div>
+            </section>
           <% end %>
 
           <% form.push("yale_container_3", form.obj["yale_container_3"] || {}) do %>
-            <% form.emit_template("yale_container_child", :index => 2) %>
+            <section id="container_child_2" class="subrecord-form-dummy">
+              <h3><%= I18n.t "yale_container._frontend.section.yale_container_3" %></h3>
+              <div class="subrecord-form-container">
+                <div class="subrecord-form-fields">
+                  <% form.emit_template("yale_container_child", :index => 1) %>
+                </div>
+              </div>
+            </section>
           <% end %>
 
           <div class="form-actions">
