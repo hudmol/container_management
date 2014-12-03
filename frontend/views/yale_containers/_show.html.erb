@@ -1,0 +1,10 @@
+<div class="control-group token-list">
+  <label class="control-label"><%= I18n.t("yale_container._singular") %></label>
+  <div class="controls">
+    <%= render_token :object => yale_container["_resolved"],
+                     :label => yale_container["_resolved"]["display_string"],
+                     :type => "yale_container",
+                     :uri => yale_container["ref"] %>
+  </div>
+</div>
+<br><br><!-- add these so the "view" popup isn't hidden -->
