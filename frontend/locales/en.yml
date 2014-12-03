@@ -25,9 +25,7 @@ en:
         create: Create a Yale Container
         save: Save Yale Container
 
-  yale_container_1:
+  yale_container_top_level:
     <<: *yale_container_attributes
-  yale_container_2:
-    <<: *yale_container_attributes
-  yale_container_3:
+  yale_container_child:
     <<: *yale_container_attributes

@@ -13,7 +13,7 @@ class YaleContainersController < ApplicationController
     @yale_container_hierarchy = JSONModel(:yale_container_hierarchy).new._always_valid!
     @yale_container_hierarchy["yale_container_1"] = JSONModel(:yale_container).new._always_valid!
     @yale_container_hierarchy["yale_container_2"] = JSONModel(:yale_container).new._always_valid!
-    @yale_container_hierarchy["yale_container_2"] = JSONModel(:yale_container).new._always_valid!
+    @yale_container_hierarchy["yale_container_3"] = JSONModel(:yale_container).new._always_valid!
   end
 
 

@@ -22,7 +22,7 @@
           </section>
 
           <% define_template("yale_container_top_level", jsonmodel_definition(:yale_container)) do |form| %>
-            <section id="container_1" class="subrecord-form-dummy">
+            <section id="container_top_level" class="subrecord-form-dummy">
               <h3><%= I18n.t "yale_container._frontend.section.yale_container_1" %></h3>
               <div class="subrecord-form-container">
                 <div class="subrecord-form-fields">
@@ -42,9 +42,9 @@
             </section>
           <% end %>
 
-          <% define_template("yale_container_child", jsonmodel_definition(:yale_container)) do |form| %>
-            <section id="container_child" class="subrecord-form-dummy">
-              <h3><%= I18n.t "yale_container._frontend.section.yale_container_2" %></h3>
+          <% define_template("yale_container_child", jsonmodel_definition(:yale_container)) do |form, opts = {}| %>
+            <section id="container_child_<%= opts[:index] %>" class="subrecord-form-dummy">
+              <h3><%= I18n.t "yale_container._frontend.section.yale_container_#{opts[:index]}" %></h3>
               <div class="subrecord-form-container">
                 <div class="subrecord-form-fields">
                   <%= form.label_and_select "type", form.possible_options_for('type', true), :required => false %>
@@ -54,16 +54,16 @@
             </section>
           <% end %>
 
-          <% form.push("yale_container_1", form.obj["yale_container_1"]) do %>
-            <% form.emit_template("yale_container_top_level", @yale_container_hierarchy["yale_container_1"]) %>
+          <% form.push("yale_container_1", form.obj["yale_container_1"] || {}) do %>
+            <% form.emit_template("yale_container_top_level") %>
           <% end %>
 
-          <% form.push("yale_container_2", form.obj["yale_container_2"]) do %>
-            <% form.emit_template("yale_container_child", @yale_container_hierarchy["yale_container_2"]) %>
+          <% form.push("yale_container_2", form.obj["yale_container_2"] || {}) do %>
+            <% form.emit_template("yale_container_child", :index => 1) %>
           <% end %>
 
-          <% form.push("yale_container_3", form.obj["yale_container_3"]) do %>
-            <% form.emit_template("yale_container_child", @yale_container_hierarchy["yale_container_3"]) %>
+          <% form.push("yale_container_3", form.obj["yale_container_3"] || {}) do %>
+            <% form.emit_template("yale_container_child", :index => 2) %>
           <% end %>
 
           <div class="form-actions">
