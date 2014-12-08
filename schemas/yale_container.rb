@@ -29,6 +29,8 @@
       "exported_to_voyager" => {"type" => "boolean", "default" => false},
       "restricted" => {"type" => "boolean", "default" => false},
 
+      "level" => {"type" => "integer", "readonly" => true},
+
       "container_locations" => {
         "type" => "array",
         "items" => {

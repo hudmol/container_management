@@ -40,13 +40,32 @@ class YaleContainer < Sequel::Model(:yale_container)
   end
 
 
+  def self.calculate_levels(objs)
+    return {} if objs.empty?
+
+    parents = self.filter(:id => objs.map(&:parent_id).compact)
+    parent_levels = calculate_levels(parents)
+
+    result = {}
+
+    objs.each {|obj|
+      result[obj.id] = parent_levels.fetch(obj.parent_id, 0) + 1
+    }
+
+    result
+  end
+
+
   def self.sequel_to_jsonmodel(objs, opts = {})
     jsons = super
+
+    levels = calculate_levels(objs)
 
     jsons.zip(objs).each do |json, obj|
       if obj.parent_id
         json['parent'] = {'ref' => uri_for(:yale_container, obj.parent_id)}
       end
+      json['level'] = levels.fetch(obj.id)
       json['display_string'] = obj.display_string
     end
 

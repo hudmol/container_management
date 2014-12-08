@@ -24,6 +24,10 @@ describe 'Yale Container model' do
 
     folder.parent["ref"].should eq(box.uri)
     reel.parent["ref"].should eq(folder.uri)
+
+    box.level.should eq(1)
+    folder.level.should eq(2)
+    reel.level.should eq(3)
   end
 
 
