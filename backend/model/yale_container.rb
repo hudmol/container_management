@@ -39,8 +39,13 @@ class YaleContainer < Sequel::Model(:yale_container)
   end
 
 
+  def format_barcode
+    self.barcode ? "[#{self.barcode}]" : ""
+  end
+
+
   def display_string
-    display_string = "#{I18n.t("enumerations.container_type.#{self.type}")} #{self.indicator}"
+    display_string = "#{I18n.t("enumerations.container_type.#{self.type}")} #{self.indicator} #{self.format_barcode}".strip
 
     if self.parent_id
       parent = YaleContainer[self.parent_id]

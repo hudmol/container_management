@@ -151,4 +151,11 @@ describe 'Yale Container model' do
       }.to raise_error(ValidationException)
   end
 
+
+  it "displays barcodes in the display string" do
+    obj = create(:json_yale_container, :type => "box", :indicator => "1", :barcode => "1234")
+
+    YaleContainer.to_jsonmodel(obj.id).display_string.should eq("Box 1 [1234]")
+  end
+
 end
