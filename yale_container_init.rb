@@ -11,5 +11,13 @@ module JSONModel
       end
     end
 
+    JSONModel(:yale_container).add_validation("top_level_yale_container_must_have_barcode") do |hash|
+      if hash['parent'].nil? && hash['barcode'].nil?
+        [["barcode", "You must provide a barcode for top-level containers"]]
+      else
+        []
+      end
+    end
+
   end
 end

@@ -7,6 +7,17 @@ class YaleContainer < Sequel::Model(:yale_container)
 
   set_model_scope :repository
 
+
+  def validate
+    validates_unique([:repo_id, :barcode],
+                     :message => "A barcode must be unique within a repository")
+    map_validation_to_json_property([:repo_id, :barcode], :barcode)
+
+    super
+  end
+
+
+
   def self.create_from_json(json, opts = {})
     parent = get_parent(json)
     parent_id = parent ? parent.id : nil

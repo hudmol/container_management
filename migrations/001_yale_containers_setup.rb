@@ -4,15 +4,18 @@ Sequel.migration do
 
     create_table(:yale_container) do
       primary_key :id
+
+      Integer :repo_id, :null => false
+
       Integer :lock_version, :default => 0, :null => false
       Integer :json_schema_version, :null => false
 
       Integer :parent_id, :null => true
 
-      String :barcode, :null => false
-      String :voyager_id, :null => false
-      Integer :exported_to_voyager, :null => false
-      Integer :restricted, :null => false
+      String :barcode
+      String :voyager_id
+      Integer :exported_to_voyager, :default => 0
+      Integer :restricted, :default => 0
 
       DynamicEnum :type_id, :null => false
       String :indicator, :null => false
@@ -22,6 +25,7 @@ Sequel.migration do
 
     alter_table(:yale_container) do
       add_foreign_key([:parent_id], :yale_container, :key => :id)
+      add_unique_constraint([:repo_id, :barcode], :name => "yale_uniq_barcode")
     end
 
 

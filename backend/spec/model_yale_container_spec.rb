@@ -120,4 +120,35 @@ describe 'Yale Container model' do
   end
 
 
+  it "blows up if you don't provide a barcode for a top-level element" do
+    expect {
+      create(:json_yale_container, :barcode => nil)
+    }.to raise_error(ValidationException)
+  end
+
+
+  it "lets you create a child container without a barcode" do
+    # Box
+    yale_box_container = build(:json_yale_container, {})
+    box_id = YaleContainer.create_from_json(yale_box_container, :repo_id => $repo_id).id
+    box_uri = JSONModel(:yale_container).uri_for(box_id)
+
+    # Folder
+    yale_folder_container = build(:json_yale_container, {"parent" => {"ref" => box_uri},
+                                                         "barcode" => nil})
+
+    expect {
+      YaleContainer.create_from_json(yale_folder_container, :repo_id => $repo_id)
+    }.to_not raise_error
+  end
+
+
+  it "enforces barcode uniqueness within a repository" do
+      create(:json_yale_container, :barcode => "1234")
+
+      expect {
+        create(:json_yale_container, :barcode => "1234")
+      }.to raise_error(ValidationException)
+  end
+
 end
