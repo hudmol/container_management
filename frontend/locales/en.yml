@@ -10,6 +10,7 @@ en:
     voyager_id: Voyager ID
     exported_to_voyager: Exported to Voyager?
     restricted: Restricted?
+    parent: Parent Container
 
     _singular: Yale Container
     _plural: Yale Containers
@@ -29,3 +30,7 @@ en:
     <<: *yale_container_attributes
   yale_container_child:
     <<: *yale_container_attributes
+
+  validation_errors:
+    you_must_provide_a_barcode_for_top-level_containers: You mush provide a barcode for top-level containers
+    a_barcode_must_be_unique_within_a_repository: A barcode must be unique within a repository

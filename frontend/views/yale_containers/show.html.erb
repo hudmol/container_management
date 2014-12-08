@@ -25,6 +25,16 @@
                 <%= render_aspace_partial :partial => "container_locations/show", :locals => { :container_locations => @yale_container["container_locations"] } %>
               </section>
             <% end %>
+          <% else %>
+            <div class="control-group token-list">
+              <label class="control-label"><%= I18n.t("yale_container.parent")%></label>
+              <div class="controls label-only">
+                <%= render_token :object => {},
+                                 :label => @yale_container['parent']['_resolved']['display_string'],
+                                 :type => "yale_container",
+                                 :uri =>  @yale_container['parent']['ref'] %>
+              </div>
+            </div>
           <% end %>
 
           <hr>
