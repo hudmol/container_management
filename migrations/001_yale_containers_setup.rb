@@ -48,7 +48,7 @@ Sequel.migration do
       Integer :location_id
       Integer :aspace_relationship_position
 
-      String :jsonmodel_type, :null => false
+      String :jsonmodel_type, :null => false, :default => 'container_location'
 
       String :status
       Date :start_date

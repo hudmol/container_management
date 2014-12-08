@@ -23,24 +23,31 @@ class YaleContainersController < ApplicationController
     begin
       values = cleanup_params_for_schema(params["yale_container_hierarchy"], JSONModel(:yale_container_hierarchy).schema)
 
+      if values["yale_container_3"].values.all?(&:blank?)
+        values.delete("yale_container_3")
+
+        values.delete("yale_container_2") if values["yale_container_2"].values.all?(&:blank?)
+      end
+
       @yale_container_hierarchy = JSONModel(:yale_container_hierarchy).from_hash(values, false)
 
       if @yale_container_hierarchy._exceptions.blank?
         begin
           result = @yale_container_hierarchy.save({}, true)
 
-          if inline?
-            if result["uris"].length > 0
-              yale_container_uri = result["uris"].last
-            else
-              # if we didn't create a container then we just take the third container
-              yale_container_uri = @yale_container_hierarchy["yale_container_3"]
-            end
+          if result["uris"].length > 0
+            yale_container_uri = result["uris"].last
+          else
+            # if we didn't create a container then we just take the third container
+            yale_container_uri = @yale_container_hierarchy["yale_container_3"]
+          end
 
-            yale_container_id = JSONModel(:yale_container).id_for(yale_container_uri)
+          yale_container_id = JSONModel(:yale_container).id_for(yale_container_uri)
+
+          if inline?
             render :json => JSONModel(:yale_container).find(yale_container_id)
           else
-            redirect_to(:controller => :yale_containers, :action => :index)
+            redirect_to(:controller => :yale_containers, :action => :show, :id => yale_container_id)
           end
         rescue JSONModel::ValidationException => ex
           handle_error
@@ -53,7 +60,7 @@ class YaleContainersController < ApplicationController
 
 
   def show
-    @yale_container = JSONModel(:yale_container).find(params[:id])
+    @yale_container = JSONModel(:yale_container).find(params[:id], find_opts)
   end
 
 
