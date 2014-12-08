@@ -1,6 +1,8 @@
 class YaleContainer < Sequel::Model(:yale_container)
   include ASModel
 
+  include Relationships
+
   corresponds_to JSONModel(:yale_container)
 
   set_model_scope :repository
@@ -24,6 +26,7 @@ class YaleContainer < Sequel::Model(:yale_container)
 
     super(json, opts.merge(:parent_id => parent_id))
   end
+
 
   def display_string
     display_string = "#{I18n.t("enumerations.container_type.#{self.type}")} #{self.indicator}"
@@ -88,5 +91,26 @@ class YaleContainer < Sequel::Model(:yale_container)
 
     created
   end
+
+
+  define_relationship(:name => :yale_container_housed_at,
+                      :json_property => 'container_locations',
+                      :contains_references_to_types => proc {[Location]},
+                      :class_callback => proc { |clz|
+                        clz.instance_eval do
+                          plugin :validation_helpers
+
+                          define_method(:validate) do
+                            if self[:status] === "previous" && !Location[self[:location_id]].temporary
+                              errors.add("container_locations/#{self[:aspace_relationship_position]}/status",
+                                         "cannot be previous if Location is not temporary")
+                            end
+
+                            super
+                          end
+
+                        end
+                      })
+
 
 end
