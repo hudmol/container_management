@@ -158,4 +158,16 @@ describe 'Yale Container model' do
     YaleContainer.to_jsonmodel(obj.id).display_string.should eq("Box 1 [1234]")
   end
 
+  it "validates hierarchies correctly" do
+    hierarchy = JSONModel(:yale_container_hierarchy).from_hash(
+      :yale_container_1 => build(:json_yale_container, :barcode => nil),
+    )
+
+    begin
+      YaleContainer.from_hierarchy(hierarchy)
+    rescue Sequel::ValidationFailed => e
+      e.errors.keys.first.should eq("yale_container_1/barcode")
+    end
+  end
+
 end

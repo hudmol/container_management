@@ -122,7 +122,14 @@ class YaleContainer < Sequel::Model(:yale_container)
         parent_ref = parent_uri ? {'parent' => {'ref' => parent_uri}} : {}
 
         json = JSONModel(:yale_container).from_hash(new_container_definition.merge(parent_ref))
-        new_container = self.create_from_json(json)
+
+        begin
+          new_container = self.create_from_json(json)
+        rescue Sequel::ValidationFailed => e
+          new_errors = Hash[e.errors.map {|field, error| ["yale_container_#{container_number}/#{field}", error]}]
+          e.errors.replace(new_errors)
+          raise e
+        end
 
         parent_uri = new_container.uri
         created << new_container
