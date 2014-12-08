@@ -13,9 +13,14 @@ class YaleContainer < Sequel::Model(:yale_container)
                      :message => "A barcode must be unique within a repository")
     map_validation_to_json_property([:repo_id, :barcode], :barcode)
 
-    super
-  end
 
+    if parent_id.nil? && barcode.nil?
+      errors.add("barcode", "You must provide a barcode for top-level containers")
+    end
+
+    super
+
+  end
 
 
   def self.create_from_json(json, opts = {})
