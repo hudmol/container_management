@@ -12,6 +12,11 @@ en:
     restricted: Restricted?
     parent: Parent Container
 
+    yale_container_2_type: Child Container Type
+    yale_container_2_indicator: Child Container Indicator
+    yale_container_3_type: Grandchild Container Type
+    yale_container_3_indicator: Grandchild Container Indicator
+
     _singular: Yale Container
     _plural: Yale Containers
 
@@ -25,11 +30,6 @@ en:
         add: Add Yale Container
         create: Create a Yale Container
         save: Save Yale Container
-
-  yale_container_top_level:
-    <<: *yale_container_attributes
-  yale_container_child:
-    <<: *yale_container_attributes
 
   validation_errors:
     you_must_provide_a_barcode_for_top-level_containers: You mush provide a barcode for top-level containers

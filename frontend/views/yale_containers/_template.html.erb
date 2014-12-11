@@ -1,5 +1,51 @@
 <% define_template "yale_container", jsonmodel_definition(:yale_container) do |form| %>
   <div>
-    <%= render_aspace_partial :partial => "yale_containers/linker", :locals => {:form => form} %>
+    <% form.push("yale_container_hierarchy", form.obj["yale_container_hierarchy"] || {}) do %>
+
+      <hr/>
+
+      <% form.push("yale_container_1", form.obj["yale_container_1"] || {}) do %>
+        <%= render_aspace_partial :partial => "yale_containers/linker", :locals => {:form => form, :label => "Parent Container"} %>
+      <% end %>
+
+      <hr/>
+
+      <% form.push("yale_container_2", form.obj["yale_container_2"] || {}) do %>
+        <%= form.label_and_select "yale_container_2_type",
+                                  form.possible_options_for('type', true),
+                                  {
+                                    :label_opts => {:id => form.id_for("type")},
+                                    :id => form.path("type")
+                                  }
+        %>
+        <%= form.label_and_textfield  "yale_container_2_indicator",
+                                      {
+                                        :label_opts => {:id => form.id_for("indicator")},
+                                        :id => form.id_for("indicator"),
+                                        :name => form.path("indicator")
+                                      }
+        %>
+      <% end %>
+
+      <hr/>
+
+      <% form.push("yale_container_3", form.obj["yale_container_3"] || {}) do %>
+        <%= form.label_and_select "yale_container_3_type",
+                                  form.possible_options_for('type', true),
+                                  {
+                                    :label_opts => {:id => form.id_for("type")},
+                                    :id => form.path("type")
+                                  }
+        %>
+        <%= form.label_and_textfield  "yale_container_3_indicator",
+                                      {
+                                        :label_opts => {:id => form.id_for("indicator")},
+                                        :id => form.id_for("indicator"),
+                                        :name => form.path("indicator")
+                                      }
+        %>
+      <% end %>
+
+    <% end %>
   </div>
 <% end %>

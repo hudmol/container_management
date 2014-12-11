@@ -1,0 +1,19 @@
+<%= render_aspace_partial :partial => "shared/form_messages", :locals => {:object => @yale_container, :form => form} %>
+
+
+<% define_template("yale_container", jsonmodel_definition(:yale_container)) do |form| %>
+  <%= form.label_and_select "type", form.possible_options_for('type', true), :required => false %>
+  <%= form.label_and_textfield("indicator", :required => false) %>
+
+  <%= form.label_and_textfield("barcode") %>
+  <%= form.label_and_textfield("voyager_id") %>
+  <%= form.label_and_boolean("exported_to_voyager") %>
+  <%= form.label_and_boolean("restricted") %>
+
+  <div class="subrecord-form-container">
+    <%= render_aspace_partial :partial => "shared/subrecord_form", :locals => {:form => form, :name => "container_locations"} %>
+  </div>
+<% end %>
+
+
+<% form.emit_template("yale_container") %>

@@ -12,9 +12,10 @@
   required = true if required.nil?
 
   linkable_types = ["yale_container"]
+  label = I18n.t("yale_container._singular") if label.nil?
 %>
 <div class="control-group <% if required %>required<% end %>">
-  <label class="control-label"><%= I18n.t("yale_container._singular") %></label>
+  <label class="control-label"><%= label %></label>
   <div class="controls">
     <div class="input-append linker-wrapper">
       <input type="text" class="linker"
