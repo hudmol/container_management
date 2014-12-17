@@ -67,6 +67,47 @@ Sequel.migration do
       add_foreign_key([:location_id], :location, :key => :id)
     end
 
+    create_table(:container_profile) do
+      primary_key :id
+
+      Integer :repo_id, :null => false
+      Integer :lock_version, :default => 0, :null => false
+      
+      String :name                     # unique
+      String :url, :null => true       # optional
+
+      String :extent_dimension         # enum (‘height’, ‘width’, ‘depth’)
+      DynamicEnum :dimension_units_id  # default ‘inches’
+
+      String :height                   # validates as float
+      String :width                    # validates as float
+      String :depth                    # validates as float
+
+      apply_mtime_columns
+    end
+
+    alter_table(:container_profile) do
+      add_unique_constraint([:name], :name => "container_profile_name_uniq")
+    end
+
+    create_enum("dimension_units", ["inches", "feet", "yards", "millimeters", "centimeters", "meters"])
+    
+    create_table(:yale_container_profile_rlshp) do
+      primary_key :id
+
+      Integer :yale_container_id
+      Integer :container_profile_id
+      Integer :aspace_relationship_position
+
+      apply_mtime_columns(false)
+    end
+
+    alter_table(:yale_container_profile_rlshp) do
+      add_foreign_key([:yale_container_id], :yale_container, :key => :id)
+      add_foreign_key([:container_profile_id], :container_profile, :key => :id)
+    end
+
+
   end
 
   down do

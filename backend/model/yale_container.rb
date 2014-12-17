@@ -159,5 +159,9 @@ class YaleContainer < Sequel::Model(:yale_container)
                         end
                       })
 
-
+  define_relationship(:name => :yale_container_profile,
+                      :json_property => 'container_profile',
+                      :contains_references_to_types => proc {[ContainerProfile]},
+                      :is_array => false)
+  
 end
