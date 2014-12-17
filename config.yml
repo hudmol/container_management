@@ -1,1 +1,3 @@
-repository_menu_controller: yale_containers
+repository_menu_controller:
+  - yale_containers
+  - container_profiles

@@ -170,4 +170,14 @@ describe 'Yale Container model' do
     end
   end
 
+  it "can be linked to a container profile" do
+    test_container_profile = create(:json_container_profile)
+
+    container_with_profile = create(:json_yale_container,
+                                     'container_profile' => {'ref' => test_container_profile.uri})
+
+    json = YaleContainer.to_jsonmodel(container_with_profile.id)
+    json['container_profile']['ref'].should eq(test_container_profile.uri)
+  end
+
 end

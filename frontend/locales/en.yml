@@ -2,6 +2,8 @@ en:
   plugins:
     yale_containers:
       label: Manage Yale Containers
+    container_profiles:
+      label: Container Profiles
 
   yale_container: &yale_container_attributes
     type: Type
@@ -31,6 +33,29 @@ en:
   yale_container_child:
     <<: *yale_container_attributes
 
+  container_profile:
+    _singular: Container Profile
+    _plural: Container Profiles
+    _frontend:
+      action:
+        save: Save
+        edit: Edit
+        create: New
+      section:
+        basic_information: Basic Information
+    name: Name    
+    url: Url
+    dimension_units: Dimension Units
+    extent_dimension: Extent Dimension
+    depth: Depth
+    height: Height
+    width: Width
+
   validation_errors:
     you_must_provide_a_barcode_for_top-level_containers: You must provide a barcode for top-level containers
     a_barcode_must_be_unique_within_a_repository: A barcode must be unique within a repository
+    container_profile_name_not_unique: already in use
+
+  group:
+    permission_types:
+      manage_container_profile_records: create/modify/delete container profile records in this repository
