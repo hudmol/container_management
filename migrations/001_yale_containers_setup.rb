@@ -87,7 +87,7 @@ Sequel.migration do
     end
 
     alter_table(:container_profile) do
-      add_unique_constraint([:name], :name => "container_profile_name_uniq")
+      add_unique_constraint([:name, :repo_id], :name => "container_profile_name_uniq")
     end
 
     create_enum("dimension_units", ["inches", "feet", "yards", "millimeters", "centimeters", "meters"])
