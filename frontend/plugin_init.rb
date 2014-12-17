@@ -3,6 +3,7 @@ ArchivesSpace::Application.config.paths['config/routes'].concat(my_routes)
 
 Rails.application.config.after_initialize do
   require_relative "../yale_container_init"
+  require_relative "lib/yale_container_request_handler"
 
   ApplicationController.class_eval do
 
