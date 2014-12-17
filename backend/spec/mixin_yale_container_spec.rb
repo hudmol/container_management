@@ -29,4 +29,105 @@ describe 'Yale Container mixin' do
     instances[0]["sub_container"]["top_container"]["ref"].should eq(top_container_uri)
   end
 
+
+  it "requires a top record to be specified" do
+    expect {
+      create_accession({
+                         "instances" => [build(:json_instance, {
+                           "instance_type" => "accession",
+                           "sub_container" => build(:json_sub_container)
+                         })]
+                       })
+    }.to raise_error(ValidationException)
+  end
+
+
+  it "requires a indicator 2 if type 2 is provided" do
+    expect {
+      create_accession({
+                         "instances" => [build(:json_instance, {
+                           "instance_type" => "accession",
+                           "sub_container" => build(:json_sub_container, {
+                            "top_container" => {
+                              "ref" => create(:json_top_container).uri
+                            },
+                            "indicator_2" => nil,
+                            "indicator_3" => nil,
+                            "type_3" => nil
+                           })
+                         })]
+                       })
+    }.to raise_error(ValidationException)
+  end
+
+
+  it "requires a type 2 if indicator 2 is provided" do
+    expect {
+      create_accession({
+                         "instances" => [build(:json_instance, {
+                           "instance_type" => "accession",
+                           "sub_container" => build(:json_sub_container, {
+                             "top_container" => {
+                               "ref" => create(:json_top_container).uri
+                             },
+                             "type_2" => nil,
+                             "indicator_3" => nil,
+                             "type_3" => nil
+                           })
+                         })]
+                       })
+    }.to raise_error(ValidationException)
+  end
+
+
+  it "requires a indicator 3 if type 3 is provided" do
+    expect {
+      create_accession({
+                         "instances" => [build(:json_instance, {
+                           "instance_type" => "accession",
+                           "sub_container" => build(:json_sub_container, {
+                             "top_container" => {
+                               "ref" => create(:json_top_container).uri
+                             },
+                             "indicator_3" => nil
+                           })
+                         })]
+                       })
+    }.to raise_error(ValidationException)
+  end
+
+
+  it "requires a type 3 if indicator 3 is provided" do
+    expect {
+      create_accession({
+                         "instances" => [build(:json_instance, {
+                           "instance_type" => "accession",
+                           "sub_container" => build(:json_sub_container, {
+                             "top_container" => {
+                               "ref" => create(:json_top_container).uri
+                             },
+                             "type_3" => nil
+                           })
+                         })]
+                       })
+    }.to raise_error(ValidationException)
+  end
+
+  it "requires a container 2 if container 3 is provided" do
+    expect {
+      create_accession({
+                         "instances" => [build(:json_instance, {
+                           "instance_type" => "accession",
+                           "sub_container" => build(:json_sub_container, {
+                             "top_container" => {
+                               "ref" => create(:json_top_container).uri
+                             },
+                             "indicator_2" => nil,
+                             "type_2" => nil,
+                           })
+                         })]
+                       })
+    }.to raise_error(ValidationException)
+  end
+
 end

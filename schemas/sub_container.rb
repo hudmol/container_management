@@ -7,6 +7,7 @@
       "top_container" => {
         "type" => "object",
         "subtype" => "ref",
+        "ifmissing" => "error",
         "properties" => {
           "ref" => {
             "type" => "JSONModel(:top_container) uri",
