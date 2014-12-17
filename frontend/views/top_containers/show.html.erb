@@ -1,0 +1,36 @@
+<%= setup_context(:object => @top_container, :title => @top_container.display_string) %>
+
+<div class="row-fluid">
+  <div class="span3"></div>
+  <div class="span9">
+    <div class="record-pane">
+      <%= readonly_context :top_container, @top_container do |readonly| %>
+        <h2><%= @top_container.display_string %> <span class="label label-info"><%= I18n.t("top_container._singular") %></span></h2>
+
+        <%= render_aspace_partial :partial => "shared/flash_messages" %>
+
+        <% define_template "top_container", jsonmodel_definition(:top_container) do |form| %>
+          <%= readonly.label_and_select "type", readonly.possible_options_for("type", true) %>
+          <%= readonly.label_and_textarea "indicator" %>
+
+          <%= readonly.label_and_textarea "barcode" %>
+          <%= readonly.label_and_textarea "voyager_id" %>
+          <%= readonly.label_and_boolean "exported_to_voyager" %>
+          <%= readonly.label_and_boolean "restricted" %>
+
+          <% if @top_container["container_locations"].length > 0 %>
+            <hr>
+            <section>
+              <%= render_aspace_partial :partial => "container_locations/show", :locals => { :container_locations => @top_container["container_locations"] } %>
+            </section>
+          <% end %>
+
+          <hr>
+          <%= display_audit_info(@top_container) %>
+        <% end %>
+
+        <% readonly.emit_template("top_container") %>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 class ArchivesSpaceService < Sinatra::Base
 
 
-  Endpoint.post('/repositories/:repo_id/containers/:id')
+  Endpoint.post('/repositories/:repo_id/top_containers/:id')
     .description("Update a yale container")
     .params(["id", :id],
             ["top_container", JSONModel(:top_container), "The updated record", :body => true],
@@ -13,7 +13,7 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
-  Endpoint.post('/repositories/:repo_id/containers')
+  Endpoint.post('/repositories/:repo_id/top_containers')
     .description("Create a yale container")
     .params(["top_container", JSONModel(:top_container), "The record to create", :body => true],
             ["repo_id", :repo_id])
@@ -24,7 +24,7 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
-  Endpoint.get('/repositories/:repo_id/containers')
+  Endpoint.get('/repositories/:repo_id/top_containers')
     .description("Get a list of TopContainers for a Repository")
     .params(["repo_id", :repo_id])
     .paginated(true)
@@ -35,7 +35,7 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
-  Endpoint.get('/repositories/:repo_id/containers/:id')
+  Endpoint.get('/repositories/:repo_id/top_containers/:id')
     .description("Get a yale container by ID")
     .params(["id", :id],
             ["repo_id", :repo_id],
@@ -49,7 +49,7 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
-  Endpoint.delete('/repositories/:repo_id/containers/:id')
+  Endpoint.delete('/repositories/:repo_id/top_containers/:id')
     .description("Delete a yale container")
     .params(["id", :id],
             ["repo_id", :repo_id])
