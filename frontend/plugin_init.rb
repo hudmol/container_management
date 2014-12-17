@@ -17,4 +17,8 @@ Rails.application.config.after_initialize do
 
   end
 
+  YaleContainerRequestHandler.new(AccessionsController, :accession)
+  YaleContainerRequestHandler.new(ResourcesController, :resource)
+  YaleContainerRequestHandler.new(ArchivalObjectsController, :archival_object)
+
 end
