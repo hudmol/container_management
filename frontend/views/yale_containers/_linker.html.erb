@@ -24,8 +24,8 @@
              data-label_plural="<%= I18n.t("yale_container._plural") %>"
              data-name="ref"
              data-path="<%= form.path %>"
-             data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json %>"
-             data-browse-url="<%= url_for :controller => :search, :action => :do_search, :format => :js, :facets => [], :sort => "title_sort asc" %>"
+             data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json, :filter_term => {:level => "1"}.to_json %>"
+             data-browse-url="<%= url_for :controller => :search, :action => :do_search, :format => :js, :facets => [], :filter_term => {:level => "1"}.to_json, :sort => "title_sort asc" %>"
              data-selected="<%= selected_json %>"
              data-multiplicity="one"
              data-types='<%= linkable_types.to_json %>'

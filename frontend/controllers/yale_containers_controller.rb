@@ -17,42 +17,23 @@ class YaleContainersController < ApplicationController
 
 
   def create
-    begin
-      values = cleanup_params_for_schema(params["yale_container_hierarchy"], JSONModel(:yale_container_hierarchy).schema)
+    handle_crud(:instance => :yale_container,
+                :model => JSONModel(:yale_container),
+                :find_opts => find_opts,
+                :on_invalid => ->(){
+                  return render_aspace_partial :partial => "yale_containers/new" if inline?
+                  return render :action => :new
+                },
+                :on_valid => ->(id){
+                  @yale_container.refetch
 
-      if values["yale_container_3"].values.all?(&:blank?)
-        values.delete("yale_container_3")
-
-        values.delete("yale_container_2") if values["yale_container_2"].values.all?(&:blank?)
-      end
-
-      @yale_container_hierarchy = JSONModel(:yale_container_hierarchy).from_hash(values, false)
-
-      if @yale_container_hierarchy._exceptions.blank?
-        begin
-          result = @yale_container_hierarchy.save({}, true)
-
-          if result["uris"].length > 0
-            yale_container_uri = result["uris"].last
-          else
-            # if we didn't create a container then we just take the third container
-            yale_container_uri = @yale_container_hierarchy["yale_container_3"]
-          end
-
-          yale_container_id = JSONModel(:yale_container).id_for(yale_container_uri)
-
-          if inline?
-            render :json => JSONModel(:yale_container).find(yale_container_id)
-          else
-            redirect_to(:controller => :yale_containers, :action => :show, :id => yale_container_id)
-          end
-        rescue JSONModel::ValidationException => ex
-          handle_error
-        end
-      else
-        handle_error
-      end
-    end
+                  if inline?
+                    render :json => @yale_container.to_hash if inline?
+                  else
+                    flash[:success] = I18n.t("yale_container._frontend.messages.created")
+                    redirect_to :controller => :yale_containers, :action => :edit, :id => id
+                  end
+                })
   end
 
 
