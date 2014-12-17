@@ -2,15 +2,14 @@ Sequel.migration do
 
   up do
 
-    create_table(:yale_container) do
+
+    create_table(:top_container) do
       primary_key :id
 
       Integer :repo_id, :null => false
 
       Integer :lock_version, :default => 0, :null => false
       Integer :json_schema_version, :null => false
-
-      Integer :parent_id, :null => true
 
       String :barcode
       String :voyager_id
@@ -23,32 +22,38 @@ Sequel.migration do
       apply_mtime_columns
     end
 
-    alter_table(:yale_container) do
-      add_foreign_key([:parent_id], :yale_container, :key => :id)
+    alter_table(:top_container) do
       add_unique_constraint([:repo_id, :barcode], :name => "yale_uniq_barcode")
     end
 
 
-    create_table(:yale_container_instance_rlshp) do
+    create_table(:sub_container) do
       primary_key :id
 
-      Integer :yale_container_id
+      Integer :lock_version, :default => 0, :null => false
+      Integer :json_schema_version, :null => false
+
       Integer :instance_id
+      Integer :top_container_id
 
-      Integer :aspace_relationship_position
+      DynamicEnum :type_2_id
+      String :indicator_2
 
-      apply_mtime_columns(false)
+      DynamicEnum :type_3_id
+      String :indicator_3
+
+      apply_mtime_columns
     end
 
-    alter_table(:yale_container_instance_rlshp) do
-      add_foreign_key([:yale_container_id], :yale_container, :key => :id)
+    alter_table(:sub_container) do
       add_foreign_key([:instance_id], :instance, :key => :id)
+      add_foreign_key([:top_container_id], :top_container, :key => :id)
     end
 
 
-    create_table(:yale_container_housed_at_rlshp) do
+    create_table(:top_container_housed_at_rlshp) do
       primary_key :id
-      Integer :yale_container_id
+      Integer :top_container_id
       Integer :location_id
       Integer :aspace_relationship_position
 
@@ -62,9 +67,24 @@ Sequel.migration do
       apply_mtime_columns(false)
     end
 
-    alter_table(:yale_container_housed_at_rlshp) do
-      add_foreign_key([:yale_container_id], :yale_container, :key => :id)
+    alter_table(:top_container_housed_at_rlshp) do
+      add_foreign_key([:top_container_id], :top_container, :key => :id)
       add_foreign_key([:location_id], :location, :key => :id)
+    end
+
+
+    create_table(:top_container_link_rlshp) do
+      primary_key :id
+      Integer :top_container_id
+      Integer :sub_container_id
+      Integer :aspace_relationship_position
+
+      apply_mtime_columns(false)
+    end
+
+    alter_table(:top_container_link_rlshp) do
+      add_foreign_key([:top_container_id], :top_container, :key => :id)
+      add_foreign_key([:sub_container_id], :sub_container, :key => :id)
     end
 
   end
