@@ -11,41 +11,20 @@
       <hr/>
 
       <% form.push("yale_container_2", form.obj["yale_container_2"] || {}) do %>
-        <%= form.label_and_select "yale_container_2_type",
-                                  form.possible_options_for('type', true),
-                                  {
-                                    :label_opts => {:id => form.id_for("type")},
-                                    :id => form.path("type")
-                                  }
-        %>
-        <%= form.label_and_textfield  "yale_container_2_indicator",
-                                      {
-                                        :label_opts => {:id => form.id_for("indicator")},
-                                        :id => form.id_for("indicator"),
-                                        :name => form.path("indicator")
-                                      }
-        %>
+        <h4 class="offset1">Child Container</h4>
+        <%= form.label_and_select "type", form.possible_options_for('type', true) %>
+        <%= form.label_and_textfield  "indicator" %>
       <% end %>
 
       <hr/>
 
       <% form.push("yale_container_3", form.obj["yale_container_3"] || {}) do %>
-        <%= form.label_and_select "yale_container_3_type",
-                                  form.possible_options_for('type', true),
-                                  {
-                                    :label_opts => {:id => form.id_for("type")},
-                                    :id => form.path("type")
-                                  }
-        %>
-        <%= form.label_and_textfield  "yale_container_3_indicator",
-                                      {
-                                        :label_opts => {:id => form.id_for("indicator")},
-                                        :id => form.id_for("indicator"),
-                                        :name => form.path("indicator")
-                                      }
-        %>
+        <h4 class="offset1">Grandchild Container</h4>
+        <%= form.label_and_select "type", form.possible_options_for('type', true) %>
+        <%= form.label_and_textfield  "indicator" %>
       <% end %>
 
     <% end %>
   </div>
 <% end %>
+
