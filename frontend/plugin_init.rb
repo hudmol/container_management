@@ -10,7 +10,7 @@ Rails.application.config.after_initialize do
 
     def find_opts
       orig = find_opts_pre_yale_container
-      orig.merge('resolve[]' => orig['resolve[]'] + ['top_container'])
+      orig.merge('resolve[]' => orig['resolve[]'] + ['top_container', 'container_profile'])
     end
 
   end

@@ -24,8 +24,19 @@
         "items" => {
           "type" => "JSONModel(:container_location) object",
         }
-      }
+      },
 
-    },
-  },
+      "container_profile" => {
+        "type" => "object",
+        "subtype" => "ref",
+        "properties" => {
+          "ref" => {"type" => "JSONModel(:container_profile) uri"},
+          "_resolved" => {
+            "type" => "object",
+            "readonly" => "true"
+          }
+        }
+      }
+    }
+  }
 }

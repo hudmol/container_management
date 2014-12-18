@@ -21,6 +21,15 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def delete
+    DB.attempt {
+      super
+    }.and_if_constraint_fails {
+      raise ConflictException.new("Top container in use")
+    }
+
+  end
+
 #  def self.create_from_json(json, opts = {})
 #    super
 #  end
@@ -71,5 +80,9 @@ class TopContainer < Sequel::Model(:top_container)
                         end
                       })
 
+  define_relationship(:name => :top_container_profile,
+                      :json_property => 'container_profile',
+                      :contains_references_to_types => proc {[ContainerProfile]},
+                      :is_array => false)
 
 end

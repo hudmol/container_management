@@ -2,6 +2,9 @@ en:
   plugins:
     top_containers:
       label: Manage Top Containers
+    container_profiles:
+      label: Container Profiles
+
 
   instance_container:
     container: Container
@@ -43,6 +46,24 @@ en:
       messages:
         created: Top Container Created
         updated: Top Container Updated
+
+  container_profile:
+    _singular: Container Profile
+    _plural: Container Profiles
+    _frontend:
+      action:
+        save: Save
+        edit: Edit
+        create: New
+      section:
+        basic_information: Basic Information
+    name: Name    
+    url: Url
+    dimension_units: Dimension Units
+    extent_dimension: Extent Dimension
+    depth: Depth
+    height: Height
+    width: Width
 
   validation_errors:
     container_2_requires_both_a_type_and_indicator: You must provide an Indicator if you provide a Type

@@ -66,4 +66,38 @@ describe 'Yale Container model' do
   end
 
 
+  it "can be linked to a container profile" do
+    test_container_profile = create(:json_container_profile)
+
+    container_with_profile = create(:json_top_container,
+                                    'container_profile' => {'ref' => test_container_profile.uri})
+
+    json = TopContainer.to_jsonmodel(container_with_profile.id)
+    json['container_profile']['ref'].should eq(test_container_profile.uri)
+  end
+
+
+  it "can't delete a TopContainer that has been linked to a sub container" do
+    box = create(:json_top_container)
+
+    accession = create_accession({
+                         "instances" => [build(:json_instance, {
+                           "instance_type" => "accession",
+                           "sub_container" => build(:json_sub_container, {
+                            "top_container" => {
+                              "ref" => box.uri
+                            }
+                           })
+                         })]
+                       })
+
+    expect { TopContainer[box.id].delete }.to raise_error(ConflictException)
+  end
+
+  it "can delete a TopContainer that has not been linked to a sub container" do
+    box = create(:json_top_container)
+
+    expect { TopContainer[box.id].delete }.to_not raise_error
+  end
+
 end
