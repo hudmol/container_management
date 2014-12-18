@@ -20,4 +20,9 @@ Rails.application.config.after_initialize do
   JSONModel(:top_container)
   JSONModel(:sub_container)
 
+
+  # Temporary workaround to get multiple menu items.
+  unless Plugins.repository_menu_items.include?('container_profiles')
+    Plugins.repository_menu_items << 'container_profiles'
+  end
 end

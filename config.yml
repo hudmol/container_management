@@ -1,3 +1,1 @@
-repository_menu_controller:
-  - top_containers
-  - container_profiles
+repository_menu_controller: top_containers
