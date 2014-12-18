@@ -17,4 +17,9 @@ Rails.application.config.after_initialize do
 
   end
 
+  # force load our JSONModels so the are registered rather than lazy initialised
+  # we need this for parse_reference to work
+  JSONModel(:top_container)
+  JSONModel(:sub_container)
+
 end

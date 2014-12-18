@@ -1,6 +1,6 @@
 en:
   plugins:
-    yale_containers:
+    top_containers:
       label: Manage Top Containers
 
   instance_container:
@@ -40,6 +40,9 @@ en:
         add: Add Yale Container
         create: Create a Top Container
         save: Save Top Container
+      messages:
+        created: Top Container Created
+        updated: Top Container Updated
 
   validation_errors:
     container_2_requires_both_a_type_and_indicator: You must provide an Indicator if you provide a Type

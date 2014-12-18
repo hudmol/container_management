@@ -1,7 +1,7 @@
 class TopContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:index, :show],
-                      "manage_container" => [:new, :create, :batch_delete]
+                      "manage_container" => [:new, :create, :edit, :update, :batch_delete]
 
 
   def index
@@ -41,10 +41,21 @@ class TopContainersController < ApplicationController
 
 
   def edit
+    @top_container = JSONModel(:top_container).find(params[:id], find_opts)
   end
 
 
   def update
+    handle_crud(:instance => :top_container,
+                :model => JSONModel(:top_container),
+                :obj => JSONModel(:top_container).find(params[:id], find_opts),
+                :on_invalid => ->(){
+                  return render action: "edit"
+                },
+                :on_valid => ->(id){
+                  flash[:success] = I18n.t("top_container._frontend.messages.updated")
+                  redirect_to :controller => :top_containers, :action => :show, :id => id
+                })
   end
 
 
@@ -52,6 +63,15 @@ class TopContainersController < ApplicationController
   end
 
   def batch_delete
+  end
+
+
+  private
+
+  helper_method :can_edit_search_result?
+  def can_edit_search_result?(record)
+    return user_can?('manage_container', record['id']) if record['primary_type'] === "top_container"
+    SearchHelper.can_edit_search_result?(record)
   end
 
 end

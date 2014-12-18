@@ -4,7 +4,9 @@
     "version" => 1,
     "type" => "object",
     "uri" => "/repositories/:repo_id/top_containers",
+
     "properties" => {
+
       "uri" => {"type" => "string", "required" => false},
 
       "type" => {"type" => "string", "dynamic_enum" => "container_type", "ifmissing" => "error"},
