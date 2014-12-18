@@ -1,7 +1,7 @@
 class TopContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:index, :show],
-                      "manage_container" => [:new, :create, :edit, :update, :batch_delete]
+                      "manage_container" => [:new, :create, :batch_delete]
 
 
   def index
@@ -70,7 +70,7 @@ class TopContainersController < ApplicationController
 
   helper_method :can_edit_search_result?
   def can_edit_search_result?(record)
-    return user_can?('manage_container', record['id']) if record['primary_type'] === "top_container"
+    return user_can?('manage_container') if record['primary_type'] === "top_container"
     SearchHelper.can_edit_search_result?(record)
   end
 
