@@ -1,7 +1,7 @@
-<%= setup_context(:title => I18n.t("yale_container._plural")) %>
+<%= setup_context(:title => I18n.t("top_container._plural")) %>
 
 <%
-   @show_multiselect_column = user_can?("manage_yale_container")
+   @show_multiselect_column = user_can?("manage_container")
 %>
 
 <div class="row-fluid">
@@ -9,13 +9,13 @@
     <%= render_aspace_partial :partial => "search/filter" %>
   </div>
   <div class="span9">
-    <% if user_can?("manage_yale_container") %>
+    <% if user_can?("manage_container") %>
       <div class="row-fluid">
         <div class="span12">
           <div class="record-toolbar">
             <div class="pull-right">
-              <%= link_to I18n.t("yale_container._frontend.action.create"), {:controller => :yale_containers, :action => :new}, :class => "btn btn-small" %>
-              <%= button_delete_action(url_for(:controller => :yale_containers, :action => :batch_delete), {
+              <%= link_to I18n.t("top_container._frontend.action.create"), {:controller => :top_containers, :action => :new}, :class => "btn btn-small" %>
+              <%= button_delete_action(url_for(:controller => :top_containers, :action => :batch_delete), {
                 :class => "btn btn-small btn-danger multiselect-enabled",
                 :"data-multiselect" => "#tabledSearchResults",
                 :"data-title" => I18n.t("actions.delete_multiple_confirm_title"),
@@ -31,7 +31,7 @@
     <div class="record-pane">
       <%= link_to_help :topic => "search" %>
 
-      <h2><%= I18n.t("yale_container._plural") %></h2>
+      <h2><%= I18n.t("top_container._plural") %></h2>
 
       <%= render_aspace_partial :partial => "shared/flash_messages" %>
 
@@ -40,4 +40,4 @@
   </div>
 </div>
 
-<script src="<%= "#{AppConfig[:frontend_prefix]}assets/yale_containers.index.js" %>"></script>
+<script src="<%= "#{AppConfig[:frontend_prefix]}assets/top_containers.index.js" %>"></script>

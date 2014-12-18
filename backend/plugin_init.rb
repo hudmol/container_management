@@ -1,5 +1,5 @@
-Permission.define("manage_yale_container",
-                  "The ability to manage yale container records",
+Permission.define("manage_container",
+                  "The ability to manage container records",
                   :level => "repository")
 
 

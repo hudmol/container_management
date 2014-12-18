@@ -1,9 +1,24 @@
 en:
   plugins:
-    yale_containers:
-      label: Manage Yale Containers
+    top_containers:
+      label: Manage Top Containers
 
-  yale_container: &yale_container_attributes
+  instance_container:
+    container: Container
+
+  sub_container:
+    top_container: Top Container
+    type_2: Child Type
+    indicator_2: Child Indicator
+    type_3: Grandchild Type
+    indicator_3: Grandchild Indicator
+    _singular: Sub Container
+    _plural: Sub Containers
+    _frontend:
+      action:
+        add: Add Container Instance
+
+  top_container:
     type: Type
     indicator: Indicator
     barcode: Barcode
@@ -12,25 +27,26 @@ en:
     restricted: Restricted?
     parent: Parent Container
 
-    _singular: Yale Container
-    _plural: Yale Containers
+    yale_container_2_type: Child Container Type
+    yale_container_2_indicator: Child Container Indicator
+    yale_container_3_type: Grandchild Container Type
+    yale_container_3_indicator: Grandchild Container Indicator
+
+    _singular: Top Container
+    _plural: Top Containers
 
     _frontend:
-      section:
-        existing_container: Inside an Existing Container
-        yale_container_1: Container 1
-        yale_container_2: Container 2
-        yale_container_3: Container 3
       action:
         add: Add Yale Container
-        create: Create a Yale Container
-        save: Save Yale Container
-
-  yale_container_top_level:
-    <<: *yale_container_attributes
-  yale_container_child:
-    <<: *yale_container_attributes
+        create: Create a Top Container
+        save: Save Top Container
+      messages:
+        created: Top Container Created
+        updated: Top Container Updated
 
   validation_errors:
+    container_2_requires_both_a_type_and_indicator: You must provide an Indicator if you provide a Type
+    container_3_requires_both_a_type_and_indicator: You must provide an Indicator if you provide a Type
+    container_2_is_required_if_container_3_is_provided: You must provide a Child Container if you provide a Grandchild Container
     you_must_provide_a_barcode_for_top-level_containers: You must provide a barcode for top-level containers
     a_barcode_must_be_unique_within_a_repository: A barcode must be unique within a repository

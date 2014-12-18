@@ -11,16 +11,16 @@
 
   required = true if required.nil?
 
-  linkable_types = ["yale_container"]
+  linkable_types = ["top_container"]
 %>
 <div class="control-group <% if required %>required<% end %>">
-  <label class="control-label"><%= I18n.t("yale_container._singular") %></label>
+  <label class="control-label"><%= I18n.t("top_container._singular") %></label>
   <div class="controls">
     <div class="input-append linker-wrapper">
       <input type="text" class="linker"
              id="<%= form.id_for("ref") %>"
-             data-label="<%= I18n.t("yale_container._singular") %>"
-             data-label_plural="<%= I18n.t("yale_container._plural") %>"
+             data-label="<%= I18n.t("top_container._singular") %>"
+             data-label_plural="<%= I18n.t("top_container._plural") %>"
              data-name="ref"
              data-path="<%= form.path %>"
              data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json %>"
@@ -34,9 +34,9 @@
         <a class="btn dropdown-toggle last" data-toggle="dropdown" href="javascript:void(0);"><span class="caret"></span></a>
         <ul class="dropdown-menu">
           <li><a href="javascript:void(0);" class="linker-browse-btn"><%= I18n.t("actions.browse") %></a></li>
-          <% if allow_create && user_can?('manage_yale_container') %>
+          <% if allow_create && user_can?('manage_container') %>
             <li>
-              <a data-target="<%= url_for :controller => :yale_containers, :action => :new, :inline => true %>" class="linker-create-btn"><%= I18n.t("actions.create") %></a>
+              <a data-target="<%= url_for :controller => :top_containers, :action => :new, :inline => true %>" class="linker-create-btn"><%= I18n.t("actions.create") %></a>
             </li>
           <% end %>
         </ul>

@@ -10,10 +10,14 @@ Rails.application.config.after_initialize do
 
     def find_opts
       orig = find_opts_pre_yale_container
-      orig['resolve[]'] = orig['resolve[]'] + ['yale_container']
-      orig
+      orig.merge('resolve[]' => orig['resolve[]'] + ['top_container'])
     end
 
   end
+
+  # force load our JSONModels so the are registered rather than lazy initialised
+  # we need this for parse_reference to work
+  JSONModel(:top_container)
+  JSONModel(:sub_container)
 
 end

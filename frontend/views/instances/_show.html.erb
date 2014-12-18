@@ -38,8 +38,8 @@
                                  :placement => "top" %>
               </div>
             </div>
-          <% elsif instance["yale_container"] and instance["yale_container"].length > 0 %>
-            <%= render_aspace_partial :partial => "yale_containers/show", :locals => { :yale_container => instance["yale_container"], :id => "instance_#{index}_yale_container" } %>
+          <% elsif instance["sub_container"] and instance["sub_container"].length > 0 %>
+            <%= render_aspace_partial :partial => "sub_containers/show", :locals => { :sub_container => instance["sub_container"], :id => "instance_#{index}_sub_container" } %>
           <% end %>
         </div>
       </div>
