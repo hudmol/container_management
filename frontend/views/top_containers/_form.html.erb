@@ -10,7 +10,7 @@
   <%= form.label_and_boolean("restricted") %>
 
   <% form.push("container_profile", form.obj["container_profile"] || {}) do %>
-      <%= render_aspace_partial :partial => "container_profiles/linker", :locals => {:form => form, :label => I18n.t("container_profile._singular"), :required => false} %>
+      <%= render_aspace_partial :partial => "container_profiles/linker", :locals => {:form => form, :label => I18n.t("container_profile._singular"), :required => false, :allow_create => false} %>
   <% end %>
 
 
