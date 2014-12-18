@@ -10,9 +10,7 @@ Rails.application.config.after_initialize do
 
     def find_opts
       orig = find_opts_pre_yale_container
-      orig['resolve[]'] = orig['resolve[]'] + ['top_container']
-      puts orig.inspect
-      orig
+      orig.merge('resolve[]' => orig['resolve[]'] + ['top_container'])
     end
 
   end
