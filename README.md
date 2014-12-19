@@ -21,5 +21,16 @@ ArchivesSpace plugins directory.  For example:
      git clone https://github.com/hudmol/yale_containers.git yale_containers
 
 
+## Upgrading from a previous release
 
+Each release of this plugin comes with some database schema changes
+that need to be applied.  To upgrade from a previous release:
 
+  1. Replace your `/path/to/archivesspace/plugins/yale_containers`
+     directory with the new release version
+     
+  2. Run the database setup script to update all tables to the latest
+     version:
+     
+          cd /path/to/archivesspace
+          scripts/setup-database.sh
