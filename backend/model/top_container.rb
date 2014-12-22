@@ -46,7 +46,7 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def display_string
-    "#{I18n.t("enumerations.container_type.#{self.type}")} #{self.indicator} #{self.format_barcode}".strip
+    "#{I18n.t("enumerations.container_type.#{self.type}", :default => self.type)} #{self.indicator} #{self.format_barcode}".strip
   end
 
 
