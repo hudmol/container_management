@@ -1,7 +1,7 @@
 class TopContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:index, :show],
-                      "manage_container" => [:new, :create, :batch_delete]
+                      "manage_container" => [:new, :create, :edit, :update, :batch_delete]
 
 
   def index
