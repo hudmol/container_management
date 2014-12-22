@@ -12,4 +12,15 @@ class ContainerProfile < Sequel::Model(:container_profile)
                       :contains_references_to_types => proc {[TopContainer]},
                       :is_array => false)
 
+
+  def self.sequel_to_jsonmodel(objs, opts = {})
+    jsons = super
+
+    jsons.zip(objs).each do |json, obj|
+      json['display_string'] = obj.name
+    end
+
+    jsons
+  end
+
 end
