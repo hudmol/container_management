@@ -16,7 +16,9 @@
 
       "height" => {"type" => "string", "required" => false}, 
       "width" => {"type" => "string", "required" => false}, 
-      "depth" => {"type" => "string", "required" => false}
+      "depth" => {"type" => "string", "required" => false},
+
+      "display_string" => {"type" => "string", "readonly" => true},
     },
   },
 }
