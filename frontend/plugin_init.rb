@@ -19,6 +19,7 @@ Rails.application.config.after_initialize do
   # we need this for parse_reference to work
   JSONModel(:top_container)
   JSONModel(:sub_container)
+  JSONModel(:container_profile)
 
 
   # Temporary workaround to get multiple menu items.
