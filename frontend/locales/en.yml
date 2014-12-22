@@ -3,7 +3,7 @@ en:
     top_containers:
       label: Manage Top Containers
     container_profiles:
-      label: Container Profiles
+      label: Manage Container Profiles
 
 
   instance_container:
@@ -40,7 +40,7 @@ en:
 
     _frontend:
       action:
-        add: Add Yale Container
+        add: Add Top Container
         create: Create a Top Container
         save: Save Top Container
       messages:
@@ -52,9 +52,9 @@ en:
     _plural: Container Profiles
     _frontend:
       action:
-        save: Save
-        edit: Edit
-        create: New
+        save: Save Container Profile
+        edit: Edit Container Profile
+        create: Create Container Profile
       section:
         basic_information: Basic Information
     name: Name    
