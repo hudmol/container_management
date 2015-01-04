@@ -1,12 +1,12 @@
 en:
   enumerations:
     dimension_units:
-      inches: inches
-      feet: feet
-      yards: yards
-      millimeters: millimeters
-      centimeters: centimeters
-      meters: meters
+      inches: Inches
+      feet: Feet
+      yards: Yards
+      millimeters: Millimeters
+      centimeters: Centimeters
+      meters: Meters
 
   enumeration_names:
     dimension_units: Dimension Units

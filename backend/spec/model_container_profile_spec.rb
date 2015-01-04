@@ -42,4 +42,24 @@ describe 'Yale Container Profile model' do
     TopContainer.to_jsonmodel(box.id)['container_profile'].should be_nil
   end
 
+
+  it "requires depth to be an integer" do
+    expect {
+      create(:json_container_profile, :depth => "123abc", :width => "10", :height => "10")
+    }.to raise_error(ValidationException)
+  end
+
+
+  it "requires width to be an integer" do
+    expect {
+      create(:json_container_profile, :depth => "10", :width => "abc123", :height => "10")
+    }.to raise_error(ValidationException)
+  end
+
+
+  it "requires height to be an integer" do
+    expect {
+      create(:json_container_profile, :depth => "10", :width => "10", :height => "1a2b3c")
+    }.to raise_error(ValidationException)
+  end
 end
