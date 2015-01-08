@@ -75,3 +75,4 @@ en:
     you_must_provide_a_barcode_for_top-level_containers: You must provide a barcode for top-level containers
     a_barcode_must_be_unique_within_a_repository: A barcode must be unique within a repository
     container_profile_name_not_unique: Container Profile name must be unique
+    must_be_an_integer: Must be an integer
