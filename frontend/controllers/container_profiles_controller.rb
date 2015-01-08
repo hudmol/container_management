@@ -26,7 +26,7 @@ class ContainerProfilesController < ApplicationController
   def create
     handle_crud(:instance => :container_profile,
                 :model => JSONModel(:container_profile),
-                :on_invalid => ->(){ render :action => "new" },
+                :on_invalid => ->(){ render :action => :new },
                 :on_valid => ->(id){
                   redirect_to(:controller => :container_profiles, :action => :show, :id => id)
                 })
@@ -40,7 +40,7 @@ class ContainerProfilesController < ApplicationController
                 :obj => JSONModel(:container_profile).find(params[:id]),
                 :replace => true,
                 :on_invalid => ->(){
-                  return render :action => "edit"
+                  return render :action => :edit
                 },
                 :on_valid => ->(id){
                   redirect_to(:controller => :container_profiles, :action => :show, :id => id)

@@ -36,5 +36,25 @@ module JSONModel
       end
     end
 
+
+    def self.check_container_profile(hash)
+      errors = []
+
+      # Ensure depth, width and height are integers
+      ["depth", "width", "height"].each do |k|
+        if !hash[k].nil? and hash[k] !~ /^\-?\d+$/
+          errors << [k, "must be an integer"]
+        end
+      end
+
+      errors
+    end
+
+    if JSONModel(:container_profile)
+      JSONModel(:container_profile).add_validation("check_container_profile") do |hash|
+        check_container_profile(hash)
+      end
+    end
+
   end
 end
