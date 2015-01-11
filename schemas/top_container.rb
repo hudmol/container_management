@@ -9,7 +9,6 @@
 
       "uri" => {"type" => "string", "required" => false},
 
-      "type" => {"type" => "string", "dynamic_enum" => "container_type", "ifmissing" => "error"},
       "indicator" => {"type" => "string", "maxLength" => 255, "minLength" => 1, "ifmissing" => "error" },
 
       "display_string" => {"type" => "string", "readonly" => true},

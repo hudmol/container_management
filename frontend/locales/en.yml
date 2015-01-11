@@ -22,7 +22,6 @@ en:
         add: Add Container Instance
 
   top_container:
-    type: Type
     indicator: Indicator
     barcode: Barcode
     voyager_id: Voyager ID

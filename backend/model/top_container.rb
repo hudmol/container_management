@@ -30,15 +30,6 @@ class TopContainer < Sequel::Model(:top_container)
 
   end
 
-#  def self.create_from_json(json, opts = {})
-#    super
-#  end
-
-
-#  def update_from_json(json, opts = {})
-#    super
-#  end
-
 
   def format_barcode
     self.barcode ? "[#{self.barcode}]" : ""
@@ -46,7 +37,7 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def display_string
-    "#{I18n.t("enumerations.container_type.#{self.type}", :default => self.type)} #{self.indicator} #{self.format_barcode}".strip
+    "#{self.indicator} #{self.format_barcode}".strip
   end
 
 

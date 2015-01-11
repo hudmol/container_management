@@ -11,13 +11,6 @@
         <%= render_aspace_partial :partial => "shared/flash_messages" %>
 
         <% define_template "top_container", jsonmodel_definition(:top_container) do |form| %>
-          <%= readonly.label_and_select "type", readonly.possible_options_for("type", true) %>
-          <%= readonly.label_and_textarea "indicator" %>
-
-          <%= readonly.label_and_textarea "barcode" %>
-          <%= readonly.label_and_textarea "voyager_id" %>
-          <%= readonly.label_and_boolean "exported_to_voyager" %>
-          <%= readonly.label_and_boolean "restricted" %>
 
           <% if @top_container.container_profile %>
             <div class="control-group token-list">
@@ -30,6 +23,13 @@
                 </div>
             </div>
           <% end %>
+
+          <%= readonly.label_and_textarea "indicator" %>
+
+          <%= readonly.label_and_textarea "barcode" %>
+          <%= readonly.label_and_textarea "voyager_id" %>
+          <%= readonly.label_and_boolean "exported_to_voyager" %>
+          <%= readonly.label_and_boolean "restricted" %>
 
 
           <% if @top_container["container_locations"].length > 0 %>

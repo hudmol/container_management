@@ -3,7 +3,6 @@ require 'factory_girl'
 FactoryGirl.define do
 
   factory :json_top_container, class: JSONModel(:top_container) do
-    type { sample(JSONModel(:top_container).schema['properties']['type']) }
     indicator { generate(:alphanumstr) }
     barcode { generate(:alphanumstr) }
     voyager_id { generate(:alphanumstr) }

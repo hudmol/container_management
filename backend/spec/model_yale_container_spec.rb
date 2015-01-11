@@ -60,9 +60,9 @@ describe 'Yale Container model' do
 
 
   it "displays barcodes in the display string" do
-    obj = create(:json_top_container, :type => "box", :indicator => "1", :barcode => "1234")
+    obj = create(:json_top_container, :indicator => "1", :barcode => "1234")
 
-    TopContainer.to_jsonmodel(obj.id).display_string.should eq("Box 1 [1234]")
+    TopContainer.to_jsonmodel(obj.id).display_string.should eq("1 [1234]")
   end
 
 
