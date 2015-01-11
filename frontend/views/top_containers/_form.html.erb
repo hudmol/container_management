@@ -2,9 +2,9 @@
 
 <% define_template("top_container", jsonmodel_definition(:top_container)) do |form| %>
   <%= form.label_and_select "type", form.possible_options_for('type', true), :required => false %>
-  <%= form.label_and_textfield("indicator", :required => false) %>
+  <%= form.label_and_textfield("indicator") %>
 
-  <%= form.label_and_textfield("barcode") %>
+  <%= form.label_and_textfield("barcode", :required => true) %>
   <%= form.label_and_textfield("voyager_id") %>
   <%= form.label_and_boolean("exported_to_voyager") %>
   <%= form.label_and_boolean("restricted") %>
