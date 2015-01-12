@@ -1,6 +1,19 @@
 require 'spec_helper'
 require_relative 'factories'
 
+
+def build_instance(top_container_json)
+  build(:json_instance, {
+          "instance_type" => "text",
+          "sub_container" => build(:json_sub_container, {
+                                     "top_container" => {
+                                       "ref" => top_container_json.uri
+                                     }
+                                   })
+        })
+end
+
+
 describe 'Yale Container model' do
 
   it "supports all kinds of wonderful metadata" do
@@ -51,11 +64,11 @@ describe 'Yale Container model' do
 
 
   it "enforces barcode uniqueness within a repository" do
-      create(:json_top_container, :barcode => "1234")
+    create(:json_top_container, :barcode => "1234")
 
-      expect {
-        create(:json_top_container, :barcode => "1234")
-      }.to raise_error(ValidationException)
+    expect {
+      create(:json_top_container, :barcode => "1234")
+    }.to raise_error(ValidationException)
   end
 
 
@@ -74,15 +87,8 @@ describe 'Yale Container model' do
     box = create(:json_top_container)
 
     accession = create_accession({
-                         "instances" => [build(:json_instance, {
-                           "instance_type" => "accession",
-                           "sub_container" => build(:json_sub_container, {
-                            "top_container" => {
-                              "ref" => box.uri
-                            }
-                           })
-                         })]
-                       })
+                                   "instances" => [build_instance(box)]
+                                 })
 
 
     expect { TopContainer[box.id].delete }.to raise_error(ConflictException)
@@ -106,16 +112,7 @@ describe 'Yale Container model' do
 
 
     it "can find an accession linked to a given top container" do
-      accession = create_accession({
-                                     "instances" => [build(:json_instance, {
-                                                             "instance_type" => "accession",
-                                                             "sub_container" => build(:json_sub_container, {
-                                                                                        "top_container" => {
-                                                                                          "ref" => box.uri
-                                                                                        }
-                                                                                      })
-                                                           })]
-                                   })
+      accession = create_accession({"instances" => [build_instance(box)]})
 
       series = top_container.series
       series.should be_instance_of(Accession)
@@ -124,16 +121,7 @@ describe 'Yale Container model' do
 
 
     it "can find a resource linked to a given top container" do
-      resource = create_resource({
-                                   "instances" => [build(:json_instance, {
-                                                           "instance_type" => "computer_disks",
-                                                           "sub_container" => build(:json_sub_container, {
-                                                                                      "top_container" => {
-                                                                                        "ref" => box.uri
-                                                                                      }
-                                                                                    })
-                                                         })]
-                                 })
+      resource = create_resource({"instances" => [build_instance(box)]})
 
       series = top_container.series
       series.should be_instance_of(Resource)
@@ -150,14 +138,7 @@ describe 'Yale Container model' do
         create(:json_archival_object,
                "resource" => {"ref" => resource.uri},
                "parent" => {"ref" => parent.uri},
-               "instances" => [build(:json_instance, {
-                                       "instance_type" => "text",
-                                       "sub_container" => build(:json_sub_container, {
-                                                                  "top_container" => {
-                                                                    "ref" => box.uri
-                                                                  }
-                                                                })
-                                     })])
+               "instances" => [build_instance(box)])
       }
 
 
@@ -184,6 +165,92 @@ describe 'Yale Container model' do
                                     'container_profile' => {'ref' => test_container_profile.uri})
 
     TopContainer[container_with_profile.id].display_string.should eq("Cardboard box 1 [123]")
+  end
+
+
+  describe "indexing" do
+
+    let (:container_profile_json) {
+      create(:json_container_profile, :name => "Cardboard box")
+    }
+
+    let (:container_profile) { ContainerProfile[container_profile_json.id] }
+
+    let (:top_container_json) {
+      create(:json_top_container,
+             'container_profile' => {'ref' => container_profile_json.uri})
+    }
+
+    let (:top_container) { TopContainer[top_container_json.id] }
+
+    it "reindexes top containers when the container profile is updated" do
+      original_mtime = top_container.refresh.system_mtime
+
+      json = ContainerProfile.to_jsonmodel(container_profile)
+      json.name = "Metal box"
+      container_profile.update_from_json(json)
+
+      top_container.refresh
+      top_container.system_mtime.should be > original_mtime
+    end
+
+
+    it "reindexes top containers when a linked accession is updated" do
+      accession = create_accession({"instances" => [build_instance(top_container_json)]})
+
+      original_mtime = top_container.refresh.system_mtime
+
+      json = Accession.to_jsonmodel(accession.id)
+      json.title = "New accession title"
+      accession.update_from_json(json)
+
+      top_container.refresh.system_mtime.should be > original_mtime
+    end
+
+
+    it "reindexes top containers when an archival object is updated" do
+      resource = create_resource
+      grandparent = create(:json_archival_object, :resource => {"ref" => resource.uri})
+      parent = create(:json_archival_object, "resource" => {"ref" => resource.uri}, "parent" => {"ref" => grandparent.uri})
+      child = create(:json_archival_object,
+                     "resource" => {"ref" => resource.uri},
+                     "parent" => {"ref" => parent.uri},
+                     "instances" => [build_instance(top_container_json)])
+
+      original_mtime = top_container.refresh.system_mtime
+
+      json = ArchivalObject.to_jsonmodel(grandparent.id)
+      json.title = "A better title"
+      ArchivalObject[grandparent.id].update_from_json(json)
+
+      top_container.refresh.system_mtime.should be > original_mtime
+    end
+
+
+    it "reindexes top containers when a tree is rearranged" do
+      resource = create_resource
+      grandparent = create(:json_archival_object, :resource => {"ref" => resource.uri})
+      parent = create(:json_archival_object, "resource" => {"ref" => resource.uri}, "parent" => {"ref" => grandparent.uri})
+      child = create(:json_archival_object,
+                     "resource" => {"ref" => resource.uri},
+                     "parent" => {"ref" => parent.uri},
+                     "instances" => [build_instance(top_container_json)])
+
+      original_mtime = top_container.refresh.system_mtime
+
+      ArchivalObject[child.id].update_position_only(grandparent.id, 1)
+
+      top_container.refresh.system_mtime.should be > original_mtime
+    end
+
+
+    it "refreshes top containers when an archival object is deleted"
+
+    # need this
+    it "refreshes top containers (linked to each tree) when two resources are merged"
+
+    it "refreshes top containers when archival objects are transferred between resources (both trees)"
+
   end
 
 end
