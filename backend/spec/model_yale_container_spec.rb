@@ -175,5 +175,15 @@ describe 'Yale Container model' do
   end
 
 
-  it "It incorporates container profile names into display strings"
+  it "incorporates container profile names into display strings" do
+    test_container_profile = create(:json_container_profile, :name => "Cardboard box")
+
+    container_with_profile = create(:json_top_container,
+                                    'barcode' => '123',
+                                    'indicator' => '1',
+                                    'container_profile' => {'ref' => test_container_profile.uri})
+
+    TopContainer[container_with_profile.id].display_string.should eq("Cardboard box 1 [123]")
+  end
+
 end

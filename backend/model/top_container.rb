@@ -83,8 +83,19 @@ class TopContainer < Sequel::Model(:top_container)
     end
   end
 
+
+  def container_profile_display_string
+    container_profile = related_records(:top_container_profile)
+    if container_profile
+      container_profile.display_string
+    else
+      ""
+    end
+  end
+
+
   def display_string
-    "#{self.indicator} #{self.format_barcode} #{self.series_display_string}".strip
+    "#{self.container_profile_display_string} #{self.indicator} #{self.format_barcode} #{self.series_display_string}".strip
   end
 
 
