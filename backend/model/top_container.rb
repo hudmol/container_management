@@ -36,8 +36,37 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def series
+    # Take the first linked subcontainer
+    subcontainer = related_records(:top_container_link).first
+    return nil if !subcontainer
+
+    # Take its first instance
+    instance = Instance[subcontainer.instance_id] or raise "Instance not found: #{subcontainer.instance_id}"
+
+    # Find the record that links to that instance
+    ASModel.all_models.each do |model|
+      next unless model.associations.include?(:instance)
+
+      association = model.association_reflection(:instance)
+
+      key = association[:key]
+
+      if instance[key]
+        return model[instance[key]]
+      end
+    end
+
+    nil
+  end
+
+
+  def series_display_string
+    ""
+  end
+
   def display_string
-    "#{self.indicator} #{self.format_barcode}".strip
+    "#{self.indicator} #{self.format_barcode} #{self.series_display_string}".strip
   end
 
 
@@ -75,5 +104,21 @@ class TopContainer < Sequel::Model(:top_container)
                       :json_property => 'container_profile',
                       :contains_references_to_types => proc {[ContainerProfile]},
                       :is_array => false)
+
+  define_relationship(:name => :top_container_link,
+                      :contains_references_to_types => proc {[SubContainer]},
+                      :is_array => true)
+
+
+  # Only allow delete if the top containers aren't linked to subcontainers.
+  def self.handle_delete(ids)
+    linked_subcontainers = find_relationship(:top_container_link).find_by_participant_ids(TopContainer, ids)
+
+    if !linked_subcontainers.empty?
+      raise ConflictException.new("Can't remove a Top Container that is still in use")
+    end
+
+    super
+  end
 
 end

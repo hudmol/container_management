@@ -59,13 +59,6 @@ describe 'Yale Container model' do
   end
 
 
-  it "displays barcodes in the display string" do
-    obj = create(:json_top_container, :indicator => "1", :barcode => "1234")
-
-    TopContainer.to_jsonmodel(obj.id).display_string.should eq("1 [1234]")
-  end
-
-
   it "can be linked to a container profile" do
     test_container_profile = create(:json_container_profile)
 
@@ -91,6 +84,7 @@ describe 'Yale Container model' do
                          })]
                        })
 
+
     expect { TopContainer[box.id].delete }.to raise_error(ConflictException)
   end
 
@@ -98,6 +92,40 @@ describe 'Yale Container model' do
     box = create(:json_top_container)
 
     expect { TopContainer[box.id].delete }.to_not raise_error
+  end
+
+
+  describe "display strings" do
+
+    let (:box) { create(:json_top_container, :indicator => "1", :barcode => "123") }
+    let (:top_container) { TopContainer[box.id] }
+
+    xit "can link a Top Container to a series and get back a display string containing the series name"
+
+    it "can show a display string for a top container that isn't linked to anything" do
+      top_container.display_string.should eq("1 [123]")
+    end
+
+
+    it "can find an accession linked to a given top container" do
+      accession = create_accession({
+                                     "instances" => [build(:json_instance, {
+                                                             "instance_type" => "accession",
+                                                             "sub_container" => build(:json_sub_container, {
+                                                                                        "top_container" => {
+                                                                                          "ref" => box.uri
+                                                                                        }
+                                                                                      })
+                                                           })]
+                                   })
+
+      series = top_container.series
+      series.should be_instance_of(Accession)
+      series.id.should eq(accession.id)
+    end
+
+    xit "can find the topmost archival object linked to a given top container" do
+    end
   end
 
 end
