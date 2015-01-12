@@ -36,6 +36,18 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  # For Archival Objects, the series is the topmost record in the tree.
+  def tree_top(obj)
+    return obj if !obj.is_a?(TreeNodes)
+
+    while obj.parent_id
+      obj = obj.class[obj.parent_id]
+    end
+
+    obj
+  end
+
+
   def series
     # Take the first linked subcontainer
     subcontainer = related_records(:top_container_link).first
@@ -53,7 +65,7 @@ class TopContainer < Sequel::Model(:top_container)
       key = association[:key]
 
       if instance[key]
-        return model[instance[key]]
+        return tree_top(model[instance[key]])
       end
     end
 
@@ -62,7 +74,13 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def series_display_string
-    ""
+    series_record = series
+
+    if series_record
+      ": #{series_record.display_string}"
+    else
+      ""
+    end
   end
 
   def display_string

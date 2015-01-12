@@ -100,8 +100,6 @@ describe 'Yale Container model' do
     let (:box) { create(:json_top_container, :indicator => "1", :barcode => "123") }
     let (:top_container) { TopContainer[box.id] }
 
-    xit "can link a Top Container to a series and get back a display string containing the series name"
-
     it "can show a display string for a top container that isn't linked to anything" do
       top_container.display_string.should eq("1 [123]")
     end
@@ -124,8 +122,55 @@ describe 'Yale Container model' do
       series.id.should eq(accession.id)
     end
 
-    xit "can find the topmost archival object linked to a given top container" do
+
+    it "can find a resource linked to a given top container" do
+      resource = create_resource({
+                                   "instances" => [build(:json_instance, {
+                                                           "instance_type" => "computer_disks",
+                                                           "sub_container" => build(:json_sub_container, {
+                                                                                      "top_container" => {
+                                                                                        "ref" => box.uri
+                                                                                      }
+                                                                                    })
+                                                         })]
+                                 })
+
+      series = top_container.series
+      series.should be_instance_of(Resource)
+      series.id.should eq(resource.id)
+    end
+
+
+    describe "archival object tree" do
+
+      let! (:resource) { create_resource }
+      let! (:grandparent) { create(:json_archival_object, :resource => {"ref" => resource.uri}) }
+      let! (:parent) { create(:json_archival_object, "resource" => {"ref" => resource.uri}, "parent" => {"ref" => grandparent.uri}) }
+      let! (:child) {
+        create(:json_archival_object,
+               "resource" => {"ref" => resource.uri},
+               "parent" => {"ref" => parent.uri},
+               "instances" => [build(:json_instance, {
+                                       "instance_type" => "text",
+                                       "sub_container" => build(:json_sub_container, {
+                                                                  "top_container" => {
+                                                                    "ref" => box.uri
+                                                                  }
+                                                                })
+                                     })])
+      }
+
+
+      it "can find the topmost archival object linked to a given top container" do
+        series = top_container.series
+        series.should be_instance_of(ArchivalObject)
+        series.id.should eq(grandparent.id)
+      end
+
+      it "can incorporates the series display string into the top container's display string" do
+        top_container.display_string.should eq("1 [123] : #{grandparent.display_string}")
+      end
+
     end
   end
-
 end
