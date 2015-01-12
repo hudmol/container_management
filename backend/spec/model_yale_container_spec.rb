@@ -2,6 +2,21 @@ require 'spec_helper'
 require_relative 'factories'
 
 
+def create_tree(top_container_json)
+  resource = create_resource
+  grandparent = create(:json_archival_object, :resource => {"ref" => resource.uri})
+  parent = create(:json_archival_object, "resource" => {"ref" => resource.uri}, "parent" => {"ref" => grandparent.uri})
+  child = create(:json_archival_object,
+                 "resource" => {"ref" => resource.uri},
+                 "parent" => {"ref" => parent.uri},
+                 "instances" => [build_instance(top_container_json)])
+
+  [resource, grandparent, parent, child]
+end
+
+
+
+
 def build_instance(top_container_json)
   build(:json_instance, {
           "instance_type" => "text",
@@ -131,24 +146,17 @@ describe 'Yale Container model' do
 
     describe "archival object tree" do
 
-      let! (:resource) { create_resource }
-      let! (:grandparent) { create(:json_archival_object, :resource => {"ref" => resource.uri}) }
-      let! (:parent) { create(:json_archival_object, "resource" => {"ref" => resource.uri}, "parent" => {"ref" => grandparent.uri}) }
-      let! (:child) {
-        create(:json_archival_object,
-               "resource" => {"ref" => resource.uri},
-               "parent" => {"ref" => parent.uri},
-               "instances" => [build_instance(box)])
-      }
-
-
       it "can find the topmost archival object linked to a given top container" do
+        (resource, grandparent, parent, child) = create_tree(box)
+
         series = top_container.series
         series.should be_instance_of(ArchivalObject)
         series.id.should eq(grandparent.id)
       end
 
       it "can incorporates the series display string into the top container's display string" do
+        (resource, grandparent, parent, child) = create_tree(box)
+
         top_container.display_string.should eq("1 [123] : #{grandparent.display_string}")
       end
 
@@ -209,13 +217,7 @@ describe 'Yale Container model' do
 
 
     it "reindexes top containers when an archival object is updated" do
-      resource = create_resource
-      grandparent = create(:json_archival_object, :resource => {"ref" => resource.uri})
-      parent = create(:json_archival_object, "resource" => {"ref" => resource.uri}, "parent" => {"ref" => grandparent.uri})
-      child = create(:json_archival_object,
-                     "resource" => {"ref" => resource.uri},
-                     "parent" => {"ref" => parent.uri},
-                     "instances" => [build_instance(top_container_json)])
+      (resource, grandparent, parent, child) = create_tree(top_container_json)
 
       original_mtime = top_container.refresh.system_mtime
 
@@ -228,13 +230,7 @@ describe 'Yale Container model' do
 
 
     it "reindexes top containers when a tree is rearranged" do
-      resource = create_resource
-      grandparent = create(:json_archival_object, :resource => {"ref" => resource.uri})
-      parent = create(:json_archival_object, "resource" => {"ref" => resource.uri}, "parent" => {"ref" => grandparent.uri})
-      child = create(:json_archival_object,
-                     "resource" => {"ref" => resource.uri},
-                     "parent" => {"ref" => parent.uri},
-                     "instances" => [build_instance(top_container_json)])
+      (resource, grandparent, parent, child) = create_tree(top_container_json)
 
       original_mtime = top_container.refresh.system_mtime
 
@@ -244,12 +240,56 @@ describe 'Yale Container model' do
     end
 
 
-    it "refreshes top containers when an archival object is deleted"
+    it "refreshes top containers when an archival object is deleted" do
+      (resource, grandparent, parent, child) = create_tree(top_container_json)
 
-    # need this
-    it "refreshes top containers (linked to each tree) when two resources are merged"
+      original_mtime = top_container.refresh.system_mtime
+      ArchivalObject[child.id].delete
+      top_container.refresh.system_mtime.should be > original_mtime
+    end
 
-    it "refreshes top containers when archival objects are transferred between resources (both trees)"
+
+    it "refreshes top containers (linked to each tree) when two resources are merged" do
+      container1_json = create(:json_top_container)
+      container1 = TopContainer[container1_json.id]
+
+      container2_json = create(:json_top_container)
+      container2 = TopContainer[container2_json.id]
+
+      (resource1, grandparent1, parent1, child1) = create_tree(container1_json)
+      (resource2, grandparent2, parent2, child2) = create_tree(container2_json)
+
+      container1_original_mtime = container1.refresh.system_mtime
+      container2_original_mtime = container2.refresh.system_mtime
+
+      resource1.assimilate([resource2])
+
+      container1.refresh.system_mtime.should be > container1_original_mtime
+      container2.refresh.system_mtime.should be > container2_original_mtime
+    end
+
+
+    it "refreshes top containers when archival objects are transferred between resources (both trees)" do
+      container1_json = create(:json_top_container)
+      container1 = TopContainer[container1_json.id]
+
+      container2_json = create(:json_top_container)
+      container2 = TopContainer[container2_json.id]
+
+      (resource1, grandparent1, parent1, child1) = create_tree(container1_json)
+      (resource2, grandparent2, parent2, child2) = create_tree(container2_json)
+
+      container1_original_mtime = container1.refresh.system_mtime
+      container2_original_mtime = container2.refresh.system_mtime
+      container1_original_display_string = container1.display_string
+
+      ComponentTransfer.transfer(resource2.uri, parent1.uri)
+
+      container1.refresh.system_mtime.should be > container1_original_mtime
+      container2.refresh.system_mtime.should be > container2_original_mtime
+
+      container1.refresh.display_string.should_not eq(container1_original_display_string)
+    end
 
   end
 

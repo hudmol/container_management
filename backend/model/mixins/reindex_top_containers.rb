@@ -20,6 +20,12 @@ module ReindexTopContainers
   end
 
 
+  def delete
+    reindex_top_containers
+    super
+  end
+
+
   def update_from_json(json, opts = {}, apply_nested_records = true)
     result = super
 
