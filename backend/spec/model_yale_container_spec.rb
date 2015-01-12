@@ -173,4 +173,7 @@ describe 'Yale Container model' do
 
     end
   end
+
+
+  it "It incorporates container profile names into display strings"
 end
