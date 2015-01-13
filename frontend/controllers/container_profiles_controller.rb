@@ -5,6 +5,8 @@ class ContainerProfilesController < ApplicationController
 
   def new
     @container_profile = JSONModel(:container_profile).new._always_valid!
+
+    render_aspace_partial :partial => "container_profiles/new" if inline?
   end
 
 
@@ -26,9 +28,18 @@ class ContainerProfilesController < ApplicationController
   def create
     handle_crud(:instance => :container_profile,
                 :model => JSONModel(:container_profile),
-                :on_invalid => ->(){ render :action => :new },
+                :on_invalid => ->(){
+                  return render_aspace_partial :partial => "container_profiles/new" if inline?
+                  return render :action => :new
+                },
                 :on_valid => ->(id){
-                  redirect_to(:controller => :container_profiles, :action => :show, :id => id)
+                  if inline?
+                    @container_profile.refetch
+                    render :json => @container_profile.to_hash if inline?
+                  else
+                    flash[:success] = I18n.t("container_profile._frontend.messages.created")
+                    redirect_to(:controller => :container_profiles, :action => :show, :id => id)
+                  end
                 })
   end
 
