@@ -104,6 +104,14 @@ class TopContainer < Sequel::Model(:top_container)
 
     jsons.zip(objs).each do |json, obj|
       json['display_string'] = obj.display_string
+
+      if series = obj.series
+        json['series'] = {
+          'ref' => series.uri,
+          'display_string' => series.display_string
+        }
+      end
+
     end
 
     jsons

@@ -6,6 +6,10 @@ class CommonIndexer
     indexer.add_document_prepare_hook {|doc, record|
       if record['record']['jsonmodel_type'] == 'top_container'
         doc['title'] = record['record']['display_string']
+        if record['record']['series']
+          doc['series_uri_u_sstr'] = record['record']['series']['ref']
+          doc['series_title_u_sstr'] = record['record']['series']['display_string']
+        end
       end
     }
   end
