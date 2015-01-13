@@ -1,1 +1,2 @@
 ArchivalObject.include(ReindexTopContainers)
+ArchivalObject.include(ArchivalObjectSeries)

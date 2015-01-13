@@ -1,6 +1,6 @@
 class TopContainersController < ApplicationController
 
-  set_access_control  "view_repository" => [:index, :show],
+  set_access_control  "view_repository" => [:index, :show, :typeahead],
                       "manage_container" => [:new, :create, :edit, :update, :batch_delete]
 
 
@@ -66,12 +66,36 @@ class TopContainersController < ApplicationController
   end
 
 
+  def typeahead
+    search_params = params_for_backend_search
+
+    series_uri = series_for_uri(params['uri'])
+    if (series_uri)
+      search_params = search_params.merge({
+                                            "filter_term[]" => [{"series_uri_u_sstr" => series_uri}.to_json]
+                                          })
+    end
+
+    render :json => Search.all(session[:repo_id], search_params)
+  end
+
   private
 
   helper_method :can_edit_search_result?
   def can_edit_search_result?(record)
     return user_can?('manage_container') if record['primary_type'] === "top_container"
     SearchHelper.can_edit_search_result?(record)
+  end
+
+  def series_for_uri(uri)
+    return if uri.blank?
+
+    parsed = JSONModel.parse_reference(uri)
+    if parsed[:type] == :archival_object
+      return JSONModel(:archival_object).find(parsed[:id]).series['ref']
+    end
+
+    uri
   end
 
 end
