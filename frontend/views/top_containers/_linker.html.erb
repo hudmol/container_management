@@ -12,6 +12,16 @@
   required = true if required.nil?
 
   linkable_types = ["top_container"]
+
+  build_typeahead_url = proc {
+    record = [:"@accession", :"@archival_object", :"@resource"].map {|instvar| self.instance_variable_get(instvar)}.compact.first
+    uri = record.uri
+    if record["parent"]
+      uri = record["parent"]["ref"]
+    end
+    url_for :controller => :top_containers, :action => :typeahead, :format => :json, :uri => uri
+  }
+
 %>
 <div class="control-group <% if required %>required<% end %>">
   <label class="control-label"><%= I18n.t("top_container._singular") %></label>
@@ -23,7 +33,7 @@
              data-label_plural="<%= I18n.t("top_container._plural") %>"
              data-name="ref"
              data-path="<%= form.path %>"
-             data-url="<%= url_for :controller => :search, :action => :do_search, :format => :json %>"
+             data-url="<%= build_typeahead_url.call %>"
              data-browse-url="<%= url_for :controller => :search, :action => :do_search, :format => :js, :facets => [], :sort => "title_sort asc" %>"
              data-selected="<%= selected_json %>"
              data-multiplicity="one"

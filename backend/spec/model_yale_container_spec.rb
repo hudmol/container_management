@@ -135,6 +135,14 @@ describe 'Yale Container model' do
     end
 
 
+    it "returns the series in the JSON output of a top container" do
+      accession = create_accession({"instances" => [build_instance(box)]})
+
+      json = TopContainer.to_jsonmodel(top_container.id)
+      json.series.should eq({'ref' => accession.uri, 'display_string' => accession.display_string})
+    end
+
+
     it "can find a resource linked to a given top container" do
       resource = create_resource({"instances" => [build_instance(box)]})
 
@@ -152,6 +160,13 @@ describe 'Yale Container model' do
         series = top_container.series
         series.should be_instance_of(ArchivalObject)
         series.id.should eq(grandparent.id)
+      end
+
+      it "includes the series in its JSON output" do
+        (resource, grandparent, parent, child) = create_tree(box)
+
+        json = TopContainer.to_jsonmodel(top_container.id)
+        json.series.should eq({'ref' => grandparent.uri, 'display_string' => grandparent.display_string})
       end
 
       it "can incorporates the series display string into the top container's display string" do

@@ -38,13 +38,11 @@ class TopContainer < Sequel::Model(:top_container)
 
   # For Archival Objects, the series is the topmost record in the tree.
   def tree_top(obj)
-    return obj if !obj.is_a?(TreeNodes)
-
-    while obj.parent_id
-      obj = obj.class[obj.parent_id]
+    if obj.respond_to?(:series)
+      obj.series
+    else
+      obj
     end
-
-    obj
   end
 
 
@@ -104,6 +102,14 @@ class TopContainer < Sequel::Model(:top_container)
 
     jsons.zip(objs).each do |json, obj|
       json['display_string'] = obj.display_string
+
+      if series = obj.series
+        json['series'] = {
+          'ref' => series.uri,
+          'display_string' => series.display_string
+        }
+      end
+
     end
 
     jsons
