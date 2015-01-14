@@ -13,11 +13,15 @@ class ContainerProfile < Sequel::Model(:container_profile)
                       :is_array => false)
 
 
+  def display_string
+    name
+  end
+
   def self.sequel_to_jsonmodel(objs, opts = {})
     jsons = super
 
     jsons.zip(objs).each do |json, obj|
-      json['display_string'] = obj.name
+      json['display_string'] = obj.display_string
     end
 
     jsons
