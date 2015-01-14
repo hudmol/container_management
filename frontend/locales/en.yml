@@ -75,3 +75,10 @@ en:
     a_barcode_must_be_unique_within_a_repository: A barcode must be unique within a repository
     container_profile_name_not_unique: Container Profile name must be unique
     must_be_an_integer: Must be an integer
+
+  search_results:
+    filter:
+      container_profile_width_u_sstr: Width
+      container_profile_height_u_sstr: Height
+      container_profile_depth_u_sstr: Depth
+      container_profile_dimension_units_u_sstr: Dimension Units
