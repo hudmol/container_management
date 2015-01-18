@@ -71,11 +71,16 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def self.find_title_for(series)
+    series.respond_to?(:display_string) ? series.display_string : series.title
+  end
+
+
   def series_display_string
     series_record = series
 
     if series_record
-      ": #{series_record.display_string}"
+      ": #{self.class.find_title_for(series_record)}"
     else
       ""
     end
@@ -106,7 +111,7 @@ class TopContainer < Sequel::Model(:top_container)
       if series = obj.series
         json['series'] = {
           'ref' => series.uri,
-          'display_string' => series.display_string
+          'display_string' => find_title_for(series)
         }
       end
 
