@@ -54,6 +54,9 @@ en:
         save: Save Container Profile
         edit: Edit Container Profile
         create: Create Container Profile
+      messages:
+        created: Container Profile Created
+        updated: Container Profile Updated
       section:
         basic_information: Basic Information
     name: Name    
