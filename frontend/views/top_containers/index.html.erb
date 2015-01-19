@@ -13,6 +13,7 @@
       <div class="row-fluid">
         <div class="span12">
           <div class="record-toolbar">
+            <%= link_to I18n.t("top_container._frontend.bulk_operations.title"), url_for(:controller => :top_containers, :action => :bulk_operations), :class => "btn" %>
             <div class="pull-right">
               <%= button_delete_action(url_for(:controller => :top_containers, :action => :batch_delete), {
                 :class => "btn btn-small btn-danger multiselect-enabled",

@@ -1,7 +1,7 @@
 class TopContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:index, :show, :typeahead],
-                      "manage_container" => [:new, :create, :edit, :update, :batch_delete]
+                      "manage_container" => [:new, :create, :edit, :update, :batch_delete, :bulk_operations, :bulk_operation_search]
 
 
   def index
@@ -78,6 +78,33 @@ class TopContainersController < ApplicationController
 
     render :json => Search.all(session[:repo_id], search_params)
   end
+
+
+  def bulk_operations
+
+  end
+
+
+  def bulk_operation_search
+    search_params = params_for_backend_search.merge({
+                                                      'type[]' => ['top_container'],
+                                                    })
+
+    filters = []
+    filters.push({'series_uri_u_sstr' => params['series']['ref']}.to_json) if params['series']
+
+
+    if (!filters.empty?)
+      search_params = search_params.merge({
+                                            "filter_term[]" => filters
+                                          })
+    end
+
+    @search_data = Search.all(session[:repo_id], search_params)
+
+    render :action => :bulk_operations
+  end
+
 
   private
 
