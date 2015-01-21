@@ -88,6 +88,7 @@ class TopContainersController < ApplicationController
   def bulk_operation_search
     search_params = params_for_backend_search.merge({
                                                       'type[]' => ['top_container'],
+                                                      'sort' => 'display_string asc'
                                                     })
 
     filters = []
@@ -100,21 +101,29 @@ class TopContainersController < ApplicationController
                                           })
     end
 
-    respond_to do |format|
-      format.json {
-        p "*** HELLO ***"
-        self.response_body = Enumerator.new do |y|
-          container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
-          JSONModel::HTTP::stream(container_search_url, search_params) do |response|
-            y << response.body
-          end
-        end
-      }
-      format.html {
-        @search_data = Search.all(session[:repo_id], search_params)
-        render :action => :bulk_operations
-      }
-    end
+    # respond_to do |format|
+    #   format.json {
+    #     p "*** HELLO ***"
+    #     self.response_body = Enumerator.new do |y|
+    #       container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
+    #       JSONModel::HTTP::stream(container_search_url, search_params) do |response|
+    #         y << response.body
+    #       end
+    #     end
+    #   }
+    #   format.html {
+        container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
+        results = JSONModel::HTTP::get_json(container_search_url, search_params)
+
+        #containers = (results['response']['docs'] || []).map{|doc| JSONModel(:top_container).from_hash(ASUtils.json_parse(doc['json']))}
+
+        render_aspace_partial :partial => "top_containers/bulk_operations/results", :locals => {:results => results['response']['docs']}
+    #  }
+      #format.html {
+      #  @search_data = Search.all(session[:repo_id], search_params)
+      #  render :action => :bulk_operations
+      #}
+   # end
   end
 
 

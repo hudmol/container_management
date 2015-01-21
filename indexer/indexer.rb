@@ -1,6 +1,7 @@
 class CommonIndexer
 
   @@record_types << :top_container
+  @@resolved_attributes << 'container_profile'
 
   add_indexer_initialize_hook do |indexer|
     indexer.add_document_prepare_hook {|doc, record|
@@ -9,6 +10,10 @@ class CommonIndexer
         if record['record']['series']
           doc['series_uri_u_sstr'] = record['record']['series']['ref']
           doc['series_title_u_sstr'] = record['record']['series']['display_string']
+        end
+        if record['record']['container_profile']
+          doc['container_profile_uri_u_sstr'] = record['record']['container_profile']['ref']
+          doc['container_profile_display_string_u_sstr'] = record['record']['container_profile']['_resolved']['display_string']
         end
       end
     }
