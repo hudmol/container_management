@@ -100,9 +100,21 @@ class TopContainersController < ApplicationController
                                           })
     end
 
-    @search_data = Search.all(session[:repo_id], search_params)
-
-    render :action => :bulk_operations
+    respond_to do |format|
+      format.json {
+        p "*** HELLO ***"
+        self.response_body = Enumerator.new do |y|
+          container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
+          JSONModel::HTTP::stream(container_search_url, search_params) do |response|
+            y << response.body
+          end
+        end
+      }
+      format.html {
+        @search_data = Search.all(session[:repo_id], search_params)
+        render :action => :bulk_operations
+      }
+    end
   end
 
 

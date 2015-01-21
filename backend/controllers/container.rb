@@ -1,5 +1,25 @@
 class ArchivesSpaceService < Sinatra::Base
 
+  Endpoint.get('/repositories/:repo_id/top_containers/search')
+  .description("Delete a yale container")
+  .params(["repo_id", :repo_id],
+          *BASE_SEARCH_PARAMS)
+  .permissions([:view_repository])
+  .returns([200, "[(:top_container)]"]) \
+  do
+
+    [
+      200,
+      {'Content-Type' => 'application/json'},
+      Enumerator.new do |y|
+        Search.search_stream(params.merge(:type => ['top_container']), params[:repo_id]) do |response|
+          y << response.body
+        end
+      end
+    ]
+
+  end
+
 
   Endpoint.post('/repositories/:repo_id/top_containers/:id')
     .description("Update a yale container")
