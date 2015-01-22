@@ -129,9 +129,11 @@ describe 'Yale Container model' do
     it "can find an accession linked to a given top container" do
       accession = create_accession({"instances" => [build_instance(box)]})
 
-      series = top_container.series
-      series.should be_instance_of(Accession)
-      series.id.should eq(accession.id)
+      collection = top_container.collection
+      collection.should be_instance_of(Accession)
+      collection.id.should eq(accession.id)
+
+      top_container.series.should be_nil
     end
 
 
@@ -139,16 +141,19 @@ describe 'Yale Container model' do
       accession = create_accession({"instances" => [build_instance(box)]})
 
       json = TopContainer.to_jsonmodel(top_container.id)
-      json.series.should eq({'ref' => accession.uri, 'display_string' => accession.display_string})
+      json.series.should be_nil
+      json.collection.should eq({'ref' => accession.uri, 'display_string' => accession.display_string})
     end
 
 
     it "can find a resource linked to a given top container" do
       resource = create_resource({"instances" => [build_instance(box)]})
 
-      series = top_container.series
-      series.should be_instance_of(Resource)
-      series.id.should eq(resource.id)
+      collection = top_container.collection
+      collection.should be_instance_of(Resource)
+      collection.id.should eq(resource.id)
+
+      top_container.series.should be_nil
     end
 
 
@@ -173,6 +178,14 @@ describe 'Yale Container model' do
         (resource, grandparent, parent, child) = create_tree(box)
 
         top_container.display_string.should eq("1 [123] : #{grandparent.display_string}")
+      end
+
+      it "can get the collection linked to a given top container" do
+        (resource, grandparent, parent, child) = create_tree(box)
+
+        collection = top_container.collection
+        collection.should be_instance_of(Resource)
+        collection.id.should eq(resource.id)
       end
 
     end

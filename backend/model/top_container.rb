@@ -41,13 +41,13 @@ class TopContainer < Sequel::Model(:top_container)
     if obj.respond_to?(:series)
       obj.series
     else
-      obj
+      nil
     end
   end
 
 
-  def series
-    # Take the first linked subcontainer
+  def linked_instance_record_matching(&block)
+# Take the first linked subcontainer
     subcontainer = related_records(:top_container_link).first
     return nil if !subcontainer
 
@@ -63,11 +63,27 @@ class TopContainer < Sequel::Model(:top_container)
       key = association[:key]
 
       if instance[key]
-        return tree_top(model[instance[key]])
+        return block.call(model[instance[key]])
       end
     end
 
     nil
+  end
+
+
+  def collection
+    linked_instance_record_matching do |obj|
+      if obj.respond_to?(:series)
+        obj.class.root_model[obj.root_record_id]
+      else
+        obj
+      end
+    end
+  end
+
+
+  def series
+    linked_instance_record_matching {|obj| tree_top(obj) }
   end
 
 
@@ -112,6 +128,12 @@ class TopContainer < Sequel::Model(:top_container)
         json['series'] = {
           'ref' => series.uri,
           'display_string' => find_title_for(series)
+        }
+      end
+      if collection = obj.collection
+        json['collection'] = {
+          'ref' => collection.uri,
+          'display_string' => find_title_for(collection)
         }
       end
 

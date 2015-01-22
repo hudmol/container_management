@@ -43,8 +43,23 @@
         "subtype" => "ref",
         "properties" => {
           "ref" => {
+            "type" => "JSONModel(:archival_object) uri",
+          },
+          "display_string" => {"type" => "string"},
+          "_resolved" => {
+            "type" => "object",
+            "readonly" => "true"
+          }
+        }
+      },
+
+      "collection" => {
+        "readonly" => "true",
+        "type" => "object",
+        "subtype" => "ref",
+        "properties" => {
+          "ref" => {
             "type" => [
-              {"type" => "JSONModel(:archival_object) uri"},
               {"type" => "JSONModel(:resource) uri"},
               {"type" => "JSONModel(:accession) uri"}
             ]
