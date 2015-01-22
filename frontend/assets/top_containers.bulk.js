@@ -19,12 +19,14 @@ BulkContainerSearch.prototype.setup_form = function() {
 BulkContainerSearch.prototype.perform_search = function(data) {
   var self = this;
 
+  self.$results_container.closest(".row-fluid").show();
+  self.$results_container.html(AS.renderTemplate("template_bulk_operation_loading"));
+
   $.ajax({
     url:"/plugins/top_containers/bulk_operations/search",
     data: data,
     type: "post",
     success: function(html) {
-      self.$results_container.closest(".row-fluid").show();
       self.$results_container.html(html);
       self.setup_table_sorter();
     }

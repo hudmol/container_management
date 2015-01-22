@@ -1,21 +1,21 @@
 <%
-   if params['series'].blank?
+   if params['collection'].blank?
      selected_json = "{}"
    else
-     selected_json = params['series']['_resolved']
+     selected_json = params['collection']['_resolved']
    end
 
-   linkable_types = ["archival_object"]
+   linkable_types = ["resource", "accession"]
 
 %>
 
 <div class="input-append linker-wrapper">
   <input type="text" class="linker"
-         id="series"
-         data-label="Series"
-         data-label_plural="Series"
+         id="collection"
+         data-label="Collection"
+         data-label_plural="Collections"
          data-name="ref"
-         data-path="series"
+         data-path="collection"
          data-url="<%= url_for  :controller => :search, :action => :do_search, :format => :json %>"
          data-browse-url="<%= url_for :controller => :search, :action => :do_search, :format => :js, :facets => [], :sort => "title_sort asc" %>"
          data-selected="<%= selected_json %>"

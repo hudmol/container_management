@@ -18,14 +18,19 @@
           </div>
         </div>
         <div class="control-group">
+          <label class="control-label" for="container_profile">Collection/Accession</label>
+          <div class="controls">
+            <%= render_aspace_partial :partial => "top_containers/bulk_operations/collection_linker" %>
+          </div>
+        </div>
+        <div class="control-group">
           <label class="control-label" for="series">Series</label>
           <div class="controls">
             <%= render_aspace_partial :partial => "top_containers/bulk_operations/series_linker" %>
           </div>
         </div>
-        <!--
         <div class="control-group">
-          <label class="control-label" for="container_profile"><%= I18n.t("container_profile._singular") %></label>
+          <label class="control-label" for="location"><%= I18n.t("container_profile._singular") %></label>
           <div class="controls">
             <%= render_aspace_partial :partial => "top_containers/bulk_operations/container_profile_linker" %>
           </div>
@@ -36,7 +41,6 @@
             <%= render_aspace_partial :partial => "top_containers/bulk_operations/location_linker" %>
           </div>
         </div>
-        -->
         <div class="control-group">
           <div class="controls">
             <%= submit_tag "Search", :class => "btn btn-primary pull-right" %>
@@ -55,10 +59,10 @@
   </div>
 </div>
 
-<div id="template_bulk_operation_result"><!--
-  <div>
-    ${uri} - ${display_string}
-  </div>
+<div id="template_bulk_operation_loading"><!--
+  <center>
+    <%= image_tag "#{AppConfig[:frontend_prefix]}assets/yale_container_loading.gif" %>
+  </center>
 --></div>
 
 <script src="<%= "#{AppConfig[:frontend_prefix]}assets/jquery.tablesorter.min.js" %>"></script>
