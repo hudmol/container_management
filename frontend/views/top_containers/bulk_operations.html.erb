@@ -4,6 +4,8 @@
    @show_multiselect_column = true
 %>
 
+<link href="<%= "#{AppConfig[:frontend_prefix]}assets/top_containers.bulk.css" %>" media="all" rel="stylesheet" type="text/css"/>
+
 <div class="row-fluid">
   <div class="span12">
     <h1><%= I18n.t("top_container._frontend.bulk_operations.title") %></h1>
@@ -59,4 +61,5 @@
   </div>
 --></div>
 
+<script src="<%= "#{AppConfig[:frontend_prefix]}assets/jquery.tablesorter.min.js" %>"></script>
 <script src="<%= "#{AppConfig[:frontend_prefix]}assets/top_containers.bulk.js" %>"></script>

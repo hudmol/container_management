@@ -87,8 +87,7 @@ class TopContainersController < ApplicationController
 
   def bulk_operation_search
     search_params = params_for_backend_search.merge({
-                                                      'type[]' => ['top_container'],
-                                                      'sort' => 'display_string asc'
+                                                      'type[]' => ['top_container']
                                                     })
 
     filters = []

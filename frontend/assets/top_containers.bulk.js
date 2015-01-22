@@ -19,22 +19,14 @@ BulkContainerSearch.prototype.setup_form = function() {
 BulkContainerSearch.prototype.perform_search = function(data) {
   var self = this;
 
-//  $.ajax({
-//    url:"/plugins/top_containers/bulk_operations/search.json",
-//    data: data,
-//    type: "post",
-//    success: function(json) {
-//      self.$results_container.closest(".row-fluid").show();
-//      self.render_results(json.response.docs);
-//    }
-//  });
   $.ajax({
     url:"/plugins/top_containers/bulk_operations/search",
     data: data,
     type: "post",
     success: function(html) {
       self.$results_container.closest(".row-fluid").show();
-      self.$results_container.html(html)
+      self.$results_container.html(html);
+      self.setup_table_sorter();
     }
   });
 };
@@ -74,20 +66,23 @@ BulkContainerSearch.prototype.update_button_state = function() {
   }
 };
 
-
-BulkContainerSearch.prototype.render_results = function(docs) {
-  var self = this;
-
-  self.$results_container.empty();
-  $.each(docs, function(i, doc) {
-    var real_json = JSON.parse(doc.json);
-    var foo = AS.renderTemplate("template_bulk_operation_result", real_json);
-    self.$results_container.append(foo);
-  });
+BulkContainerSearch.prototype.setup_table_sorter = function() {
+  var tablesorter_opts = {
+    // disable sort on the checkbox column
+    headers: {
+      0: { sorter: false}
+    },
+    // default sort: Collection, Series, Indicator
+    sortList: [[1,0],[2,0],[4,0]]
+  };
+  this.$results_container.find("table").tablesorter(tablesorter_opts);
 };
+
 
 $(function() {
 
-  new BulkContainerSearch($("#bulk_operation_form"), $("#bulk_operation_results"), $(".record-toolbar.bulk-operation-toolbar"));
+  new BulkContainerSearch($("#bulk_operation_form"),
+                          $("#bulk_operation_results"),
+                          $(".record-toolbar.bulk-operation-toolbar"));
 
 });

@@ -2,11 +2,15 @@
   <thead>
     <tr>
       <th><%= check_box_tag "select_all" %></th>
-      <th>Display String</th>
+      <th>Collection/Accession</th>
+      <th>Series</th>
       <th>Container Profile</th>
-      <th>Indicator</th>
       <th>Barcode</th>
       <th>Series</th>
+      <th>Current Location</th>
+      <th>Voyager ID</th>
+      <th>Restricted?</th>
+      <th>Exported?</th>
     </tr>
   </thead>
   <tbody>
@@ -14,11 +18,15 @@
       <% container_json = ASUtils.json_parse(doc['json']) %>
       <tr>
         <td><%= check_box_tag "uri", container_json['uri'] %></td>
-        <td><%= container_json['display_string'] %></td>
+        <td><%= (doc['collection_display_string_u_sstr'] || [""]).first %></td>
+        <td><%= (doc['series_title_u_sstr'] || [""]).first %></td>
         <td><%= (doc['container_profile_display_string_u_sstr'] || [""]).first %></td>
         <td><%= container_json['indicator'] %></td>
         <td><%= container_json['barcode'] %></td>
-        <td><%= (doc['series_title_u_sstr'] || [""]).first %></td>
+        <td><%= (doc['location_display_string_u_sstr'] || [""]).first %></td>
+        <td><%= container_json['voyager_id'] %></td>
+        <td><%= container_json['restricted'] %></td>
+        <td><%= container_json['exported_to_voyager'] %></td>
       </tr>
     <% end %>
   </tbody>
