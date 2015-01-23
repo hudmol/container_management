@@ -143,6 +143,8 @@ describe 'Yale Container model' do
       json = TopContainer.to_jsonmodel(top_container.id)
       json.series.should be_nil
       json.collection.should eq({'ref' => accession.uri, 'display_string' => accession.display_string})
+
+      top_container.display_string.should eq("1 [123] : #{accession.display_string}")
     end
 
 
@@ -154,6 +156,7 @@ describe 'Yale Container model' do
       collection.id.should eq(resource.id)
 
       top_container.series.should be_nil
+      top_container.display_string.should eq("1 [123] : #{resource.title}")
     end
 
 

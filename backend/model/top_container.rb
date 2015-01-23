@@ -92,11 +92,33 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def linked_record_display_string
+    result = series_display_string
+
+    if result.empty?
+      collection_display_string
+    else
+      result
+    end
+  end
+
+
   def series_display_string
     series_record = series
 
     if series_record
       ": #{self.class.find_title_for(series_record)}"
+    else
+      ""
+    end
+  end
+
+
+  def collection_display_string
+    collection_record = collection
+
+    if collection_record
+      ": #{self.class.find_title_for(collection_record)}"
     else
       ""
     end
@@ -114,7 +136,7 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def display_string
-    "#{self.container_profile_display_string} #{self.indicator} #{self.format_barcode} #{self.series_display_string}".strip
+    "#{self.container_profile_display_string} #{self.indicator} #{self.format_barcode} #{self.linked_record_display_string}".strip
   end
 
 

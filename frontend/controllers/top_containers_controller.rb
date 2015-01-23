@@ -69,12 +69,7 @@ class TopContainersController < ApplicationController
   def typeahead
     search_params = params_for_backend_search
 
-    series_uri = series_for_uri(params['uri'])
-    if (series_uri)
-      search_params = search_params.merge({
-                                            "filter_term[]" => [{"series_uri_u_sstr" => series_uri}.to_json]
-                                          })
-    end
+    search_params = search_params.merge(search_filter_for(params[:uri]))
 
     render :json => Search.all(session[:repo_id], search_params)
   end
@@ -137,15 +132,22 @@ class TopContainersController < ApplicationController
     SearchHelper.can_edit_search_result?(record)
   end
 
-  def series_for_uri(uri)
-    return if uri.blank?
+
+  def search_filter_for(uri)
+    return {} if uri.blank?
 
     parsed = JSONModel.parse_reference(uri)
-    if parsed[:type] == :archival_object
-      return JSONModel(:archival_object).find(parsed[:id]).series['ref']
+
+    if parsed[:type] == "archival_object"
+      series_uri = JSONModel(:archival_object).find(parsed[:id]).series['ref']
+      return {
+        "filter_term[]" => [{"series_uri_u_sstr" => series_uri}.to_json]
+      }
     end
 
-    uri
+    return {
+      "filter_term[]" => [{"collection_uri_u_sstr" => uri}.to_json]
+    }
   end
 
 end
