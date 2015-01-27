@@ -45,6 +45,7 @@ en:
       messages:
         created: Top Container Created
         updated: Top Container Updated
+        filter_required: Please provide a filter
       bulk_operations:
         title: Bulk Operations
 

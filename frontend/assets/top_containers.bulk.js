@@ -29,6 +29,10 @@ BulkContainerSearch.prototype.perform_search = function(data) {
     success: function(html) {
       self.$results_container.html(html);
       self.setup_table_sorter();
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      var html = AS.renderTemplate("template_bulk_operation_error_message", {message: jqXHR.responseText})
+      self.$results_container.html(html);
     }
   });
 };

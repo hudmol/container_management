@@ -87,8 +87,11 @@ class TopContainersController < ApplicationController
     filters.push({'container_profile_uri_u_sstr' => params['container_profile']['ref']}.to_json) if params['container_profile']
     filters.push({'location_uri_u_sstr' => params['location']['ref']}.to_json) if params['location']
 
+    if filters.empty? && params['q'].blank?
+      return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
+    end
 
-    if (!filters.empty?)
+    unless filters.empty?
       search_params = search_params.merge({
                                             "filter_term[]" => filters
                                           })
