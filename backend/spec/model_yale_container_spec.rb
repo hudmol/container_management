@@ -2,9 +2,9 @@ require 'spec_helper'
 require_relative 'factories'
 
 
-def create_tree(top_container_json)
+def create_tree(top_container_json, opts = {})
   resource = create_resource
-  grandparent = create(:json_archival_object, :resource => {"ref" => resource.uri})
+  grandparent = create(:json_archival_object, {:resource => {"ref" => resource.uri}}.merge(opts.fetch(:grandparent_properties, {})))
   parent = create(:json_archival_object, "resource" => {"ref" => resource.uri}, "parent" => {"ref" => grandparent.uri})
   child = create(:json_archival_object,
                  "resource" => {"ref" => resource.uri},
@@ -122,7 +122,7 @@ describe 'Yale Container model' do
     let (:top_container) { TopContainer[box.id] }
 
     it "can show a display string for a top container that isn't linked to anything" do
-      top_container.display_string.should eq("1 [123]")
+      top_container.display_string.should eq("Container 1: [123]")
     end
 
 
@@ -137,17 +137,6 @@ describe 'Yale Container model' do
     end
 
 
-    it "returns the series in the JSON output of a top container" do
-      accession = create_accession({"instances" => [build_instance(box)]})
-
-      json = TopContainer.to_jsonmodel(top_container.id)
-      json.series.should be_nil
-      json.collection.should eq({'ref' => accession.uri, 'display_string' => accession.display_string})
-
-      top_container.display_string.should eq("1 [123] : #{accession.display_string}")
-    end
-
-
     it "can find a resource linked to a given top container" do
       resource = create_resource({"instances" => [build_instance(box)]})
 
@@ -156,7 +145,6 @@ describe 'Yale Container model' do
       collection.id.should eq(resource.id)
 
       top_container.series.should be_nil
-      top_container.display_string.should eq("1 [123] : #{resource.title}")
     end
 
 
@@ -177,12 +165,6 @@ describe 'Yale Container model' do
         json.series.should eq({'ref' => grandparent.uri, 'display_string' => grandparent.display_string})
       end
 
-      it "can incorporates the series display string into the top container's display string" do
-        (resource, grandparent, parent, child) = create_tree(box)
-
-        top_container.display_string.should eq("1 [123] : #{grandparent.display_string}")
-      end
-
       it "can get the collection linked to a given top container" do
         (resource, grandparent, parent, child) = create_tree(box)
 
@@ -192,18 +174,42 @@ describe 'Yale Container model' do
       end
 
     end
-  end
 
 
-  it "incorporates container profile names into display strings" do
-    test_container_profile = create(:json_container_profile, :name => "Cardboard box")
+    it "shows a display string for a linked series-level AO" do
+      (resource, grandparent, parent, child) = create_tree(box,
+                                                           :grandparent_properties => {
+                                                             'level' => "series",
+                                                             'component_id' => "3",
+                                                           })
 
-    container_with_profile = create(:json_top_container,
-                                    'barcode' => '123',
-                                    'indicator' => '1',
-                                    'container_profile' => {'ref' => test_container_profile.uri})
+      top_container.display_string.should eq("Container 1: Series 3 [123]")
+    end
 
-    TopContainer[container_with_profile.id].display_string.should eq("Cardboard box 1 [123]")
+    it "shows a display string for a linked other-level AO" do
+      (resource, grandparent, parent, child) = create_tree(box,
+                                                           :grandparent_properties => {
+                                                             'component_id' => "9",
+                                                             'level' => 'otherlevel',
+                                                             'other_level' => 'Handbag'
+                                                           })
+
+      top_container.display_string.should eq("Container 1: Handbag 9 [123]")
+    end
+
+    it "shows a display string for a linked accession" do
+      accession = create_accession({"instances" => [build_instance(box)]})
+
+      top_container.display_string.should eq("Container 1: [123]")
+    end
+
+
+    it "shows a display string for a linked resource" do
+      resource = create_resource({"instances" => [build_instance(box)]})
+
+      top_container.display_string.should eq("Container 1: [123]")
+    end
+
   end
 
 
@@ -312,14 +318,11 @@ describe 'Yale Container model' do
 
       container1_original_mtime = container1.refresh.system_mtime
       container2_original_mtime = container2.refresh.system_mtime
-      container1_original_display_string = container1.display_string
 
       ComponentTransfer.transfer(resource2.uri, parent1.uri)
 
       container1.refresh.system_mtime.should be > container1_original_mtime
       container2.refresh.system_mtime.should be > container2_original_mtime
-
-      container1.refresh.display_string.should_not eq(container1_original_display_string)
     end
 
   end

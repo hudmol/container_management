@@ -35,7 +35,9 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def format_barcode
-    self.barcode ? "[#{self.barcode}]" : ""
+    if self.barcode
+      "[#{self.barcode}]"
+    end
   end
 
 
@@ -96,51 +98,18 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
-  def linked_record_display_string
-    result = series_display_string
-
-    if result.empty?
-      collection_display_string
-    else
-      result
-    end
-  end
-
-
-  def series_display_string
+  def series_label
     series_record = series
 
-    if series_record
-      ": #{self.class.find_title_for(series_record)}"
-    else
-      ""
-    end
-  end
-
-
-  def collection_display_string
-    collection_record = collection
-
-    if collection_record
-      ": #{self.class.find_title_for(collection_record)}"
-    else
-      ""
-    end
-  end
-
-
-  def container_profile_display_string
-    container_profile = related_records(:top_container_profile)
-    if container_profile
-      container_profile.display_string
-    else
-      ""
+    if series
+      level = series.other_level || I18n.t("enumerations.archival_record_level.#{series.level}", series.level)
+      "#{level} #{series.component_id}"
     end
   end
 
 
   def display_string
-    "#{self.container_profile_display_string} #{self.indicator} #{self.format_barcode} #{self.linked_record_display_string}".strip
+    ["Container", "#{indicator}:", series_label, format_barcode].compact.join(" ")
   end
 
 
