@@ -132,6 +132,10 @@ class TopContainer < Sequel::Model(:top_container)
         }
       end
 
+      if json['exported_to_ils']
+        json['exported_to_ils'] = json['exported_to_ils'].getlocal.iso8601
+      end
+
     end
 
     jsons

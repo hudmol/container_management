@@ -24,8 +24,10 @@ en:
   top_container:
     indicator: Indicator
     barcode: Barcode
-    voyager_id: Voyager ID
-    exported_to_voyager: Exported to Voyager?
+    ils_holding_id: ILS Holding ID
+    ils_item_id: ILS Item ID
+    exported_to_ils: Exported to ILS
+    not_exported: Not exported
     restricted: Restricted?
     parent: Parent Container
 

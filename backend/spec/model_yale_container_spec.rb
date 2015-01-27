@@ -33,22 +33,25 @@ describe 'Yale Container model' do
 
   it "supports all kinds of wonderful metadata" do
     barcode = '12345678'
-    voyager_id = '112358'
-    exported_to_voyager = true
+    ils_holding_id = '112358'
+    ils_item_id = '853211'
+    exported_to_ils = Time.at(1234567890).iso8601
     restricted = false
 
     yale_box_container = build(:json_top_container,
                                'barcode' => barcode,
-                               'voyager_id' => voyager_id,
-                               'exported_to_voyager' => exported_to_voyager,
+                               'ils_holding_id' => ils_holding_id,
+                               'ils_item_id' => ils_item_id,
+                               'exported_to_ils' => exported_to_ils,
                                'restricted' => restricted)
 
     box_id = TopContainer.create_from_json(yale_box_container, :repo_id => $repo_id).id
 
     box = TopContainer.to_jsonmodel(box_id)
     box.barcode.should eq(barcode)
-    box.voyager_id.should eq(voyager_id)
-    box.exported_to_voyager.should eq(exported_to_voyager)
+    box.ils_holding_id.should eq(ils_holding_id)
+    box.ils_item_id.should eq(ils_item_id)
+    box.exported_to_ils.should eq(exported_to_ils)
     box.restricted.should eq(restricted)
   end
 

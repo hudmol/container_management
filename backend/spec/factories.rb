@@ -5,9 +5,10 @@ FactoryGirl.define do
   factory :json_top_container, class: JSONModel(:top_container) do
     indicator { generate(:alphanumstr) }
     barcode { generate(:alphanumstr) }
-    voyager_id { generate(:alphanumstr) }
+    ils_holding_id { generate(:alphanumstr) }
+    ils_item_id { generate(:alphanumstr) }
     restricted { false }
-    exported_to_voyager { true }
+    exported_to_ils { Time.now.iso8601 }
   end
 
   factory :json_container_profile, class: JSONModel(:container_profile) do
