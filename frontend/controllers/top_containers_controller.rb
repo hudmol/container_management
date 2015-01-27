@@ -5,7 +5,6 @@ class TopContainersController < ApplicationController
 
 
   def index
-    @search_data = Search.for_type(session[:repo_id], "top_container", params_for_backend_search)
   end
 
 
@@ -60,9 +59,11 @@ class TopContainersController < ApplicationController
 
 
   def delete
+    raise "TODO"
   end
 
   def batch_delete
+    raise "TODO"
   end
 
 
@@ -72,11 +73,6 @@ class TopContainersController < ApplicationController
     search_params = search_params.merge(search_filter_for(params[:uri]))
 
     render :json => Search.all(session[:repo_id], search_params)
-  end
-
-
-  def bulk_operations
-
   end
 
 
@@ -98,29 +94,10 @@ class TopContainersController < ApplicationController
                                           })
     end
 
-    # respond_to do |format|
-    #   format.json {
-    #     p "*** HELLO ***"
-    #     self.response_body = Enumerator.new do |y|
-    #       container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
-    #       JSONModel::HTTP::stream(container_search_url, search_params) do |response|
-    #         y << response.body
-    #       end
-    #     end
-    #   }
-    #   format.html {
-        container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
-        results = JSONModel::HTTP::get_json(container_search_url, search_params)
+    container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
+    results = JSONModel::HTTP::get_json(container_search_url, search_params)
 
-        #containers = (results['response']['docs'] || []).map{|doc| JSONModel(:top_container).from_hash(ASUtils.json_parse(doc['json']))}
-
-        render_aspace_partial :partial => "top_containers/bulk_operations/results", :locals => {:results => results['response']['docs']}
-    #  }
-      #format.html {
-      #  @search_data = Search.all(session[:repo_id], search_params)
-      #  render :action => :bulk_operations
-      #}
-   # end
+    render_aspace_partial :partial => "top_containers/bulk_operations/results", :locals => {:results => results}
   end
 
 
