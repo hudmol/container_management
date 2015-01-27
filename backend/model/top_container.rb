@@ -49,8 +49,9 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
-  def linked_instance_record_matching(&block)
-# Take the first linked subcontainer
+  # return the first archival record linked to this top container
+  def linked_archival_record
+    # Take the first linked subcontainer
     subcontainer = related_records(:top_container_link).first
     return nil if !subcontainer
 
@@ -66,7 +67,7 @@ class TopContainer < Sequel::Model(:top_container)
       key = association[:key]
 
       if instance[key]
-        return block.call(model[instance[key]])
+        return model[instance[key]]
       end
     end
 
@@ -75,18 +76,18 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def collection
-    linked_instance_record_matching do |obj|
-      if obj.respond_to?(:series)
-        obj.class.root_model[obj.root_record_id]
-      else
-        obj
-      end
+    obj = linked_archival_record
+
+    if obj.respond_to?(:series)
+      obj.class.root_model[obj.root_record_id]
+    else
+      obj
     end
   end
 
 
   def series
-    linked_instance_record_matching {|obj| tree_top(obj) }
+    tree_top(linked_archival_record)
   end
 
 
