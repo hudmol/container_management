@@ -2,9 +2,15 @@
 
 <%
   top_containers = results['response']['docs']
+  num_found = results['response']["numFound"].to_i
+  rows = results['responseHeader']['params']['rows'].to_i
 %>
-
-<p>Matching results: <strong><%= results['response']["numFound"] %></strong></p>
+<% if rows < num_found %>
+  <div class="alert alert-warning">Not all results have been listed. Please refine your search.</div>
+  <p>Showing <strong><%= [rows, num_found].min %></strong> of <strong><%= num_found %></strong> matching results</p>
+<% else %>
+  <p>Matching results: <strong><%= num_found %></strong></p>
+<% end %>
 
 <table class="table table-striped table-bordered table-condensed table-hover table-sortable table-search-results">
   <thead>
