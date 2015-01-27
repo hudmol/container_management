@@ -46,6 +46,8 @@ BulkContainerSearch.prototype.setup_results_list = function(docs) {
   });
 
   self.$results_container.on("click", ":checkbox", function(event) {
+    event.stopPropagation();
+
     var $checkbox = $(this);
     var $row = $checkbox.closest("tr");
     $row.toggleClass("selected");
