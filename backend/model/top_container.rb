@@ -218,7 +218,9 @@ class TopContainer < Sequel::Model(:top_container)
             end
 
 
-    query.pagination(1, 1000000).
+    max_results = AppConfig.has_key?(:max_top_container_results) ? AppConfig[:max_top_container_results] : 10000
+
+    query.pagination(1, max_results).
       set_repo_id(repo_id).
       set_record_types(params[:type]).
       set_filter_terms(params[:filter_term]).
