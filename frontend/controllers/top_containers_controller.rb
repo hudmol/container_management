@@ -5,7 +5,6 @@ class TopContainersController < ApplicationController
 
 
   def index
-    @search_data = Search.for_type(session[:repo_id], "top_container", params_for_backend_search)
   end
 
 
@@ -60,49 +59,48 @@ class TopContainersController < ApplicationController
 
 
   def delete
+    raise "TODO"
   end
 
   def batch_delete
+    raise "TODO"
   end
 
 
   def typeahead
     search_params = params_for_backend_search
 
-    series_uri = series_for_uri(params['uri'])
-    if (series_uri)
-      search_params = search_params.merge({
-                                            "filter_term[]" => [{"series_uri_u_sstr" => series_uri}.to_json]
-                                          })
-    end
+    search_params = search_params.merge(search_filter_for(params[:uri]))
 
     render :json => Search.all(session[:repo_id], search_params)
   end
 
 
-  def bulk_operations
-
-  end
-
-
   def bulk_operation_search
     search_params = params_for_backend_search.merge({
-                                                      'type[]' => ['top_container'],
+                                                      'type[]' => ['top_container']
                                                     })
 
     filters = []
     filters.push({'series_uri_u_sstr' => params['series']['ref']}.to_json) if params['series']
+    filters.push({'collection_uri_u_sstr' => params['collection']['ref']}.to_json) if params['collection']
+    filters.push({'container_profile_uri_u_sstr' => params['container_profile']['ref']}.to_json) if params['container_profile']
+    filters.push({'location_uri_u_sstr' => params['location']['ref']}.to_json) if params['location']
 
+    if filters.empty? && params['q'].blank?
+      return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
+    end
 
-    if (!filters.empty?)
+    unless filters.empty?
       search_params = search_params.merge({
                                             "filter_term[]" => filters
                                           })
     end
 
-    @search_data = Search.all(session[:repo_id], search_params)
+    container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
+    results = JSONModel::HTTP::get_json(container_search_url, search_params)
 
-    render :action => :bulk_operations
+    render_aspace_partial :partial => "top_containers/bulk_operations/results", :locals => {:results => results}
   end
 
 
@@ -114,15 +112,22 @@ class TopContainersController < ApplicationController
     SearchHelper.can_edit_search_result?(record)
   end
 
-  def series_for_uri(uri)
-    return if uri.blank?
+
+  def search_filter_for(uri)
+    return {} if uri.blank?
 
     parsed = JSONModel.parse_reference(uri)
-    if parsed[:type] == :archival_object
-      return JSONModel(:archival_object).find(parsed[:id]).series['ref']
+
+    if parsed[:type] == "archival_object"
+      series_uri = JSONModel(:archival_object).find(parsed[:id]).series['ref']
+      return {
+        "filter_term[]" => [{"series_uri_u_sstr" => series_uri}.to_json]
+      }
     end
 
-    uri
+    return {
+      "filter_term[]" => [{"collection_uri_u_sstr" => uri}.to_json]
+    }
   end
 
 end

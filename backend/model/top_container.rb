@@ -1,3 +1,6 @@
+require 'uri'
+require 'net/http'
+
 class TopContainer < Sequel::Model(:top_container)
   include ASModel
 
@@ -41,12 +44,13 @@ class TopContainer < Sequel::Model(:top_container)
     if obj.respond_to?(:series)
       obj.series
     else
-      obj
+      nil
     end
   end
 
 
-  def series
+  # return the first archival record linked to this top container
+  def linked_archival_record
     # Take the first linked subcontainer
     subcontainer = related_records(:top_container_link).first
     return nil if !subcontainer
@@ -63,11 +67,27 @@ class TopContainer < Sequel::Model(:top_container)
       key = association[:key]
 
       if instance[key]
-        return tree_top(model[instance[key]])
+        return model[instance[key]]
       end
     end
 
     nil
+  end
+
+
+  def collection
+    obj = linked_archival_record
+
+    if obj.respond_to?(:series)
+      obj.class.root_model[obj.root_record_id]
+    else
+      obj
+    end
+  end
+
+
+  def series
+    tree_top(linked_archival_record)
   end
 
 
@@ -76,11 +96,33 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def linked_record_display_string
+    result = series_display_string
+
+    if result.empty?
+      collection_display_string
+    else
+      result
+    end
+  end
+
+
   def series_display_string
     series_record = series
 
     if series_record
       ": #{self.class.find_title_for(series_record)}"
+    else
+      ""
+    end
+  end
+
+
+  def collection_display_string
+    collection_record = collection
+
+    if collection_record
+      ": #{self.class.find_title_for(collection_record)}"
     else
       ""
     end
@@ -98,7 +140,7 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def display_string
-    "#{self.container_profile_display_string} #{self.indicator} #{self.format_barcode} #{self.series_display_string}".strip
+    "#{self.container_profile_display_string} #{self.indicator} #{self.format_barcode} #{self.linked_record_display_string}".strip
   end
 
 
@@ -112,6 +154,12 @@ class TopContainer < Sequel::Model(:top_container)
         json['series'] = {
           'ref' => series.uri,
           'display_string' => find_title_for(series)
+        }
+      end
+      if collection = obj.collection
+        json['collection'] = {
+          'ref' => collection.uri,
+          'display_string' => find_title_for(collection)
         }
       end
 
@@ -159,6 +207,38 @@ class TopContainer < Sequel::Model(:top_container)
     end
 
     super
+  end
+
+
+  def self.search_stream(params, repo_id, &block)
+    query = if params[:q]
+              Solr::Query.create_keyword_search(params[:q])
+            else
+              Solr::Query.create_match_all_query
+            end
+
+
+    max_results = AppConfig.has_key?(:max_top_container_results) ? AppConfig[:max_top_container_results] : 10000
+
+    query.pagination(1, max_results).
+      set_repo_id(repo_id).
+      set_record_types(params[:type]).
+      set_filter_terms(params[:filter_term]).
+      set_facets(params[:facet])
+
+
+    url = query.to_solr_url
+    req = Net::HTTP::Get.new(url.request_uri)
+
+    Net::HTTP.start(url.host, url.port) do |http|
+      http.request(req, nil) do |response|
+        if response.code =~ /^4/
+          raise response.body
+        end
+
+        block.call(response)
+      end
+    end
   end
 
 end

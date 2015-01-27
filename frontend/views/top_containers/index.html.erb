@@ -1,43 +1,70 @@
 <%= setup_context(:title => I18n.t("top_container._plural")) %>
 
-<%
-   @show_multiselect_column = user_can?("manage_container")
-%>
+<link href="<%= "#{AppConfig[:frontend_prefix]}assets/top_containers.bulk.css" %>" media="all" rel="stylesheet" type="text/css"/>
 
 <div class="row-fluid">
-  <div class="span3">
-    <%= render_aspace_partial :partial => "search/filter" %>
-  </div>
-  <div class="span9">
-    <% if user_can?("manage_container") %>
-      <div class="row-fluid">
-        <div class="span12">
-          <div class="record-toolbar">
-            <%= link_to I18n.t("top_container._frontend.bulk_operations.title"), url_for(:controller => :top_containers, :action => :bulk_operations), :class => "btn" %>
-            <div class="pull-right">
-              <%= button_delete_action(url_for(:controller => :top_containers, :action => :batch_delete), {
-                :class => "btn btn-small btn-danger multiselect-enabled",
-                :"data-multiselect" => "#tabledSearchResults",
-                :"data-title" => I18n.t("actions.delete_multiple_confirm_title"),
-                :"data-message" => I18n.t("actions.delete_multiple_confirm_message"),
-                :"data-confirm-btn-label" => "#{I18n.t("actions.delete_multiple")}",
-                :disabled => "disabled"
-              }) %>
-            </div>
+  <div class="span12">
+    <h1><%= I18n.t("top_container._plural") %></h1>
+    <%= form_tag({:controller => :top_containers, :action => :bulk_operations}, {:class => "form-horizontal", :id => "bulk_operation_form"}) do |f| %>
+      <div class="span8">
+        <div class="control-group">
+          <label class="control-label" for="q">Keyword</label>
+          <div class="controls">
+            <%= text_field_tag "q", params["q"], :style => "width: 100%;" %>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="container_profile">Collection/Accession</label>
+          <div class="controls">
+            <%= render_aspace_partial :partial => "top_containers/bulk_operations/collection_linker" %>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="series">Series</label>
+          <div class="controls">
+            <%= render_aspace_partial :partial => "top_containers/bulk_operations/series_linker" %>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="location"><%= I18n.t("container_profile._singular") %></label>
+          <div class="controls">
+            <%= render_aspace_partial :partial => "top_containers/bulk_operations/container_profile_linker" %>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="location"><%= I18n.t("location._singular") %></label>
+          <div class="controls">
+            <%= render_aspace_partial :partial => "top_containers/bulk_operations/location_linker" %>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <%= submit_tag "Search", :class => "btn btn-primary pull-right" %>
           </div>
         </div>
       </div>
     <% end %>
-    <div class="record-pane">
-      <%= link_to_help :topic => "search" %>
-
-      <h2><%= I18n.t("top_container._plural") %></h2>
-
-      <%= render_aspace_partial :partial => "shared/flash_messages" %>
-
-      <%= render_aspace_partial :partial => "search/listing" %>
-    </div>
+  </div>
+</div>
+<br/>
+<div class="row-fluid" style="display: none">
+  <div class="span12">
+    <%= render_aspace_partial :partial => "top_containers/bulk_operations/toolbar" %>
+    <div id="bulk_operation_results" class="record-pane"></div>
+    <%= render_aspace_partial :partial => "top_containers/bulk_operations/toolbar" %>
   </div>
 </div>
 
-<script src="<%= "#{AppConfig[:frontend_prefix]}assets/top_containers.index.js" %>"></script>
+<div id="template_bulk_operation_loading"><!--
+  <center>
+    <%= image_tag "#{AppConfig[:frontend_prefix]}assets/yale_container_loading.gif" %>
+  </center>
+--></div>
+<div id="template_bulk_operation_error_message"><!--
+  <div class="alert alert-error">
+    ${message}
+  </div>
+--></div>
+
+<script src="<%= "#{AppConfig[:frontend_prefix]}assets/jquery.tablesorter.min.js" %>"></script>
+<script src="<%= "#{AppConfig[:frontend_prefix]}assets/top_containers.bulk.js" %>"></script>
