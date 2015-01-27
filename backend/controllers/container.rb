@@ -12,7 +12,7 @@ class ArchivesSpaceService < Sinatra::Base
       200,
       {'Content-Type' => 'application/json'},
       Enumerator.new do |y|
-        Search.search_stream(params.merge(:type => ['top_container']), params[:repo_id]) do |response|
+        TopContainer.search_stream(params.merge(:type => ['top_container']), params[:repo_id]) do |response|
           y << response.body
         end
       end

@@ -1,3 +1,6 @@
+require 'uri'
+require 'net/http'
+
 class TopContainer < Sequel::Model(:top_container)
   include ASModel
 
@@ -203,6 +206,36 @@ class TopContainer < Sequel::Model(:top_container)
     end
 
     super
+  end
+
+
+  def self.search_stream(params, repo_id, &block)
+    query = if params[:q]
+              Solr::Query.create_keyword_search(params[:q])
+            else
+              Solr::Query.create_match_all_query
+            end
+
+
+    query.pagination(1, 1000000).
+      set_repo_id(repo_id).
+      set_record_types(params[:type]).
+      set_filter_terms(params[:filter_term]).
+      set_facets(params[:facet])
+
+
+    url = query.to_solr_url
+    req = Net::HTTP::Get.new(url.request_uri)
+
+    Net::HTTP.start(url.host, url.port) do |http|
+      http.request(req, nil) do |response|
+        if response.code =~ /^4/
+          raise response.body
+        end
+
+        block.call(response)
+      end
+    end
   end
 
 end
