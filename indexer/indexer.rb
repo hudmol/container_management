@@ -6,6 +6,14 @@ class CommonIndexer
 
   add_indexer_initialize_hook do |indexer|
     indexer.add_document_prepare_hook {|doc, record|
+      if record['record']['jsonmodel_type'] == 'archival_object'
+        unless record['record']['parent']
+          doc['types'] << 'series_ao'
+        end
+      end
+    }
+
+    indexer.add_document_prepare_hook {|doc, record|
       if record['record']['jsonmodel_type'] == 'top_container'
         doc['title'] = record['record']['display_string']
         if record['record']['series']
