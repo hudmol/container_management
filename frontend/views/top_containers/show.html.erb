@@ -27,8 +27,11 @@
           <%= readonly.label_and_textarea "indicator" %>
 
           <%= readonly.label_and_textarea "barcode" %>
-          <%= readonly.label_and_textarea "voyager_id" %>
-          <%= readonly.label_and_boolean "exported_to_voyager" %>
+
+          <%= readonly.label_and_textarea "ils_holding_id" %>
+          <%= readonly.label_and_textarea "ils_item_id" %>
+          <%= readonly.label_and_textarea "exported_to_ils", :default => I18n.t("top_container.not_exported") %>
+
           <%= readonly.label_and_boolean "restricted" %>
 
 

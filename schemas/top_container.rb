@@ -14,8 +14,11 @@
       "display_string" => {"type" => "string", "readonly" => true},
 
       "barcode" => {"type" => "string", "maxLength" => 255, "minLength" => 1},
-      "voyager_id" => {"type" => "string", "maxLength" => 255, "minLength" => 1},
-      "exported_to_voyager" => {"type" => "boolean", "default" => false},
+
+      "ils_holding_id" => {"type" => "string", "maxLength" => 255, "required" => false},
+      "ils_item_id" => {"type" => "string", "maxLength" => 255, "required" => false},
+      "exported_to_ils" => {"type" => "string", "required" => false},
+
       "restricted" => {"type" => "boolean", "default" => false},
 
       "container_locations" => {

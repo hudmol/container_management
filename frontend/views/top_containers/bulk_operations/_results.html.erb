@@ -22,9 +22,10 @@
       <th>Indicator</th>
       <th>Barcode</th>
       <th>Current Location</th>
-      <th>Voyager ID</th>
+      <th>ILS Holding ID</th>
+      <th>ILS Item ID</th>
       <th>Restricted?</th>
-      <th>Exported?</th>
+      <th>Exported</th>
       <th><!-- Actions --></th>
     </tr>
   </thead>
@@ -39,9 +40,14 @@
         <td><%= container_json['indicator'] %></td>
         <td><%= container_json['barcode'] %></td>
         <td><%= (doc['location_display_string_u_sstr'] || [""]).first %></td>
-        <td><%= container_json['voyager_id'] %></td>
+        <td><%= container_json['ils_holding_id'] %></td>
+        <td><%= container_json['ils_item_id'] %></td>
         <td><%= I18n.t("boolean.#{container_json['restricted']}") %></td>
-        <td><%= I18n.t("boolean.#{container_json['exported_to_voyager']}") %></td>
+        <% if container_json['exported_to_ils'].blank? %>
+          <td><%= I18n.t("top_container.not_exported") %></td>
+        <% else %>
+          <td><%= container_json['exported_to_ils'] %></td>
+        <% end %>
         <td>
           <div class="btn-group pull-right">
             <%= link_to I18n.t("actions.view"), {:controller => :resolver, :action => :resolve_readonly, :uri => container_json["uri"]}, :class => "btn btn-mini" %>
