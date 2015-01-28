@@ -13,7 +13,7 @@
 
       "display_string" => {"type" => "string", "readonly" => true},
 
-      "barcode" => {"type" => "string", "maxLength" => 255, "minLength" => 1},
+      "barcode" => {"type" => "string", "maxLength" => 255},
 
       "ils_holding_id" => {"type" => "string", "maxLength" => 255, "required" => false},
       "ils_item_id" => {"type" => "string", "maxLength" => 255, "required" => false},

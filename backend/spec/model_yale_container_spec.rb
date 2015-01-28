@@ -74,10 +74,10 @@ describe 'Yale Container model' do
   end
 
 
-  it "blows up if you don't provide a barcode for a top-level element" do
+  it "doesn't blow up if you don't provide a barcode for a top-level element" do
     expect {
       create(:json_top_container, :barcode => nil)
-    }.to raise_error(ValidationException)
+    }.to_not raise_error(ValidationException)
   end
 
 
