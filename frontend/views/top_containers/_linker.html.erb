@@ -15,14 +15,18 @@
 
   build_typeahead_url = proc {
     record = [:"@accession", :"@archival_object", :"@resource"].map {|instvar| self.instance_variable_get(instvar)}.compact.first
+    # If a new record resource or accession, uri will be nil and the typeahead will search
+    # within the repository.
+    # If an existing accession then scope the typeahead to just this accession
     uri = record.uri
-    # if an AO with a parent, typeahead should search within the series
-    if !record["parent"].blank?
-      uri = record["parent"]["ref"]
-    # if the AO is a new series, then typeahead should search within the resource
-    elsif !record["resource"].blank?
+
+    # If the record is part of a resource collection then scope the typeahead
+    # search within the entire resource hierarchy. This will apply to all archival
+    # objects within a tree and when editing the top most resource record
+    unless record["resource"].blank?
       uri = record["resource"]["ref"]
     end
+
     url_for :controller => :top_containers, :action => :typeahead, :format => :json, :uri => uri
   }
 
