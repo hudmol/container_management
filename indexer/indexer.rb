@@ -11,10 +11,12 @@ class CommonIndexer
         if record['record']['series']
           doc['series_uri_u_sstr'] = record['record']['series']['ref']
           doc['series_title_u_sstr'] = record['record']['series']['display_string']
+          doc['series_identifier_u_stext'] = CommonIndexer.generate_permuations_for_identifier(record['record']['series']['identifier'])
         end
         if record['record']['collection']
           doc['collection_uri_u_sstr'] = record['record']['collection']['ref']
           doc['collection_display_string_u_sstr'] = record['record']['collection']['display_string']
+          doc['collection_identifier_u_stext'] = CommonIndexer.generate_permuations_for_identifier(record['record']['collection']['identifier'])
         end
         if record['record']['container_profile']
           doc['container_profile_uri_u_sstr'] = record['record']['container_profile']['ref']
@@ -47,6 +49,18 @@ class CommonIndexer
         doc["container_profile_dimension_units_u_sstr"] = record['record']['dimension_units']
       end
     }
+  end
+
+
+  def self.generate_permuations_for_identifier(identifer)
+    return [] if identifer.nil?
+
+    [
+      identifer,
+      identifer.gsub(/[[:punct:]]+/, " "),
+      identifer.gsub(/[[:punct:] ]+/, ""),
+      identifer.scan(/([0-9]+|[^0-9]+)/).flatten(1).join(" ")
+    ].uniq
   end
 
 end

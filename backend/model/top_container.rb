@@ -122,12 +122,14 @@ class TopContainer < Sequel::Model(:top_container)
       if series = obj.series
         json['series'] = {
           'ref' => series.uri,
+          'identifier' => series.component_id,
           'display_string' => find_title_for(series)
         }
       end
       if collection = obj.collection
         json['collection'] = {
           'ref' => collection.uri,
+          'identifier' => Identifiers.format(Identifiers.parse(collection.identifier)),
           'display_string' => find_title_for(collection)
         }
       end
@@ -195,6 +197,8 @@ class TopContainer < Sequel::Model(:top_container)
       set_filter_terms(params[:filter_term]).
       set_facets(params[:facet])
 
+
+    query.add_solr_param(:qf, "series_identifier_u_stext collection_identifier_u_stext")
 
     url = query.to_solr_url
     req = Net::HTTP::Get.new(url.request_uri)
