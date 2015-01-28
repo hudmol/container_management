@@ -46,6 +46,7 @@
             "type" => "JSONModel(:archival_object) uri",
           },
           "display_string" => {"type" => "string"},
+          "identifier" => {"type" => "string"},
           "_resolved" => {
             "type" => "object",
             "readonly" => "true"
@@ -65,6 +66,7 @@
             ]
           },
           "display_string" => {"type" => "string"},
+          "identifier" => {"type" => "string"},
           "_resolved" => {
             "type" => "object",
             "readonly" => "true"
