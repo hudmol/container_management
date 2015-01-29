@@ -43,23 +43,23 @@ describe 'Yale Container Profile model' do
   end
 
 
-  it "requires depth to be an integer" do
+  it "requires depth to be a number with no more than 2 decimal places" do
     expect {
       create(:json_container_profile, :depth => "123abc", :width => "10", :height => "10")
     }.to raise_error(ValidationException)
   end
 
 
-  it "requires width to be an integer" do
+  it "requires width to be a number with no more than 2 decimal places" do
     expect {
-      create(:json_container_profile, :depth => "10", :width => "abc123", :height => "10")
+      create(:json_container_profile, :depth => "10", :width => "123.001", :height => "10")
     }.to raise_error(ValidationException)
   end
 
 
-  it "requires height to be an integer" do
+  it "requires height to be a number with no more than 2 decimal places" do
     expect {
-      create(:json_container_profile, :depth => "10", :width => "10", :height => "1a2b3c")
+      create(:json_container_profile, :depth => "10", :width => "10", :height => "-10")
     }.to raise_error(ValidationException)
   end
 end

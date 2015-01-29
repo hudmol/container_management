@@ -17,6 +17,7 @@ class ContainerProfile < Sequel::Model(:container_profile)
     name
   end
 
+
   def self.sequel_to_jsonmodel(objs, opts = {})
     jsons = super
 

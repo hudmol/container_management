@@ -40,10 +40,10 @@ module JSONModel
     def self.check_container_profile(hash)
       errors = []
 
-      # Ensure depth, width and height are integers
+      # Ensure depth, width and height have no more than 2 decimal places
       ["depth", "width", "height"].each do |k|
-        if !hash[k].nil? and hash[k] !~ /^\-?\d+$/
-          errors << [k, "must be an integer"]
+        if hash[k] !~ /\A\d+(\.\d\d?)?\Z/
+          errors << [k, "must be a number with no more than 2 decimal places"]
         end
       end
 
