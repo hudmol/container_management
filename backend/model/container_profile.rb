@@ -28,14 +28,4 @@ class ContainerProfile < Sequel::Model(:container_profile)
     jsons
   end
 
-
-  def validate
-    ['width', 'height', 'depth'].each do |dim|
-      val = self.method(dim).call
-      errors.add(dim.intern, "#{dim} must be a number with no more than 2 decimal places") unless val.match('\A\d+(\.\d\d?)?\Z')
-    end
-
-    super
-  end
-
 end
