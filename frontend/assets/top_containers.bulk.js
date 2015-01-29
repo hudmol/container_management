@@ -76,6 +76,8 @@ BulkContainerSearch.prototype.update_button_state = function() {
 
 BulkContainerSearch.prototype.setup_table_sorter = function() {
   var tablesorter_opts = {
+    // only sort on the second row of header columns
+    selectorHeaders: "thead tr.sortable-columns th",
     // disable sort on the checkbox column
     headers: {
       0: { sorter: false}
