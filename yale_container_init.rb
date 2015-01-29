@@ -56,5 +56,30 @@ module JSONModel
       end
     end
 
+
+    def self.check_top_container(hash)
+      errors = []
+
+      if cfg = AppConfig[:yale_containers_barcode_length]
+        min = 0
+        max = 999
+        if cfg.has_key?(:system_default)
+          min = cfg[:system_default][:min] if cfg[:system_default].has_key?(:min)
+          max = cfg[:system_default][:max] if cfg[:system_default].has_key?(:max)
+        end
+        if (!hash["barcode"].nil? && (hash["barcode"].length < min || hash["barcode"].length > max))
+          errors << ["barcode", "length must be within range set in configuration"]
+        end
+      end
+
+      errors
+    end
+
+    if JSONModel(:top_container)
+      JSONModel(:top_container).add_validation("check_top_container") do |hash|
+        check_top_container(hash)
+      end
+    end
+
   end
 end

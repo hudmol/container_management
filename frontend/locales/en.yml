@@ -80,6 +80,7 @@ en:
     container_3_requires_both_a_type_and_indicator: You must provide an Indicator if you provide a Type
     container_2_is_required_if_container_3_is_provided: You must provide a Child Container if you provide a Grandchild Container
     a_barcode_must_be_unique_within_a_repository: A barcode must be unique within a repository
+    length_must_be_within_range_set_in_configuration: Length must be within range set in configuration
     container_profile_name_not_unique: Container Profile name must be unique
     must_be_a_number_with_no_more_than_2_decimal_places: Must be a number with no more than 2 decimal places
 
