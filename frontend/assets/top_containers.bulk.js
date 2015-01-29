@@ -5,6 +5,7 @@ function BulkContainerSearch($search_form, $results_container, $toolbar) {
 
   this.setup_form();
   this.setup_results_list();
+  this.setup_bulk_action_test();
 }
 
 BulkContainerSearch.prototype.setup_form = function() {
@@ -29,10 +30,12 @@ BulkContainerSearch.prototype.perform_search = function(data) {
     success: function(html) {
       self.$results_container.html(html);
       self.setup_table_sorter();
+      self.update_button_state();
     },
     error: function(jqXHR, textStatus, errorThrown) {
       var html = AS.renderTemplate("template_bulk_operation_error_message", {message: jqXHR.responseText})
       self.$results_container.html(html);
+      self.update_button_state();
     }
   });
 };
@@ -76,14 +79,38 @@ BulkContainerSearch.prototype.update_button_state = function() {
 
 BulkContainerSearch.prototype.setup_table_sorter = function() {
   var tablesorter_opts = {
+    // only sort on the second row of header columns
+    selectorHeaders: "thead tr.sortable-columns th",
     // disable sort on the checkbox column
     headers: {
       0: { sorter: false}
     },
     // default sort: Collection, Series, Indicator
-    sortList: [[1,0],[2,0],[4,0]]
+    sortList: [[1,0],[3,0],[4,0],[6,0]]
   };
   this.$results_container.find("table").tablesorter(tablesorter_opts);
+};
+
+BulkContainerSearch.prototype.get_selection = function() {
+  var self = this;
+  var results = [];
+
+  self.$results_container.find("tbody :checkbox:checked").each(function(i, checkbox) {
+    results.push([checkbox.value, $(checkbox).data("display-string")]);
+  });
+
+  return results;
+};
+
+BulkContainerSearch.prototype.setup_bulk_action_test = function() {
+  var self = this;
+  var $link = $("#bulkActionTestSelection", self.$toolbar);
+
+  $link.on("click", function() {
+    AS.openQuickModal("Test Selection", AS.renderTemplate("bulk_action_test_selection", {
+      selection: self.get_selection()
+    }))
+  });
 };
 
 

@@ -50,6 +50,7 @@
           },
           "display_string" => {"type" => "string"},
           "identifier" => {"type" => "string"},
+          "level_display_string" => {"type" => "string"},
           "_resolved" => {
             "type" => "object",
             "readonly" => "true"

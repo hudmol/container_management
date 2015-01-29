@@ -162,10 +162,19 @@ describe 'Yale Container model' do
       end
 
       it "includes the series in its JSON output" do
-        (resource, grandparent, parent, child) = create_tree(box)
+        (resource, grandparent, parent, child) = create_tree(box,
+                                                             :grandparent_properties => {
+                                                              'component_id' => 'GP1',
+                                                              'level' => 'series'
+                                                             })
 
         json = TopContainer.to_jsonmodel(top_container.id)
-        json.series.should eq({'ref' => grandparent.uri, 'display_string' => grandparent.display_string})
+        json.series.should eq({
+          'ref' => grandparent.uri,
+          'identifier' => grandparent.component_id,
+          'display_string' => grandparent.display_string,
+          'level_display_string' => 'Series'
+        })
       end
 
       it "can get the collection linked to a given top container" do
