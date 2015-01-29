@@ -94,12 +94,13 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
-  def series_label
-    series_record = series
+  def level_display_string
+    series.other_level || I18n.t("enumerations.archival_record_level.#{series.level}", series.level)
+  end
 
+  def series_label
     if series
-      level = series.other_level || I18n.t("enumerations.archival_record_level.#{series.level}", series.level)
-      "#{level} #{series.component_id}"
+      "#{level_display_string} #{series.component_id}"
     end
   end
 
@@ -119,7 +120,8 @@ class TopContainer < Sequel::Model(:top_container)
         json['series'] = {
           'ref' => series.uri,
           'identifier' => series.component_id,
-          'display_string' => find_title_for(series)
+          'display_string' => find_title_for(series),
+          'level_display_string' => obj.level_display_string
         }
       end
       if collection = obj.collection

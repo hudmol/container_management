@@ -83,7 +83,7 @@ BulkContainerSearch.prototype.setup_table_sorter = function() {
       0: { sorter: false}
     },
     // default sort: Collection, Series, Indicator
-    sortList: [[1,0],[2,0],[4,0]]
+    sortList: [[1,0],[3,0],[4,0],[6,0]]
   };
   this.$results_container.find("table").tablesorter(tablesorter_opts);
 };
