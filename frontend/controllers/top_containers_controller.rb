@@ -118,7 +118,7 @@ class TopContainersController < ApplicationController
     min = 0
     max = 255
     if cfg = AppConfig[:yale_containers_barcode_length]
-      repo_key = "repository_#{session['repo_id']}".intern
+      repo_key = JSONModel(:repository).find(session['repo_id']).repo_code
       [:system_default, repo_key].each do |key|
         if cfg.has_key?(key)
           min = cfg[key][:min] if cfg[key].has_key?(:min)

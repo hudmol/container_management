@@ -17,7 +17,7 @@ class TopContainer < Sequel::Model(:top_container)
     map_validation_to_json_property([:repo_id, :barcode], :barcode)
 
     if cfg = AppConfig[:yale_containers_barcode_length]
-      repo_key = "repository_#{self.class.active_repository}".intern
+      repo_key = Repository[self.class.active_repository].repo_code
       min = 0
       max = 255
       [:system_default, repo_key].each do |key|
