@@ -80,4 +80,17 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
+  Endpoint.post('/repositories/:repo_id/top_containers_batch')
+    .description("Update a batch of yale containers")
+    .params(["ids", [Integer]],
+            ["ils_holding_id", String],
+            ["repo_id", :repo_id])
+    .permissions([:manage_container])
+    .returns([200, :updated]) \
+  do
+    DB.open(true) do |db|
+      db[:top_container].where(:id => params[:ids]).update(:ils_holding_id => params[:ils_holding_id], :system_mtime => Time.now)
+    end
+  end
+
 end
