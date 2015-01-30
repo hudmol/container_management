@@ -231,4 +231,9 @@ class TopContainer < Sequel::Model(:top_container)
     end
   end
 
+
+  def self.batch_update(ids, fields)
+    self.filter(:id => ids).update(fields.merge({:system_mtime => Time.now, :user_mtime => Time.now}))
+  end
+
 end
