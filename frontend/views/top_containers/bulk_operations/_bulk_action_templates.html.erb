@@ -5,3 +5,89 @@
   {/for}
   </ul>
 --></div>
+
+<div id="bulk_action_update_ils_fields"><!--
+    <div class="alert alert-info" id="alertBucket">Click the checkbox of the fields to update.</div>
+    <%= form_tag({:controller => :top_containers, :action => :bulk_operation_update}, {:class => "form-horizontal", :id => "bulk_update_form", :onchange => "formChanged();" }) do |f| %>
+      <div class="span4">
+        <div class="control-group">
+          <label class="control-label" for="ils_holding_id">ILS Holding ID</label>
+          <div class="controls">
+            <%= text_field_tag "ils_holding_id", params["ils_holding_id"], :style => "width: 80%;", :disabled => "disabled", :id => "ils_holding_id" %>
+            <%= check_box_tag "update_ils_holding_id", params["update_ils_holding_id"], false, :onclick => "handleClick(this);", :name => "fieldToggle" %>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="ils_item_id">ILS Item ID</label>
+          <div class="controls">
+            <%= text_field_tag "ils_item_id", params["ils_item_id"], :style => "width: 80%;", :disabled => "disabled", :id => "ils_item_id" %>
+            <%= check_box_tag "update_ils_item_id", params["update_ils_item_id"], false, :onclick => "handleClick(this)", :name => "fieldToggle" %>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <%= submit_tag "Update ${selection.length} records", :id => "bulk_update_submit", :class => "btn btn-primary", :disabled => "disabled" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <script>
+      $('#bulk_update_form').on("submit", function(event) {
+        event.preventDefault();
+        var ids = '';
+        {for container in selection}
+          ids += "${container[0]}".replace(/(.+\/)/, '') + ',';
+        {/for}
+        ids = ids.slice(0,-1);
+        data = $('#bulk_update_form').serializeArray();
+        data.push({name: "ids", value: ids});
+        $.ajax({
+          url:"/plugins/top_containers/bulk_operations/update",
+          data: data,
+          type: "post",
+          success: function(html) {
+            $.each($(":input[name=fieldToggle]"), function(idx, cb) {
+              if (cb.checked) {
+                cb.click();
+              }
+            });
+            $('#alertBucket').replaceWith(html);
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            $('#alertBucket').replaceWith('<div id="alertBucket" class="alert alert-error">' + jqXHR.responseText + '</div>');
+          }
+        });
+      });
+
+      function formChanged() {
+        var anyon = false;
+        $.each($(":input[name=fieldToggle]"), function(idx, cb) {
+          if (cb.checked) {
+            anyon = true;
+          }
+        });
+        if (anyon) {
+          $('#alertBucket').replaceWith('<div id="alertBucket" class="alert alert-warning">You are about to update multiple records.</div>');
+          $('#bulk_update_submit').removeAttr('disabled')
+        } else {
+          $('#alertBucket').replaceWith('<div id="alertBucket" class="alert alert-info">Click the checkbox of the fields to update.</div>');
+          $('#bulk_update_submit').attr('disabled', 'disabled')
+
+        }
+      }
+
+
+      function handleClick(cb) {
+        id = cb.id.replace(/[^_]+_/, '');
+        elt = $('#' + id);
+        if (cb.checked) {
+          elt.removeAttr('disabled');
+          elt.focus();
+        } else {
+          elt.attr('disabled', 'disabled');
+        }
+      }
+
+    </script>
+--></div>

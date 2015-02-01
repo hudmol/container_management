@@ -6,6 +6,7 @@ function BulkContainerSearch($search_form, $results_container, $toolbar) {
   this.setup_form();
   this.setup_results_list();
   this.setup_bulk_action_test();
+  this.setup_bulk_action_update_fields();
 }
 
 BulkContainerSearch.prototype.setup_form = function() {
@@ -110,6 +111,18 @@ BulkContainerSearch.prototype.setup_bulk_action_test = function() {
 
   $link.on("click", function() {
     AS.openQuickModal("Test Selection", AS.renderTemplate("bulk_action_test_selection", {
+      selection: self.get_selection()
+    }))
+  });
+};
+
+
+BulkContainerSearch.prototype.setup_bulk_action_update_fields = function() {
+  var self = this;
+  var $link = $("#bulkActionUpdateIlsFields", self.$toolbar);
+
+  $link.on("click", function() {
+    AS.openQuickModal("Update ILS Fields", AS.renderTemplate("bulk_action_update_ils_fields", {
       selection: self.get_selection()
     }))
   });
