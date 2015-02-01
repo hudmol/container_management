@@ -113,21 +113,14 @@ class TopContainersController < ApplicationController
   end
 
 
+  include ApplicationHelper
+
   helper_method :barcode_length_range
   def barcode_length_range
-    min = 0
-    max = 255
-    if cfg = AppConfig[:yale_containers_barcode_length]
-      repo_key = JSONModel(:repository).find(session['repo_id']).repo_code
-      [:system_default, repo_key].each do |key|
-        if cfg.has_key?(key)
-          min = cfg[key][:min] if cfg[key].has_key?(:min)
-          max = cfg[key][:max] if cfg[key].has_key?(:max)
-        end
-      end
-    end
-    "#{min}-#{max}"
+    check = BarcodeCheck.new(current_repo[:repo_code])
+    "#{check.min}-#{check.max}"
   end
+
 
   def search_filter_for(uri)
     return {} if uri.blank?

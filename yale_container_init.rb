@@ -1,3 +1,6 @@
+require_relative 'lib/barcode_check'
+
+
 module JSONModel
   module Validations
 
