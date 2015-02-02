@@ -16,6 +16,12 @@ class TopContainer < Sequel::Model(:top_container)
                      :message => "A barcode must be unique within a repository")
     map_validation_to_json_property([:repo_id, :barcode], :barcode)
 
+    check = BarcodeCheck.new(Repository[self.class.active_repository].repo_code)
+
+    if !check.valid?(self[:barcode])
+      errors.add(:barcode, "Length must be within the range set in configuration")
+    end
+
     super
   end
 

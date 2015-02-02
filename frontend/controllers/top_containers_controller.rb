@@ -113,6 +113,15 @@ class TopContainersController < ApplicationController
   end
 
 
+  include ApplicationHelper
+
+  helper_method :barcode_length_range
+  def barcode_length_range
+    check = BarcodeCheck.new(current_repo[:repo_code])
+    "#{check.min}-#{check.max}"
+  end
+
+
   def search_filter_for(uri)
     return {} if uri.blank?
 

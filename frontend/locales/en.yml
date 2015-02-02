@@ -36,6 +36,9 @@ en:
     yale_container_3_type: Grandchild Container Type
     yale_container_3_indicator: Grandchild Container Indicator
 
+    barcode_length_for_this_repository: "Barcode length for this repository:"
+    characters: characters
+
     _singular: Top Container
     _plural: Top Containers
 
@@ -82,6 +85,7 @@ en:
     a_barcode_must_be_unique_within_a_repository: A barcode must be unique within a repository
     container_profile_name_not_unique: Container Profile name must be unique
     must_be_a_number_with_no_more_than_2_decimal_places: Must be a number with no more than 2 decimal places
+    length_must_be_within_the_range_set_in_configuration: Length must be within the range set in configuration
 
   search_results:
     filter:
