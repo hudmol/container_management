@@ -119,10 +119,10 @@ BulkContainerSearch.prototype.setup_bulk_action_test = function() {
 
 BulkContainerSearch.prototype.setup_bulk_action_update_fields = function() {
   var self = this;
-  var $link = $("#bulkActionUpdateIlsFields", self.$toolbar);
+  var $link = $("#bulkActionUpdateIlsHolding", self.$toolbar);
 
   $link.on("click", function() {
-    AS.openQuickModal("Update ILS Fields", AS.renderTemplate("bulk_action_update_ils_fields", {
+    AS.openQuickModal("Update ILS Holding IDs", AS.renderTemplate("bulk_action_update_ils_holding", {
       selection: self.get_selection()
     }))
   });
