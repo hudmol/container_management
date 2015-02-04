@@ -9,6 +9,7 @@
 <div id="bulk_action_update_ils_holding"><!--
     <div class="alert alert-info" id="alertBucket">Enter a value for ILS Holding ID for all selected containers.</div>
     <%= form_tag({:controller => :top_containers, :action => :bulk_operation_update}, {:class => "form-horizontal", :id => "bulk_update_form" }) do |f| %>
+      <input type="hidden" name="ids" value="${ids}">
       <div class="span4">
         <div class="control-group">
           <label class="control-label" for="ils_holding_id">ILS Holding ID</label>
@@ -23,34 +24,4 @@
         </div>
       </div>
     <% end %>
-
-    <script>
-      $('#bulk_update_form').on("submit", function(event) {
-        event.preventDefault();
-        var ids = '';
-        {for container in selection}
-          ids += "${container[0]}".replace(/(.+\/)/, '') + ',';
-        {/for}
-        ids = ids.slice(0,-1);
-        data = $('#bulk_update_form').serializeArray();
-        data.push({name: "ids", value: ids});
-        $.ajax({
-          url:"/plugins/top_containers/bulk_operations/update",
-          data: data,
-          type: "post",
-          success: function(html) {
-            $.each($(":input[name=fieldToggle]"), function(idx, cb) {
-              if (cb.checked) {
-                cb.click();
-              }
-            });
-            $('#alertBucket').replaceWith(html);
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertBucket').replaceWith('<div id="alertBucket" class="alert alert-error">' + jqXHR.responseText + '</div>');
-          }
-        });
-      });
-
-    </script>
 --></div>
