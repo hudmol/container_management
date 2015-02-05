@@ -8,9 +8,16 @@
 --></div>
 
 <div id="bulk_action_update_ils_holding"><!--
-    <div class="alert alert-info" id="alertBucket">Enter a value for ILS Holding ID for all selected containers.</div>
-    <%= form_tag({:controller => :top_containers, :action => :bulk_operation_update}, {:class => "form-horizontal", :id => "bulk_update_form" }) do |f| %>
-      <div class="modal-body">
+  <div class="alert alert-info" id="alertBucket">Enter a value for ILS Holding ID for all selected containers.</div>
+
+  <div class="token-list span6">
+    {for container in selection}
+      <%= render_token(:object => "${container[0]}", :label => "${container[1]}") %>
+    {/for}
+  </div>
+
+  <%= form_tag({:controller => :top_containers, :action => :bulk_operation_update}, {:class => "form-horizontal", :id => "bulk_update_form" }) do |f| %>
+    <div class="modal-body">
       <input type="hidden" name="ids" value="${ids}">
       <div class="span4">
         <div class="control-group">
@@ -20,10 +27,10 @@
           </div>
         </div>
       </div>
-      </div>
-      <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Update ${selection.length} records</button>
-        <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
-      </div>
-    <% end %>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary">Update ${selection.length} records</button>
+      <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
+    </div>
+  <% end %>
 --></div>
