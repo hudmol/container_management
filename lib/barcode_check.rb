@@ -21,7 +21,7 @@ class BarcodeCheck
 
 
   def valid?(barcode)
-    barcode && (min..max).cover?(barcode.length)
+    !barcode || (min..max).cover?(barcode.length)
   end
 
 end
