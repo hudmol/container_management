@@ -133,7 +133,7 @@ BulkContainerSearch.prototype.setup_bulk_action_update_ils_holding = function() 
       idArray.push(c[0].replace(/^.*\//, ''));
     });
     var ids = idArray.join();
-    AS.openQuickModal("Update ILS Holding IDs", AS.renderTemplate("bulk_action_update_ils_holding", {
+    AS.openCustomModal("bulkUpdateModal", "Update ILS Holding IDs", AS.renderTemplate("bulk_action_update_ils_holding", {
       selection: self.get_selection(),
       ids: ids
     }))

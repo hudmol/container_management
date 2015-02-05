@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 <div id="bulk_action_test_selection"><!--
   <ul>
   {for container in selection}
@@ -9,6 +10,7 @@
 <div id="bulk_action_update_ils_holding"><!--
     <div class="alert alert-info" id="alertBucket">Enter a value for ILS Holding ID for all selected containers.</div>
     <%= form_tag({:controller => :top_containers, :action => :bulk_operation_update}, {:class => "form-horizontal", :id => "bulk_update_form" }) do |f| %>
+      <div class="modal-body">
       <input type="hidden" name="ids" value="${ids}">
       <div class="span4">
         <div class="control-group">
@@ -17,11 +19,11 @@
             <%= text_field_tag "ils_holding_id", params["ils_holding_id"], :style => "width: 80%;" %>
           </div>
         </div>
-        <div class="control-group">
-          <div class="controls">
-            <%= submit_tag "Update ${selection.length} records", :id => "bulk_update_submit", :class => "btn btn-primary" %>
-          </div>
-        </div>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Update ${selection.length} records</button>
+        <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
       </div>
     <% end %>
 --></div>
