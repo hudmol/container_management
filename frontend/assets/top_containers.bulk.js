@@ -172,6 +172,4 @@ $(function() {
                           $("#bulk_operation_results"),
                           $(".record-toolbar.bulk-operation-toolbar"));
 
-  new BulkContainerUpdate($("#bulk_update_form"));
-
 });
