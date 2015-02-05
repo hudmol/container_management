@@ -140,7 +140,7 @@ BulkContainerSearch.prototype.setup_bulk_action_update_ils_holding = function() 
   });
 };
 
-BulkContainerSearch.prototype.setup_update_form = function() {
+BulkContainerUpdate.prototype.setup_update_form = function() {
   var self = this;
 
   this.$update_form.on("submit", function(event) {
@@ -149,7 +149,7 @@ BulkContainerSearch.prototype.setup_update_form = function() {
   });
 };
 
-BulkContainerSearch.prototype.perform_update = function(data) {
+BulkContainerUpdate.prototype.perform_update = function(data) {
   var self = this;
 
   $.ajax({
