@@ -10,7 +10,7 @@
 <div id="bulk_action_update_ils_holding"><!--
   <div class="alert alert-info" id="alertBucket">Enter a value for ILS Holding ID for all selected containers.</div>
 
-  <div class="token-list span6">
+  <div class="token-list span6" style="width: 100%; height: 60px; overflow: scroll;">
     {for container in selection}
       <%= render_token(:object => "${container[0]}", :label => "${container[1]}") %>
     {/for}
