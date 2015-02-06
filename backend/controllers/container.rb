@@ -80,25 +80,15 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
-  Endpoint.post('/repositories/:repo_id/top_containers_batch')
-    .description("Update a batch of yale containers")
+  Endpoint.post('/repositories/:repo_id/top_containers/batch/ils_holding_id')
+    .description("Update ild_holding_id for a batch of yale containers")
     .params(["ids", [Integer]],
-            ["ils_holding_id", String, "Value to set for ils_holding_id", :optional => true],
-            ["ils_item_id", String, "Value to set for ils_item_id", :optional => true],
+            ["ils_holding_id", String, "Value to set for ils_holding_id"],
             ["repo_id", :repo_id])
     .permissions([:manage_container])
     .returns([200, :updated]) \
   do
-    fields = {}
-    [:ils_holding_id, :ils_item_id].each do |fld|
-      if params.has_key?(fld)
-        fields[fld] = params[fld]
-      end
-    end
-    result = "No fields specified - no action"
-    unless fields.empty?
-      result = TopContainer.batch_update(params[:ids], fields)
-    end
+    result = TopContainer.batch_update(params[:ids], :ils_holding_id => params[:ils_holding_id])
     json_response(result)
   end
 
