@@ -66,7 +66,19 @@ class TopContainersController < ApplicationController
   end
 
   def batch_delete
-    raise "TODO"
+    response = JSONModel::HTTP.post_form("/batch_delete",
+                                         {
+                                "record_uris[]" => Array(params[:record_uris])
+                                         })
+
+    if response.code === "200"
+      flash[:success] = I18n.t("top_container.batch_delete.success")
+      deleted_uri_param = params[:record_uris].map{|uri| "deleted_uri[]=#{uri}"}.join("&")
+      redirect_to "#{request.referrer}?#{deleted_uri_param}"
+    else
+      flash[:error] = "#{I18n.t("top_container.batch_delete.error")}<br/> #{ASUtils.json_parse(response.body)["error"]["failures"].map{|err| "#{err["response"]} [#{err["uri"]}]"}.join("<br/>")}".html_safe
+      redirect_to request.referrer
+    end
   end
 
 
