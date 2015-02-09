@@ -1,6 +1,7 @@
 <% can_edit = user_can?("manage_container") %>
 
 <%
+  multiselect = true if multiselect.nil?
   top_containers = results['response']['docs']
   num_found = results['response']["numFound"].to_i
   rows = results['responseHeader']['params']['rows'].to_i
@@ -24,7 +25,7 @@
       <th></th>
     </tr>
     <tr class="sortable-columns">
-      <th><%= check_box_tag "select_all" %></th>
+      <th><% if multiselect %><%= check_box_tag "select_all" %><% end %></th>
       <th>ID</th>
       <th>Title</th>
       <th>Level</th>
@@ -44,7 +45,13 @@
     <% top_containers.each do |doc| %>
       <% container_json = ASUtils.json_parse(doc['json']) %>
       <tr>
-        <td><%= check_box_tag "uri", container_json['uri'], false, "data-display-string" => doc['title'] %></td>
+        <td>
+          <% if multiselect %>
+            <%= check_box_tag "uri", container_json['uri'], false, "data-display-string" => doc['title'] %>
+          <% else %>
+            <%= radio_button_tag "linker-item", container_json["uri"], false, :"data-object" => container_json.to_json %>
+          <% end %>
+        </td>
         <td><%= Array(doc['collection_identifier_u_stext']).first %></td>
         <td><%= Array(doc['collection_display_string_u_sstr']).first %></td>
         <td><%= Array(doc['series_level_u_sstr']).first %></td>
