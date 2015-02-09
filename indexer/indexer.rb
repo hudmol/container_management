@@ -49,6 +49,7 @@ class CommonIndexer
             end
           end
         end
+        doc['exported_u_sbool'] = record['record'].has_key?('exported_to_ils')
       end
     }
   end
