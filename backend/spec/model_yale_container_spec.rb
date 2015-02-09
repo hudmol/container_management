@@ -101,21 +101,24 @@ describe 'Yale Container model' do
   end
 
 
-  it "can't delete a TopContainer that has been linked to a sub container" do
-    box = create(:json_top_container)
+  it "deletes all related subcontainers and instances when deleted" do
+    box1 = create(:json_top_container)
+    box2 = create(:json_top_container)
 
-    accession = create_accession({
-                                   "instances" => [build_instance(box)]
-                                 })
+    acc1 = create_accession({
+                              "instances" => [build_instance(box1), build_instance(box1), build_instance(box2)]
+                            })
 
+    acc2 = create_accession({
+                              "instances" => [build_instance(box1), build_instance(box2), build_instance(box2)]
+                            })
 
-    expect { TopContainer[box.id].delete }.to raise_error(ConflictException)
-  end
+    TopContainer[box1.id].delete
 
-  it "can delete a TopContainer that has not been linked to a sub container" do
-    box = create(:json_top_container)
-
-    expect { TopContainer[box.id].delete }.to_not raise_error
+    acc1 = Accession[acc1.id]
+    acc2 = Accession[acc2.id]
+    acc1.instance.length.should eq(1)
+    acc2.instance.length.should eq(2)
   end
 
 

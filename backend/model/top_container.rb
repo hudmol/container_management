@@ -26,16 +26,6 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
-  def delete
-    DB.attempt {
-      super
-    }.and_if_constraint_fails {
-      raise ConflictException.new("Top container in use")
-    }
-
-  end
-
-
   def format_barcode
     if self.barcode
       "[#{self.barcode}]"
@@ -186,14 +176,9 @@ class TopContainer < Sequel::Model(:top_container)
                       :is_array => true)
 
 
-  # Only allow delete if the top containers aren't linked to subcontainers.
-  def self.handle_delete(ids)
-    linked_subcontainers = find_relationship(:top_container_link).find_by_participant_ids(TopContainer, ids)
-
-    if !linked_subcontainers.empty?
-      raise ConflictException.new("Can't remove a Top Container that is still in use")
-    end
-
+  # When deleting a top_container, delete all related instances and their subcontainers
+  def delete
+    related_records(:top_container_link).map {|sub| Instance[sub.instance_id].delete }
     super
   end
 

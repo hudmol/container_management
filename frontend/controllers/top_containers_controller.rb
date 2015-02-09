@@ -1,7 +1,7 @@
 class TopContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:index, :show, :typeahead, :bulk_operations_browse],
-                      "manage_container" => [:new, :create, :edit, :update, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update]
+                      "manage_container" => [:new, :create, :edit, :update, :delete, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update]
 
 
   def index
@@ -59,7 +59,10 @@ class TopContainersController < ApplicationController
 
 
   def delete
-    raise "TODO"
+    top_container = JSONModel(:top_container).find(params[:id])
+    top_container.delete
+
+    redirect_to(:controller => :top_containers, :action => :index, :deleted_uri => top_container.uri)
   end
 
   def batch_delete

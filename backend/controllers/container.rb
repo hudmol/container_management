@@ -1,7 +1,7 @@
 class ArchivesSpaceService < Sinatra::Base
 
   Endpoint.get('/repositories/:repo_id/top_containers/search')
-  .description("Delete a yale container")
+  .description("Search for yale containers")
   .params(["repo_id", :repo_id],
           *BASE_SEARCH_PARAMS)
   .permissions([:view_repository])
