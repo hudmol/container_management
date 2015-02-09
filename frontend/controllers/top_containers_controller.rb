@@ -1,6 +1,6 @@
 class TopContainersController < ApplicationController
 
-  set_access_control  "view_repository" => [:index, :show, :typeahead],
+  set_access_control  "view_repository" => [:index, :show, :typeahead, :bulk_operations_browse],
                       "manage_container" => [:new, :create, :edit, :update, :batch_delete, :bulk_operations, :bulk_operation_search]
 
 
@@ -77,30 +77,15 @@ class TopContainersController < ApplicationController
 
 
   def bulk_operation_search
-    search_params = params_for_backend_search.merge({
-                                                      'type[]' => ['top_container']
-                                                    })
-
-    filters = []
-    filters.push({'series_uri_u_sstr' => params['series']['ref']}.to_json) if params['series']
-    filters.push({'collection_uri_u_sstr' => params['collection']['ref']}.to_json) if params['collection']
-    filters.push({'container_profile_uri_u_sstr' => params['container_profile']['ref']}.to_json) if params['container_profile']
-    filters.push({'location_uri_u_sstr' => params['location']['ref']}.to_json) if params['location']
-
-    if filters.empty? && params['q'].blank?
-      return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
-    end
-
-    unless filters.empty?
-      search_params = search_params.merge({
-                                            "filter_term[]" => filters
-                                          })
-    end
-
-    container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
-    results = JSONModel::HTTP::get_json(container_search_url, search_params)
+    results = perform_search
 
     render_aspace_partial :partial => "top_containers/bulk_operations/results", :locals => {:results => results}
+  end
+
+
+  def bulk_operations_browse
+    results = perform_search if params.has_key?("q")
+    render_aspace_partial :partial => "top_containers/browse", :locals => {:results => results}
   end
 
 
@@ -137,6 +122,32 @@ class TopContainersController < ApplicationController
     return {
       "filter_term[]" => [{"collection_uri_u_sstr" => uri}.to_json]
     }
+  end
+
+
+  def perform_search
+    search_params = params_for_backend_search.merge({
+                                                      'type[]' => ['top_container']
+                                                    })
+
+    filters = []
+    filters.push({'series_uri_u_sstr' => params['series']['ref']}.to_json) if params['series']
+    filters.push({'collection_uri_u_sstr' => params['collection']['ref']}.to_json) if params['collection']
+    filters.push({'container_profile_uri_u_sstr' => params['container_profile']['ref']}.to_json) if params['container_profile']
+    filters.push({'location_uri_u_sstr' => params['location']['ref']}.to_json) if params['location']
+
+    if filters.empty? && params['q'].blank?
+      return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
+    end
+
+    unless filters.empty?
+      search_params = search_params.merge({
+                                            "filter_term[]" => filters
+                                          })
+    end
+
+    container_search_url = "#{JSONModel(:top_container).uri_for("")}/search"
+    JSONModel::HTTP::get_json(container_search_url, search_params)
   end
 
 end
