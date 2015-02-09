@@ -85,7 +85,7 @@ class TopContainersController < ApplicationController
 
   def bulk_operations_browse
     results = perform_search if params.has_key?("q")
-    render_aspace_partial :partial => "top_containers/browse", :locals => {:results => results}
+    render_aspace_partial :partial => "top_containers/bulk_operations/browse", :locals => {:results => results}
   end
 
 

@@ -1,5 +1,5 @@
 <div id="topContainerBrowseContainer">
-  <%= render_aspace_partial :partial => "search_criteria", :locals => {:form_target => {:controller => :top_containers, :action => :bulk_operations_browse}} %>
+  <%= render_aspace_partial :partial => "top_containers/bulk_operations/search_criteria", :locals => {:form_target => {:controller => :top_containers, :action => :bulk_operations_browse}} %>
   <% unless results.nil? %>
     <%= render_aspace_partial :partial => "top_containers/bulk_operations/results", :locals => {:results => results, :multiselect => false} %>
   <% end %>
