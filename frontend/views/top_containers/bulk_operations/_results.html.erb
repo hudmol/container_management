@@ -2,6 +2,7 @@
 
 <%
   multiselect = true if multiselect.nil?
+  show_edit_actions = true if show_edit_actions.nil?
   top_containers = results['response']['docs']
   num_found = results['response']["numFound"].to_i
   rows = results['responseHeader']['params']['rows'].to_i
@@ -28,7 +29,7 @@
       <th>Restricted?</th>
       <th>Exported</th>
       <th>Linked records</th>
-      <th><!-- Actions --></th>
+      <% if show_edit_actions %><th><!-- Actions --></th><% end %>
     </tr>
   </thead>
   <tbody>
@@ -104,6 +105,7 @@
             </dl>
         </td>
 
+        <% if show_edit_actions %>
         <td>
           <div class="btn-group pull-right">
             <%= link_to I18n.t("actions.view"), {:controller => :resolver, :action => :resolve_readonly, :uri => container_json["uri"]}, :class => "btn btn-mini" %>
@@ -112,6 +114,7 @@
             <% end %>
           </div>
         </td>
+        <% end %>
       </tr>
     <% end %>
   </tbody>
