@@ -76,15 +76,27 @@ class TopContainersController < ApplicationController
   end
 
 
+  class MissingFilterException < Exception; end
+
+
   def bulk_operation_search
-    results = perform_search
+    begin
+      results = perform_search
+    rescue MissingFilterException
+      return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
+    end
 
     render_aspace_partial :partial => "top_containers/bulk_operations/results", :locals => {:results => results}
   end
 
 
   def bulk_operations_browse
-    results = perform_search if params.has_key?("q")
+    begin
+      results = perform_search if params.has_key?("q")
+    rescue MissingFilterException
+      return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
+    end
+
     render_aspace_partial :partial => "top_containers/bulk_operations/browse", :locals => {:results => results}
   end
 
@@ -137,7 +149,7 @@ class TopContainersController < ApplicationController
     filters.push({'location_uri_u_sstr' => params['location']['ref']}.to_json) if params['location']
 
     if filters.empty? && params['q'].blank?
-      return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
+      raise MissingFilterException.new
     end
 
     unless filters.empty?
