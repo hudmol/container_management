@@ -62,4 +62,19 @@ describe 'Yale Container Profile model' do
       create(:json_container_profile, :depth => "10", :width => "10", :height => "-10")
     }.to raise_error(ValidationException)
   end
+
+
+  it "has a very informative display string" do
+    jcp = create(:json_container_profile, :name => "Manuscript",
+                :depth => "8",
+                :height => "13",
+                :width => "5.5",
+                :dimension_units => "inches",
+                :extent_dimension => "width")
+
+    cp = ContainerProfile[jcp.id]
+
+    cp.display_string.should eq("Manuscript [8d, 13h, 5.5w inches] extent measured by width")
+  end
+
 end
