@@ -21,6 +21,7 @@ class CommonIndexer
           doc['series_uri_u_sstr'] = record['record']['series'].map {|series| series['ref']}
           doc['series_title_u_sstr'] = record['record']['series'].map {|series| series['display_string']}
           doc['series_level_u_sstr'] = record['record']['series'].map {|series| series['level_display_string']}
+          doc['series_identifier_stored_u_sstr'] = record['record']['series'].map {|series| series['identifier']}
           doc['series_identifier_u_stext'] = record['record']['series'].map {|series|
             CommonIndexer.generate_permutations_for_identifier(series['identifier'])
           }.flatten
@@ -29,6 +30,7 @@ class CommonIndexer
         if record['record']['collection']
           doc['collection_uri_u_sstr'] = record['record']['collection'].map {|collection| collection['ref']}
           doc['collection_display_string_u_sstr'] = record['record']['collection'].map {|collection| collection['display_string']}
+          doc['collection_identifier_stored_u_sstr'] = record['record']['collection'].map {|collection| collection['identifier']}
           doc['collection_identifier_u_stext'] = record['record']['collection'].map {|collection|
             CommonIndexer.generate_permutations_for_identifier(collection['identifier'])
           }.flatten

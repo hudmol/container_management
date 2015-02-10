@@ -88,16 +88,16 @@
          <td>
             <dl>
 
-                <% if doc['collection_identifier_u_stext'] %>
+                <% if doc['collection_identifier_stored_u_sstr'] %>
                     <dt>Collection</dt>
-                    <% Array(doc['collection_identifier_u_stext']).zip(Array(doc['collection_display_string_u_sstr'])).each do |identifier, display| %>
+                    <% Array(doc['collection_identifier_stored_u_sstr']).zip(Array(doc['collection_display_string_u_sstr'])).each do |identifier, display| %>
                         <dd><%= identifier %> - <%= display %></dd>
                     <% end %>
                 <% end %>
 
                 <% if doc['series_level_u_sstr'] %>
                     <dt>Series</dt>
-                    <% Array(doc['series_level_u_sstr']).zip(Array(doc['series_identifier_u_stext'])).each do |level, identifier| %>
+                    <% Array(doc['series_level_u_sstr']).zip(Array(doc['series_identifier_stored_u_sstr'])).each do |level, identifier| %>
                         <dd><%= level %> - <%= identifier %></dd>
                     <% end %>
                 <% end %>
