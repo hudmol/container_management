@@ -42,38 +42,44 @@
 
       "series" => {
         "readonly" => "true",
-        "type" => "object",
-        "subtype" => "ref",
-        "properties" => {
-          "ref" => {
-            "type" => "JSONModel(:archival_object) uri",
-          },
-          "display_string" => {"type" => "string"},
-          "identifier" => {"type" => "string"},
-          "level_display_string" => {"type" => "string"},
-          "_resolved" => {
-            "type" => "object",
-            "readonly" => "true"
+        "type" => "array",
+        "items" => {
+          "type" => "object",
+          "subtype" => "ref",
+          "properties" => {
+            "ref" => {
+              "type" => "JSONModel(:archival_object) uri",
+            },
+            "display_string" => {"type" => "string"},
+            "identifier" => {"type" => "string"},
+            "level_display_string" => {"type" => "string"},
+            "_resolved" => {
+              "type" => "object",
+              "readonly" => "true"
+            }
           }
         }
       },
 
       "collection" => {
         "readonly" => "true",
-        "type" => "object",
-        "subtype" => "ref",
-        "properties" => {
-          "ref" => {
-            "type" => [
-              {"type" => "JSONModel(:resource) uri"},
-              {"type" => "JSONModel(:accession) uri"}
-            ]
-          },
-          "display_string" => {"type" => "string"},
-          "identifier" => {"type" => "string"},
-          "_resolved" => {
-            "type" => "object",
-            "readonly" => "true"
+        "type" => "array",
+        "items" => {
+          "type" => "object",
+          "subtype" => "ref",
+          "properties" => {
+            "ref" => {
+              "type" => [
+                {"type" => "JSONModel(:resource) uri"},
+                {"type" => "JSONModel(:accession) uri"}
+              ]
+            },
+            "display_string" => {"type" => "string"},
+            "identifier" => {"type" => "string"},
+            "_resolved" => {
+              "type" => "object",
+              "readonly" => "true"
+            }
           }
         }
       }

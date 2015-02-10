@@ -132,22 +132,22 @@ describe 'Yale Container model' do
     it "can find an accession linked to a given top container" do
       accession = create_accession({"instances" => [build_instance(box)]})
 
-      collection = top_container.collection
+      collection = top_container.collections.first
       collection.should be_instance_of(Accession)
       collection.id.should eq(accession.id)
 
-      top_container.series.should be_nil
+      top_container.series.should be_empty
     end
 
 
     it "can find a resource linked to a given top container" do
       resource = create_resource({"instances" => [build_instance(box)]})
 
-      collection = top_container.collection
+      collection = top_container.collections.first
       collection.should be_instance_of(Resource)
       collection.id.should eq(resource.id)
 
-      top_container.series.should be_nil
+      top_container.series.should be_empty
     end
 
 
@@ -156,7 +156,7 @@ describe 'Yale Container model' do
       it "can find the topmost archival object linked to a given top container" do
         (resource, grandparent, parent, child) = create_tree(box)
 
-        series = top_container.series
+        series = top_container.series.first
         series.should be_instance_of(ArchivalObject)
         series.id.should eq(grandparent.id)
       end
@@ -169,7 +169,7 @@ describe 'Yale Container model' do
                                                              })
 
         json = TopContainer.to_jsonmodel(top_container.id)
-        json.series.should eq({
+        json.series.first.should eq({
           'ref' => grandparent.uri,
           'identifier' => grandparent.component_id,
           'display_string' => grandparent.display_string,
@@ -180,7 +180,7 @@ describe 'Yale Container model' do
       it "can get the collection linked to a given top container" do
         (resource, grandparent, parent, child) = create_tree(box)
 
-        collection = top_container.collection
+        collection = top_container.collections.first
         collection.should be_instance_of(Resource)
         collection.id.should eq(resource.id)
       end

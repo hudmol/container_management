@@ -53,14 +53,19 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
-  # return the first archival record linked to this top container
-  def linked_archival_record
-    # Take the first linked subcontainer
-    subcontainer = related_records(:top_container_link).first
-    return nil if !subcontainer
+  # return all archival records linked to this top container
+  def linked_archival_records
+    related_records(:top_container_link).map {|subcontainer|
+      linked_archival_record_for(subcontainer)
+    }.compact.uniq {|obj| obj.uri}
+  end
 
-    # Take its first instance
-    instance = Instance[subcontainer.instance_id] or raise "Instance not found: #{subcontainer.instance_id}"
+
+  def linked_archival_record_for(subcontainer)
+    # Find its linked instance
+    instance = Instance[subcontainer.instance_id]
+
+    return nil unless instance
 
     # Find the record that links to that instance
     ASModel.all_models.each do |model|
@@ -74,24 +79,22 @@ class TopContainer < Sequel::Model(:top_container)
         return model[instance[key]]
       end
     end
-
-    nil
   end
 
 
-  def collection
-    obj = linked_archival_record
-
-    if obj.respond_to?(:series)
-      obj.class.root_model[obj.root_record_id]
-    else
-      obj
-    end
+  def collections
+    linked_archival_records.map {|obj|
+      if obj.respond_to?(:series)
+        obj.class.root_model[obj.root_record_id]
+      else
+        obj
+      end
+    }.uniq {|obj| obj.uri}
   end
 
 
   def series
-    tree_top(linked_archival_record)
+    linked_archival_records.map {|record| tree_top(record)}.compact.uniq {|obj| obj.uri}
   end
 
 
@@ -100,13 +103,16 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
-  def level_display_string
+  def level_display_string(series)
     series.other_level || I18n.t("enumerations.archival_record_level.#{series.level}", series.level)
   end
 
   def series_label
-    if series
-      "#{level_display_string} #{series.component_id}"
+    attached_series = self.series
+    if attached_series.empty?
+      nil
+    else
+      attached_series.map {|s| "#{level_display_string(s)} #{s.component_id}" }.join("; ")
     end
   end
 
@@ -122,16 +128,19 @@ class TopContainer < Sequel::Model(:top_container)
     jsons.zip(objs).each do |json, obj|
       json['display_string'] = obj.display_string
 
-      if series = obj.series
-        json['series'] = {
+      obj.series.each do |series|
+        json['series'] ||= []
+        json['series'] << {
           'ref' => series.uri,
           'identifier' => series.component_id,
           'display_string' => find_title_for(series),
-          'level_display_string' => obj.level_display_string
+          'level_display_string' => obj.level_display_string(series)
         }
       end
-      if collection = obj.collection
-        json['collection'] = {
+
+      obj.collections.each do |collection|
+        json['collection'] ||= []
+        json['collection'] << {
           'ref' => collection.uri,
           'identifier' => Identifiers.format(Identifiers.parse(collection.identifier)),
           'display_string' => find_title_for(collection)

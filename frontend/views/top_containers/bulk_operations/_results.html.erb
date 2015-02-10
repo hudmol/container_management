@@ -17,19 +17,8 @@
 
 <table class="table table-striped table-bordered table-condensed table-hover table-sortable table-search-results">
   <thead>
-    <tr>
-      <th></th>
-      <th colspan="2">Collection/Accession</th>
-      <th colspan="2">Series</th>
-      <th colspan="8">Top Container</th>
-      <th></th>
-    </tr>
     <tr class="sortable-columns">
       <th><% if multiselect %><%= check_box_tag "select_all" %><% end %></th>
-      <th>ID</th>
-      <th>Title</th>
-      <th>Level</th>
-      <th>ID</th>
       <th>Container Profile</th>
       <th>Indicator</th>
       <th>Barcode</th>
@@ -38,6 +27,7 @@
       <th>ILS Item ID</th>
       <th>Restricted?</th>
       <th>Exported</th>
+      <th>Linked records</th>
       <th><!-- Actions --></th>
     </tr>
   </thead>
@@ -52,10 +42,6 @@
             <%= radio_button_tag "linker-item", container_json["uri"], false, :"data-object" => container_json.to_json %>
           <% end %>
         </td>
-        <td><%= Array(doc['collection_identifier_u_stext']).first %></td>
-        <td><%= Array(doc['collection_display_string_u_sstr']).first %></td>
-        <td><%= Array(doc['series_level_u_sstr']).first %></td>
-        <td><%= Array(doc['series_identifier_u_stext']).first %></td>
         <td><%= Array(doc['container_profile_display_string_u_sstr']).first %></td>
         <td><%= container_json['indicator'] %></td>
         <td><%= container_json['barcode'] %></td>
@@ -68,6 +54,56 @@
         <% else %>
           <td><%= container_json['exported_to_ils'] %></td>
         <% end %>
+
+        <!-- <td>
+        <ul>
+        <% Array(doc['collection_identifier_u_stext']).each do |id| %>
+            <li><%= id %></li>
+        <% end %>
+        </ul>
+        </td>
+        <td>
+        <ul>
+        <% Array(doc['collection_display_string_u_sstr']).each do |id| %>
+            <li><%= id %></li>
+        <% end %>
+        </ul>
+        </td>
+        <td>
+        <ul>
+        <% Array(doc['series_level_u_sstr']).each do |id| %>
+            <li><%= id %></li>
+        <% end %>
+        </ul>
+        </td>
+        <td>
+        <ul>
+        <% Array(doc['series_identifier_u_stext']).each do |id| %>
+            <li><%= id %></li>
+        <% end %>
+        </ul>
+        </td> -->
+
+
+         <td>
+            <dl>
+
+                <% if doc['collection_identifier_stored_u_sstr'] %>
+                    <dt>Collection</dt>
+                    <% Array(doc['collection_identifier_stored_u_sstr']).zip(Array(doc['collection_display_string_u_sstr'])).each do |identifier, display| %>
+                        <dd><%= identifier %> - <%= display %></dd>
+                    <% end %>
+                <% end %>
+
+                <% if doc['series_level_u_sstr'] %>
+                    <dt>Series</dt>
+                    <% Array(doc['series_level_u_sstr']).zip(Array(doc['series_identifier_stored_u_sstr'])).each do |level, identifier| %>
+                        <dd><%= level %> - <%= identifier %></dd>
+                    <% end %>
+                <% end %>
+            </dl>
+        </td>
+
         <td>
           <div class="btn-group pull-right">
             <%= link_to I18n.t("actions.view"), {:controller => :resolver, :action => :resolve_readonly, :uri => container_json["uri"]}, :class => "btn btn-mini" %>
