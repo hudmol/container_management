@@ -94,7 +94,7 @@ class TopContainersController < ApplicationController
     begin
       results = perform_search if params.has_key?("q")
     rescue MissingFilterException
-      return render :text => I18n.t("top_container._frontend.messages.filter_required"), :status => 500
+      flash[:error] = I18n.t("top_container._frontend.messages.filter_required")
     end
 
     render_aspace_partial :partial => "top_containers/bulk_operations/browse", :locals => {:results => results}
