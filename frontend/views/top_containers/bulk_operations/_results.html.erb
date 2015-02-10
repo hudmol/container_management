@@ -52,10 +52,35 @@
             <%= radio_button_tag "linker-item", container_json["uri"], false, :"data-object" => container_json.to_json %>
           <% end %>
         </td>
-        <td><%= Array(doc['collection_identifier_u_stext']).first %></td>
-        <td><%= Array(doc['collection_display_string_u_sstr']).first %></td>
-        <td><%= Array(doc['series_level_u_sstr']).first %></td>
-        <td><%= Array(doc['series_identifier_u_stext']).first %></td>
+        <td>
+            <ul>
+            <% Array(doc['collection_identifier_u_stext']).each do |id| %>
+                <li><%= id %></li>
+            <% end %>
+            </ul>
+        </td>
+        <td>
+            <ul>
+            <% Array(doc['collection_display_string_u_sstr']).each do |id| %>
+                <li><%= id %></li>
+            <% end %>
+            </ul>
+        </td>
+        <td>
+            <ul>
+            <% Array(doc['series_level_u_sstr']).each do |id| %>
+                <li><%= id %></li>
+            <% end %>
+            </ul>
+        </td>
+        <td>
+            <ul>
+            <% Array(doc['series_identifier_u_stext']).each do |id| %>
+                <li><%= id %></li>
+            <% end %>
+            </ul>
+        </td>
+
         <td><%= Array(doc['container_profile_display_string_u_sstr']).first %></td>
         <td><%= container_json['indicator'] %></td>
         <td><%= container_json['barcode'] %></td>

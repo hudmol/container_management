@@ -16,21 +16,29 @@ class CommonIndexer
     indexer.add_document_prepare_hook {|doc, record|
       if record['record']['jsonmodel_type'] == 'top_container'
         doc['title'] = record['record']['display_string']
+
         if record['record']['series']
-          doc['series_uri_u_sstr'] = record['record']['series']['ref']
-          doc['series_title_u_sstr'] = record['record']['series']['display_string']
-          doc['series_level_u_sstr'] = record['record']['series']['level_display_string']
-          doc['series_identifier_u_stext'] = CommonIndexer.generate_permutations_for_identifier(record['record']['series']['identifier'])
+          doc['series_uri_u_sstr'] = record['record']['series'].map {|series| series['ref']}
+          doc['series_title_u_sstr'] = record['record']['series'].map {|series| series['display_string']}
+          doc['series_level_u_sstr'] = record['record']['series'].map {|series| series['level_display_string']}
+          doc['series_identifier_u_stext'] = record['record']['series'].map {|series|
+            CommonIndexer.generate_permutations_for_identifier(series['identifier'])
+          }.flatten
         end
+
         if record['record']['collection']
-          doc['collection_uri_u_sstr'] = record['record']['collection']['ref']
-          doc['collection_display_string_u_sstr'] = record['record']['collection']['display_string']
-          doc['collection_identifier_u_stext'] = CommonIndexer.generate_permutations_for_identifier(record['record']['collection']['identifier'])
+          doc['collection_uri_u_sstr'] = record['record']['collection'].map {|collection| collection['ref']}
+          doc['collection_display_string_u_sstr'] = record['record']['collection'].map {|collection| collection['display_string']}
+          doc['collection_identifier_u_stext'] = record['record']['collection'].map {|collection|
+            CommonIndexer.generate_permutations_for_identifier(collection['identifier'])
+          }.flatten
         end
+
         if record['record']['container_profile']
           doc['container_profile_uri_u_sstr'] = record['record']['container_profile']['ref']
           doc['container_profile_display_string_u_sstr'] = record['record']['container_profile']['_resolved']['display_string']
         end
+
         if record['record']['container_locations'].length > 0
           record['record']['container_locations'].each do |container_location|
             if container_location['status'] == 'current'
