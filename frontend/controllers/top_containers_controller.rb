@@ -147,6 +147,9 @@ class TopContainersController < ApplicationController
     filters.push({'collection_uri_u_sstr' => params['collection']['ref']}.to_json) if params['collection']
     filters.push({'container_profile_uri_u_sstr' => params['container_profile']['ref']}.to_json) if params['container_profile']
     filters.push({'location_uri_u_sstr' => params['location']['ref']}.to_json) if params['location']
+    unless params['exported'].blank?
+      filters.push({'exported_u_sbool' => (params['exported'] == "yes" ? true : false)}.to_json)
+    end
 
     if filters.empty? && params['q'].blank?
       raise MissingFilterException.new
