@@ -26,6 +26,7 @@ BulkActionBarcodeRapidEntry.prototype.show = function() {
   var $modal = AS.openCustomModal("bulkActionBarcodeRapidEntryModal", this.$menuItem.text(), dialog_content, "full");
 
   this.setup_keyboard_handling($modal);
+  this.setup_form_submission($modal);
 };
 
 
@@ -35,7 +36,10 @@ BulkActionBarcodeRapidEntry.prototype.setup_keyboard_handling = function($modal)
   $(":input", $modal).
     on("focus",
       function() {
-        $(this).ScrollTo({duration: 0});
+        $(this).ScrollTo({
+          duration: 0,
+          offsetTop: 400
+        });
       }).
     on("keyup",
       function(event) {
@@ -46,6 +50,22 @@ BulkActionBarcodeRapidEntry.prototype.setup_keyboard_handling = function($modal)
     );
 };
 
+
+BulkActionBarcodeRapidEntry.prototype.setup_form_submission = function($modal) {
+  var self = this;
+  var $form = $modal.find("form");
+  $form.ajaxForm({
+    dataType: "html",
+    type: "POST",
+    beforeSubmit: function() {
+      // maybe disable the button
+      $form.find(":submit").addClass("disabled").attr("disabled","disabled");
+    },
+    success: function(html) {
+      $form.replaceWith(html);
+    }
+  });
+};
 
 $(function() {
   AS.yale_containers.bulkActionBarcodeRapidEntry = new BulkActionBarcodeRapidEntry(AS.yale_containers.bulkContainerSearch);

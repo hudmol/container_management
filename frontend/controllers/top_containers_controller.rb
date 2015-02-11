@@ -1,7 +1,9 @@
+require 'uri'
+
 class TopContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:index, :show, :typeahead, :bulk_operations_browse],
-                      "manage_container" => [:new, :create, :edit, :update, :delete, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update]
+                      "manage_container" => [:new, :create, :edit, :update, :delete, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update, :update_barcodes]
 
 
   def index
@@ -124,6 +126,24 @@ class TopContainersController < ApplicationController
                                           })
     result = ASUtils.json_parse(response.body)
     render_aspace_partial :partial => "top_containers/bulk_operations/update_result", :locals => {:result => result}
+  end
+
+
+  def update_barcodes
+    update_uris = params[:update_uris]
+    barcode_data = {}
+    update_uris.map{|uri| barcode_data[uri] = params[uri]}
+
+    post_uri = "#{JSONModel::HTTP.backend_url}/repositories/#{session[:repo_id]}/top_containers/bulk/barcodes"
+
+    begin
+      response = JSONModel::HTTP::post_json(URI(post_uri), barcode_data.to_json)
+
+      result = ASUtils.json_parse(response.body)
+      render_aspace_partial :partial => "top_containers/bulk_operations/bulk_action_success", :locals => {:result => result}
+    rescue Exception => e
+      render :text => e, :status => 500
+    end
   end
 
 

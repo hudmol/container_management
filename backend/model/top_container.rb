@@ -228,4 +228,16 @@ class TopContainer < Sequel::Model(:top_container)
     out
   end
 
+
+  def self.bulk_update_barcodes(barcode_data)
+    updated = []
+
+    barcode_data.each do |uri, barcode|
+      id = my_jsonmodel.id_for(uri)
+      self[id].update(:barcode => barcode, :system_mtime => Time.now)
+      updated << id
+    end
+
+    updated
+  end
 end
