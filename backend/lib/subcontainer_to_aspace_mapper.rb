@@ -12,10 +12,10 @@ class SubContainerToAspaceMapper
 
 
   def type_1
-    if container_profile.name =~ /Flat Grey/
+    if container_profile && container_profile.name =~ /Flat Grey/
       'carton'
     else
-      raise "Unknown type_1: #{self}"
+      'box'
     end
   end
 
