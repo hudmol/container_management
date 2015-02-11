@@ -40,7 +40,7 @@ it "allows container profiles to be deleted" do
 
   it "fails when you try to update a container_profile that doesn't exist" do
     cp = build(:json_container_profile)
-    cp.uri = "#{$repo}/container_profiles/9999"
+    cp.uri = "/container_profiles/9999"
 
     expect { cp.save }.to raise_error
   end

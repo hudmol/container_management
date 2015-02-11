@@ -4,31 +4,18 @@ require_relative 'factories'
 describe 'Yale Container Profile model' do
 
   it "can be created from a JSON module" do
-    cp = ContainerProfile.create_from_json(build(:json_container_profile, :name => "Big black bag"),
-                                         :repo_id => $repo_id)
+    cp = ContainerProfile.create_from_json(build(:json_container_profile, :name => "Big black bag"))
 
     ContainerProfile[cp[:id]].name.should eq("Big black bag")
   end
 
 
-  it "enforces name uniqueness within a repository" do
+  it "enforces name uniqueness" do
       create(:json_container_profile, :name => "1234")
 
       expect {
         create(:json_container_profile, :name => "1234")
       }.to raise_error(ValidationException)
-  end
-
-
-  it "doesn't enforce name uniqueness between repositories" do
-    repo1 = make_test_repo("REPO1")
-    repo2 = make_test_repo("REPO2")
-
-    expect {
-      [repo1, repo2].each do |repo_id|
-        ContainerProfile.create_from_json(build(:json_container_profile, {:name => "Gary"}), :repo_id => repo_id)
-      end
-    }.to_not raise_error
   end
 
 

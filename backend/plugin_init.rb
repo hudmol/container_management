@@ -4,6 +4,6 @@ Permission.define("manage_container",
 
 Permission.define("manage_container_profile_record",
 				  "The ability to create/update/delete container profile records",
-				  :level => "repository")
+				  :level => "global")
 
 require_relative "../yale_container_init"
