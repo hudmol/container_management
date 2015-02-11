@@ -2,9 +2,15 @@
 
 <div id="template_bulk_barcode_action_dialog"><!--
   <div class="modal-body">
+    <table class="table table-striped table-bordered table-condensed table-hover">
     {for container in selection}
-      ${container.display_string}<br/>
+      <tr>
+        <td>${container.display_string}</td>
+        <td>${container.row.find(".top-container-linked-records").html()}</td>
+        <td><input type="text" name="${container.uri}" value="${container.row.find(".top-container-barcode").text().trim()}" /></td>
+      </tr>
     {/for}
+    </table>
   </div>
   <div class="modal-footer">
     <button type="submit" class="btn btn-primary">Update ${selection.length} records</button>

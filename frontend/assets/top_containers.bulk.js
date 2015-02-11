@@ -149,7 +149,7 @@ BulkContainerSearch.prototype.get_selection = function() {
 };
 
 BulkContainerSearch.prototype.add_menu_item = function(menuItemHtml) {
-  return $(menuItemHtml).appendTo($("#bulkActions ul.dropdown-menu", this.$toolbar));
+  return $($(menuItemHtml).appendTo($("#bulkActions ul.dropdown-menu", this.$toolbar))[0]);
 };
 
 
