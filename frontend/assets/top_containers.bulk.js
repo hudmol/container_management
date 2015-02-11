@@ -58,10 +58,11 @@ BulkContainerSearch.prototype.setup_results_list = function(docs) {
     var $checkbox = $(this);
     var $row = $checkbox.closest("tr");
     $row.toggleClass("selected");
+    var $first_row_state = $row[0].className
 
-    if (event.shiftKey && $row[0].className == "selected") {
+    if (event.shiftKey) {
 	$row = $row.prev();
-	while ($row[0] != null && $row[0].className != "selected") {
+	while ($row[0] != null && $row[0].className != $first_row_state) {
 	    $row.find(":checkbox").click();
 	    $row = $row.prev();
 	}
