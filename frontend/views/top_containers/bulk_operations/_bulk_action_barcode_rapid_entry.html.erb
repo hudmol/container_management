@@ -1,0 +1,17 @@
+<script src="<%= "#{AppConfig[:frontend_prefix]}assets/top_containers.bulk.barcodes.js" %>"></script>
+
+<div id="template_bulk_barcode_action_dialog"><!--
+  <div class="modal-body">
+    {for container in selection}
+      ${container.display_string}<br/>
+    {/for}
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary">Update ${selection.length} records</button>
+    <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
+  </div>
+--></div>
+
+<div id="template_bulk_action_barcodes_menu_item"><!--
+  <li><a id="showBulkActionRapidBarcodeEntry" href="javascript:void(0);">Rapid Barcode Entry</a></li>
+--></div>
