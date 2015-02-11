@@ -25,3 +25,7 @@
     border-right: 4px solid transparent !important;
     border-top: 4px solid #000 !important;
 }
+.selected-record-list {
+    max-height: 180px;
+    overflow: auto;
+}

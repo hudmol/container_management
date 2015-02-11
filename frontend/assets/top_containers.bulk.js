@@ -128,15 +128,11 @@ BulkContainerSearch.prototype.setup_bulk_action_update_ils_holding = function() 
   var $link = $("#bulkActionUpdateIlsHolding", self.$toolbar);
 
   $link.on("click", function() {
-    var idArray = [];
-    self.get_selection().forEach(function(c) {
-      idArray.push(c[0].replace(/^.*\//, ''));
-    });
-    var ids = idArray.join();
+    var updateUris = self.get_selection().map(function(c) { return c[0] });
     AS.openCustomModal("bulkUpdateModal", "Update ILS Holding IDs", AS.renderTemplate("bulk_action_update_ils_holding", {
       selection: self.get_selection(),
-      ids: ids
-    }))
+      updateUris: updateUris
+    }), 'full')
   });
 };
 

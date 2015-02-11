@@ -102,10 +102,11 @@ class TopContainersController < ApplicationController
 
 
   def bulk_operation_update
-    data = params.clone
-    data['ids[]'] = Array(params['ids'].split(',')).map{|v| v.to_i}
-    data.delete('ids')
-    response = JSONModel::HTTP::post_form("/repositories/#{session[:repo_id]}/top_containers/batch/ils_holding_id", data)
+    response = JSONModel::HTTP::post_form("/repositories/#{session[:repo_id]}/top_containers/batch/ils_holding_id",
+                                          {
+                                            'ils_holding_id' => params['ils_holding_id'],
+                                            'ids[]' => params['updateUri'].map {|uri| JSONModel(:top_container).id_for(uri) }
+                                          })
     result = ASUtils.json_parse(response.body)
     render_aspace_partial :partial => "top_containers/bulk_operations/update_result", :locals => {:result => result}
   end
