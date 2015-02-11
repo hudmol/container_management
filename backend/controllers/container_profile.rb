@@ -48,7 +48,7 @@ class ArchivesSpaceService < Sinatra::Base
   Endpoint.delete('/container_profiles/:id')
     .description("Delete an Container Profile")
     .params(["id", :id])
-    .permissions([:delete_archival_record])
+    .permissions([:manage_container_profile_record])
     .returns([200, :deleted]) \
   do
     handle_delete(ContainerProfile, params[:id])
