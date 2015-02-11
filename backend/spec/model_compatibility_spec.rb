@@ -78,6 +78,33 @@ describe 'Yale Container compatibility' do
     end
 
 
+    it "creates a top container with a barcode if none already exists" do
+      instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                                "container" => {
+                                                  "barcode_1" => '12345678',
+                                                  "indicator_1" => '999'
+                                                })
+
+      accession = create_accession({"instances" => [instance]})
+
+      created = TopContainer[:barcode => '12345678']
+      created.indicator.should eq('999')
+    end
+
+
+    it "creates a top container with a barcode if none already exists, defaulting the indicator if absent" do
+      instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                                "container" => {
+                                                  "barcode_1" => '12345678',
+                                                })
+
+      accession = create_accession({"instances" => [instance]})
+
+      created = TopContainer[:barcode => '12345678']
+      created.indicator.should eq('1')
+    end
+
+
     it "finds an existing top container linked within the same series where the ind_1 matches" do
       container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234'))
 

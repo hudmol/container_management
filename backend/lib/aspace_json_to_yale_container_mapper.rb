@@ -1,5 +1,7 @@
 class AspaceJsonToYaleContainerMapper
 
+  DEFAULT_INDICATOR = '1'
+
   def initialize(json)
     @json = json
   end
@@ -42,8 +44,13 @@ class AspaceJsonToYaleContainerMapper
     # If we have a barcode, attempt to locate an existing top container
     barcode = container['barcode_1']
 
-    if barcode && (top_container = TopContainer[:barcode => barcode])
-      top_container
+    if barcode
+      if (top_container = TopContainer[:barcode => barcode])
+        top_container
+      else
+        indicator = container['indicator_1'] || DEFAULT_INDICATOR
+        TopContainer.create_from_json(JSONModel(:top_container).from_hash('barcode' => barcode, 'indicator' => indicator))
+      end
     else
       nil
     end
