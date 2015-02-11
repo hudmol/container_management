@@ -125,7 +125,12 @@ class TopContainersController < ApplicationController
                                             'ids[]' => params['updateUri'].map {|uri| JSONModel(:top_container).id_for(uri) }
                                           })
     result = ASUtils.json_parse(response.body)
-    render_aspace_partial :partial => "top_containers/bulk_operations/update_result", :locals => {:result => result}
+
+    if result.has_key?('records_updated')
+      render_aspace_partial :partial => "top_containers/bulk_operations/bulk_action_success", :locals => {:result => result}
+    else
+      render :text => "There seems to have been a problem with the update: #{result['error']}", :status => 500
+    end
   end
 
 

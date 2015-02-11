@@ -9,7 +9,6 @@ function BulkContainerSearch($search_form, $results_container, $toolbar) {
 
   this.setup_form();
   this.setup_results_list();
-  this.setup_bulk_action_update_ils_holding();
   this.setup_bulk_action_delete();
 }
 
@@ -146,17 +145,6 @@ BulkContainerSearch.prototype.get_selection = function() {
   return results;
 };
 
-BulkContainerSearch.prototype.setup_bulk_action_update_ils_holding = function() {
-  var self = this;
-  var $link = $("#bulkActionUpdateIlsHolding", self.$toolbar);
-
-  $link.on("click", function() {
-    AS.openCustomModal("bulkUpdateModal", "Update ILS Holding IDs", AS.renderTemplate("bulk_action_update_ils_holding", {
-      selection: self.get_selection()
-    }), 'full')
-  });
-};
-
 BulkContainerSearch.prototype.setup_bulk_action_delete = function() {
   var self = this;
   var $link = $("#bulkActionDelete", self.$toolbar);
@@ -175,37 +163,62 @@ BulkContainerSearch.prototype.setup_bulk_action_delete = function() {
  * BulkContainerUpdate - ILS bulk action
  *
  */
-function BulkContainerUpdate($update_form) {
-  this.$update_form = $update_form;
+function BulkContainerUpdate(bulkContainerSearch) {
+  this.bulkContainerSearch = bulkContainerSearch;
 
-  this.setup_update_form();
+  this.setup_menu_item();
 };
 
 
-BulkContainerUpdate.prototype.setup_update_form = function() {
+BulkContainerUpdate.prototype.setup_update_form = function($modal) {
   var self = this;
 
-  this.$update_form.on("submit", function(event) {
+  var $form = $modal.find("form");
+
+  $form.on("submit", function(event) {
     event.preventDefault();
-    self.perform_update(self.$update_form.serializeArray());
+    self.perform_update($form, $modal);
   });
 };
 
 
-BulkContainerUpdate.prototype.perform_update = function(data) {
+BulkContainerUpdate.prototype.perform_update = function($form, $modal) {
   var self = this;
 
   $.ajax({
     url:"/plugins/top_containers/bulk_operations/update",
-        data: data,
-        type: "post",
-        success: function(html) {
-        $('#alertBucket').replaceWith(html);
+    data: $form.serializeArray(),
+    type: "post",
+    success: function(html) {
+      $form.replaceWith(html);
+      $modal.trigger("resize");
     },
-        error: function(jqXHR, textStatus, errorThrown) {
-        $('#alertBucket').replaceWith('<div id="alertBucket" class="alert alert-error">' + jqXHR.responseText + '</div>');
+    error: function(jqXHR, textStatus, errorThrown) {
+      var error = AS.renderTemplate("template_bulk_operation_error_message", {message: jqXHR.responseText});
+      $('#alertBucket').replaceWith(error);
     }
   });
+};
+
+BulkContainerUpdate.prototype.setup_menu_item = function() {
+  var self = this;
+  self.$link = $("#bulkActionUpdateIlsHolding", self.$toolbar);
+
+  self.$link.on("click", function() {
+    self.show();
+  });
+};
+
+
+BulkContainerUpdate.prototype.show = function() {
+  var dialog_content = AS.renderTemplate("bulk_action_update_ils_holding", {
+    selection: this.bulkContainerSearch.get_selection()
+  });
+
+
+  var $modal = AS.openCustomModal("bulkUpdateModal", this.$link.text(), dialog_content, 'full');
+
+  this.setup_update_form($modal);
 };
 
 
@@ -220,11 +233,11 @@ function BulkActionBarcodeRapidEntry(bulkContainerSearch) {
 
   this.bulkContainerSearch = bulkContainerSearch;
 
-  this.initMenuItem();
+  this.setup_menu_item();
 }
 
 
-BulkActionBarcodeRapidEntry.prototype.initMenuItem = function() {
+BulkActionBarcodeRapidEntry.prototype.setup_menu_item = function() {
   var self = this;
 
   self.$menuItem = $("#" + self.MENU_ID, self.bulkContainerSearch.$toolbar);
@@ -284,6 +297,11 @@ BulkActionBarcodeRapidEntry.prototype.setup_form_submission = function($modal) {
     success: function(html) {
       $form.replaceWith(html);
       $modal.trigger("resize");
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      var error = AS.renderTemplate("template_bulk_operation_error_message", {message: jqXHR.responseText});
+      $('#alertBucket').replaceWith(error);
+      $form.find(":submit").removeClass("disabled").removeAttr("disabled");
     }
   });
 };
@@ -300,4 +318,5 @@ $(function() {
                                                   $(".record-toolbar.bulk-operation-toolbar"));
 
   new BulkActionBarcodeRapidEntry(bulkContainerSearch);
+  new BulkContainerUpdate(bulkContainerSearch);
 });

@@ -36,8 +36,6 @@
         <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
     </div>
   <% end %>
-  <script>new BulkContainerUpdate($("#bulk_update_form"));</script>
-
 --></div>
 
 <<<<<<< HEAD
@@ -69,6 +67,7 @@
 <div id="template_bulk_barcode_action_dialog"><!--
   <%= form_tag({:controller => :top_containers, :action => :update_barcodes}, {:class => "form-horizontal", :id => "bulk_update_form" }) do |f| %>
   <div class="modal-body">
+    <div id="alertBucket"></div>
     <table class="table table-striped table-bordered table-condensed table-hover">
     <thead>
       <tr>
