@@ -7,6 +7,7 @@ function BulkContainerSearch($search_form, $results_container, $toolbar) {
   this.setup_results_list();
   this.setup_bulk_action_test();
   this.setup_bulk_action_update_ils_holding();
+  this.setup_bulk_action_delete();
 }
 
 function BulkContainerUpdate($update_form) {
@@ -137,6 +138,19 @@ BulkContainerSearch.prototype.setup_bulk_action_update_ils_holding = function() 
   $link.on("click", function() {
     var updateUris = self.get_selection().map(function(c) { return c[0] });
     AS.openCustomModal("bulkUpdateModal", "Update ILS Holding IDs", AS.renderTemplate("bulk_action_update_ils_holding", {
+      selection: self.get_selection(),
+      updateUris: updateUris
+    }), 'full')
+  });
+};
+
+BulkContainerSearch.prototype.setup_bulk_action_delete = function() {
+  var self = this;
+  var $link = $("#bulkActionDelete", self.$toolbar);
+
+  $link.on("click", function() {
+    var updateUris = self.get_selection().map(function(c) { return c[0] });
+    AS.openCustomModal("bulkActionModal", "Delete Top Containers", AS.renderTemplate("bulk_action_delete", {
       selection: self.get_selection(),
       updateUris: updateUris
     }), 'full')
