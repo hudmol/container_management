@@ -14,13 +14,13 @@
         <div class="selected-record-list well">
             <ul>
                 {for container in selection}
-                <li>${container[1]}</li>
+                <li>${container.display_string}</li>
                 {/for}
             </ul>
         </div>
 
-        {for uri in updateUris}
-        <input type="hidden" name="updateUri[]" value="${uri}">
+        {for container in selection}
+          <input type="hidden" name="updateUri[]" value="${container.uri}">
         {/for}
         <div class="span4">
             <div class="control-group">
