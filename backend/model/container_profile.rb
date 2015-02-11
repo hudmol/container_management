@@ -14,7 +14,7 @@ class ContainerProfile < Sequel::Model(:container_profile)
 
 
   def display_string
-    name
+    "#{name} [#{depth}d, #{height}h, #{width}w #{dimension_units}] extent measured by #{extent_dimension}"
   end
 
 

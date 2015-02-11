@@ -61,7 +61,7 @@ class CommonIndexer
     indexer.add_document_prepare_hook {|doc, record|
       if doc['primary_type'] == 'container_profile'
         doc['json'] = record['record'].to_json
-        doc['title'] = record['record']['name']
+        doc['title'] = record['record']['display_string']
 
         ['width', 'height', 'depth'].each do |property|
           doc["container_profile_#{property}_u_sstr"] = record['record'][property]
