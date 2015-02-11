@@ -1,4 +1,6 @@
-class SubContainerToAspaceMapper
+# Take our record containing Yale containers and generate corresponding
+# ArchivesSpace container records.
+class SubContainerToAspaceJsonMapper
 
   def initialize(instance_json, instance_obj)
     @instance_json = instance_json

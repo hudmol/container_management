@@ -11,3 +11,16 @@ require_relative "../yale_container_init"
 Dir.glob(File.join(File.dirname(__FILE__), "lib", "*.rb")).sort.each do |file|
   require File.absolute_path(file)
 end
+
+
+# Any record supporting instances needs our compatibility mixin added as well.
+# This allows mappings between ArchivesSpace containers and the new container
+# model.
+ASModel.all_models.each do |model|
+  if model.included_modules.include?(Instances)
+    model.include(MapToAspaceContainer)
+  end
+end
+
+
+
