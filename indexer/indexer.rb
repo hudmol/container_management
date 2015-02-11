@@ -45,6 +45,7 @@ class CommonIndexer
           record['record']['container_locations'].each do |container_location|
             if container_location['status'] == 'current'
               doc['location_uri_u_sstr'] = container_location['ref']
+              doc['location_uris'] = container_location['ref']
               doc['location_display_string_u_sstr'] = container_location['_resolved']['title']
             end
           end
