@@ -1,7 +1,7 @@
 class TopContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:index, :show, :typeahead, :bulk_operations_browse],
-                      "manage_container" => [:new, :create, :edit, :update, :batch_delete, :bulk_operations, :bulk_operation_search]
+                      "manage_container" => [:new, :create, :edit, :update, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update]
 
 
   def index
@@ -98,6 +98,17 @@ class TopContainersController < ApplicationController
     end
 
     render_aspace_partial :partial => "top_containers/bulk_operations/browse", :locals => {:results => results}
+  end
+
+
+  def bulk_operation_update
+    response = JSONModel::HTTP::post_form("/repositories/#{session[:repo_id]}/top_containers/batch/ils_holding_id",
+                                          {
+                                            'ils_holding_id' => params['ils_holding_id'],
+                                            'ids[]' => params['updateUri'].map {|uri| JSONModel(:top_container).id_for(uri) }
+                                          })
+    result = ASUtils.json_parse(response.body)
+    render_aspace_partial :partial => "top_containers/bulk_operations/update_result", :locals => {:result => result}
   end
 
 

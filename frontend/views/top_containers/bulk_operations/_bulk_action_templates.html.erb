@@ -5,3 +5,37 @@
   {/for}
   </ul>
 --></div>
+
+<div id="bulk_action_update_ils_holding"><!--
+  <%= form_tag({:controller => :top_containers, :action => :bulk_operation_update}, {:class => "form-horizontal", :id => "bulk_update_form" }) do |f| %>
+    <div class="modal-body">
+        <div class="alert alert-info" id="alertBucket">Enter a value for ILS Holding ID for all selected containers.</div>
+
+        <div class="selected-record-list well">
+            <ul>
+                {for container in selection}
+                <li>${container[1]}</li>
+                {/for}
+            </ul>
+        </div>
+
+        {for uri in updateUris}
+        <input type="hidden" name="updateUri[]" value="${uri}">
+        {/for}
+        <div class="span4">
+            <div class="control-group">
+                <label class="control-label" for="ils_holding_id">ILS Holding ID</label>
+                <div class="controls">
+                    <%= text_field_tag "ils_holding_id", params["ils_holding_id"], :style => "width: 80%;" %>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Update ${selection.length} records</button>
+        <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
+    </div>
+  <% end %>
+  <script>new BulkContainerUpdate($("#bulk_update_form"));</script>
+
+--></div>

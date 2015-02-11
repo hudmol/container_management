@@ -6,6 +6,13 @@ function BulkContainerSearch($search_form, $results_container, $toolbar) {
   this.setup_form();
   this.setup_results_list();
   this.setup_bulk_action_test();
+  this.setup_bulk_action_update_ils_holding();
+}
+
+function BulkContainerUpdate($update_form) {
+  this.$update_form = $update_form;
+
+  this.setup_update_form();
 }
 
 BulkContainerSearch.prototype.setup_form = function() {
@@ -113,6 +120,45 @@ BulkContainerSearch.prototype.setup_bulk_action_test = function() {
       selection: self.get_selection()
     }))
   });
+};
+
+
+BulkContainerSearch.prototype.setup_bulk_action_update_ils_holding = function() {
+  var self = this;
+  var $link = $("#bulkActionUpdateIlsHolding", self.$toolbar);
+
+  $link.on("click", function() {
+    var updateUris = self.get_selection().map(function(c) { return c[0] });
+    AS.openCustomModal("bulkUpdateModal", "Update ILS Holding IDs", AS.renderTemplate("bulk_action_update_ils_holding", {
+      selection: self.get_selection(),
+      updateUris: updateUris
+    }), 'full')
+  });
+};
+
+BulkContainerUpdate.prototype.setup_update_form = function() {
+  var self = this;
+
+  this.$update_form.on("submit", function(event) {
+    event.preventDefault();
+    self.perform_update(self.$update_form.serializeArray());
+  });
+};
+
+BulkContainerUpdate.prototype.perform_update = function(data) {
+  var self = this;
+
+  $.ajax({
+	  url:"/plugins/top_containers/bulk_operations/update",
+	      data: data,
+	      type: "post",
+	      success: function(html) {
+	      $('#alertBucket').replaceWith(html);
+	  },
+	      error: function(jqXHR, textStatus, errorThrown) {
+	      $('#alertBucket').replaceWith('<div id="alertBucket" class="alert alert-error">' + jqXHR.responseText + '</div>');
+	  }
+      });
 };
 
 
