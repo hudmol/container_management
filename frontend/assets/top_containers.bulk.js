@@ -60,7 +60,7 @@ BulkContainerSearch.prototype.setup_results_list = function(docs) {
     $row.toggleClass("selected");
     var $first_row_state = $row[0].className
 
-    if (event.shiftKey) {
+    if (event.altKey) {
 	$row = $row.prev();
 	while ($row[0] != null && $row[0].className != $first_row_state) {
 	    $row.find(":checkbox").click();
