@@ -141,14 +141,16 @@ class TopContainersController < ApplicationController
 
     post_uri = "#{JSONModel::HTTP.backend_url}/repositories/#{session[:repo_id]}/top_containers/bulk/barcodes"
 
-    begin
-      response = JSONModel::HTTP::post_json(URI(post_uri), barcode_data.to_json)
+    response = JSONModel::HTTP::post_json(URI(post_uri), barcode_data.to_json)
+    result = ASUtils.json_parse(response.body)
 
-      result = ASUtils.json_parse(response.body)
-      render_aspace_partial :partial => "top_containers/bulk_operations/bulk_action_success", :locals => {:result => result}
-    rescue Exception => e
-      render :text => e, :status => 500
+    if response.code =~ /^4/
+      # massage errors to use arrays so play nice in message template
+      result['error'].clone.each {|attr, errors| result['error'][attr] = Array(errors)}
+      return render_aspace_partial :partial => 'shared/quick_messages', :locals => {:exceptions => result, :jsonmodel => "top_container"}, :status => 500
     end
+
+    render_aspace_partial :partial => "top_containers/bulk_operations/bulk_action_success", :locals => {:result => result}
   end
 
 

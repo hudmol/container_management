@@ -377,4 +377,58 @@ describe 'Yale Container model' do
 
   end
 
+  describe "bulk action" do
+    it "can set multiple valid barcodes" do
+      container1_json = create(:json_top_container)
+      container2_json = create(:json_top_container)
+
+      barcode_data = {}
+      barcode_data[container1_json.uri] = "987654321"
+      barcode_data[container2_json.uri] = "876543210"
+
+      results = TopContainer.bulk_update_barcodes(barcode_data)
+      results.should include(container1_json.id, container2_json.id)
+
+      TopContainer[container1_json.id].barcode.should eq("987654321")
+      TopContainer[container2_json.id].barcode.should eq("876543210")
+    end
+
+    it "throws exception when attempt to update to an invalid barcode" do
+      orig_barcode_config = AppConfig[:yale_containers_barcode_length]
+      AppConfig[:yale_containers_barcode_length] = {
+        :system_default => {:min => 4, :max => 6}
+      }
+
+      container1_json = create(:json_top_container)
+      container2_json = create(:json_top_container)
+
+      original_barcode_1 = TopContainer[container1_json.id].barcode
+      original_barcode_2 = TopContainer[container2_json.id].barcode
+
+      barcode_data = {}
+      barcode_data[container1_json.uri] = "7777777"
+      barcode_data[container2_json.uri] = "333"
+
+      expect {
+        TopContainer.bulk_update_barcodes(barcode_data)
+      }.to raise_error(ValidationException)
+
+      AppConfig[:yale_containers_barcode_length] = orig_barcode_config
+    end
+
+    it "throws exception when attempt to set duplicate barcode" do
+      container1_json = create(:json_top_container)
+      container2_json = create(:json_top_container)
+
+      barcode_data = {}
+      barcode_data[container1_json.uri] = "7777777"
+      barcode_data[container2_json.uri] = "7777777"
+
+      expect {
+        TopContainer.bulk_update_barcodes(barcode_data)
+      }.to raise_error(Sequel::DatabaseError)
+
+    end
+  end
+
 end

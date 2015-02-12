@@ -297,7 +297,7 @@ BulkActionBarcodeRapidEntry.prototype.setup_form_submission = function($modal) {
       $modal.trigger("resize");
     },
     error: function(jqXHR, textStatus, errorThrown) {
-      var error = AS.renderTemplate("template_bulk_operation_error_message", {message: jqXHR.responseText});
+      var error = $("<div>").attr("id", "alertBucket").html(jqXHR.responseText);
       $('#alertBucket').replaceWith(error);
       $form.find(":submit").removeClass("disabled").removeAttr("disabled");
     }
