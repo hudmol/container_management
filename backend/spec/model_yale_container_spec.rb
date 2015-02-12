@@ -401,6 +401,22 @@ describe 'Yale Container model' do
       JSONModel(:top_container).find(topcon2.id).restricted.should eq(false)
     end
 
+
+    it "allows the calculated value for restricted to be overridden" do
+      Time.stub!(:now).and_return(Time.at(0))
+
+      topcon1 = create(:json_top_container)
+      create_archival_object_with_rights(topcon1, [["19720120", "19740809"]])
+      JSONModel(:top_container).find(topcon1.id).restricted.should eq(false)
+
+      puts "topcon1 #{topcon1.inspect}"      
+
+      topcon1 = JSONModel(:top_container).find(topcon1.id)
+      topcon1.override_restricted = true
+      topcon1.restricted = true
+      topcon1.save
+      JSONModel(:top_container).find(topcon1.id).restricted.should eq(true)
+    end
   end
 
   describe "bulk action" do

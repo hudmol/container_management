@@ -20,6 +20,7 @@
       "exported_to_ils" => {"type" => "string", "required" => false},
 
       "restricted" => {"type" => "boolean", "default" => false},
+      "override_restricted" => {"type" => "boolean", "default" => false},
 
       "container_locations" => {
         "type" => "array",

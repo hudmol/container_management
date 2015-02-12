@@ -142,7 +142,7 @@ class TopContainer < Sequel::Model(:top_container)
         json['exported_to_ils'] = json['exported_to_ils'].getlocal.iso8601
       end
 
-      json['restricted'] = obj.restricted_by_rights?
+      json['restricted'] = obj.restricted_by_rights? if obj.override_restricted == 0
     end
 
     jsons

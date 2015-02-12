@@ -29,6 +29,7 @@ en:
     exported_to_ils: Exported to ILS
     not_exported: Not exported
     restricted: Restricted?
+    override_restricted: Override restricted?
     parent: Parent Container
 
     yale_container_2_type: Child Container Type

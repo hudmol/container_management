@@ -20,7 +20,8 @@
   <%= form.label_and_readonly("exported_to_ils", I18n.t("top_container.not_exported")) %>
   <%= form.hidden_input("exported_to_ils") %>
 
-  <%= form.label_and_boolean("restricted") %>
+  <%= form.label_and_boolean("restricted", form.obj["override_restricted"] ? {} : {:disabled => "disabled"}) %>
+  <%= form.label_and_boolean("override_restricted") %>
 
   <div class="subrecord-form-container">
     <%= render_aspace_partial :partial => "shared/subrecord_form", :locals => {:form => form, :name => "container_locations"} %>
