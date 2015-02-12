@@ -39,6 +39,10 @@ en:
     barcode_length_for_this_repository: "Barcode length for this repository:"
     characters: characters
 
+    batch_delete:
+      success: Top Containers successfully deleted
+      error: There was a problem deleting Top Containers
+
     _singular: Top Container
     _plural: Top Containers
 

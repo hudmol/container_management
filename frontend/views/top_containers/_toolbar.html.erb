@@ -13,13 +13,13 @@
           </div>
         <% end %>
         <% if !['new'].include?(controller.action_name) %>
-        <!-- <div class="btn-toolbar pull-right">
+        <div class="btn-toolbar pull-right">
           <div class="btn-group">
             <div class="btn btn-inline-form">
-              <%# button_delete_action url_for(:controller => :top_containers, :action => :delete, :id => @top_container.id) unless @top_container.id.nil? %>
+              <%= button_delete_action url_for(:controller => :top_containers, :action => :delete, :id => @top_container.id) unless @top_container.id.nil? %>
             </div>
           </div>
-        </div> -->
+        </div>
         <% end %>
       </div>
     </div>

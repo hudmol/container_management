@@ -1,7 +1,7 @@
 class TopContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:index, :show, :typeahead, :bulk_operations_browse],
-                      "manage_container" => [:new, :create, :edit, :update, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update]
+                      "manage_container" => [:new, :create, :edit, :update, :delete, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update]
 
 
   def index
@@ -59,11 +59,26 @@ class TopContainersController < ApplicationController
 
 
   def delete
-    raise "TODO"
+    top_container = JSONModel(:top_container).find(params[:id])
+    top_container.delete
+
+    redirect_to(:controller => :top_containers, :action => :index, :deleted_uri => top_container.uri)
   end
 
   def batch_delete
-    raise "TODO"
+    response = JSONModel::HTTP.post_form("/batch_delete",
+                                         {
+                                "record_uris[]" => Array(params[:record_uris])
+                                         })
+
+    if response.code === "200"
+      flash[:success] = I18n.t("top_container.batch_delete.success")
+      deleted_uri_param = params[:record_uris].map{|uri| "deleted_uri[]=#{uri}"}.join("&")
+      redirect_to "#{request.referrer}?#{deleted_uri_param}"
+    else
+      flash[:error] = "#{I18n.t("top_container.batch_delete.error")}<br/> #{ASUtils.json_parse(response.body)["error"]["failures"].map{|err| "#{err["response"]} [#{err["uri"]}]"}.join("<br/>")}".html_safe
+      redirect_to request.referrer
+    end
   end
 
 

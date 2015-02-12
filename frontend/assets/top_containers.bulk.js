@@ -7,6 +7,7 @@ function BulkContainerSearch($search_form, $results_container, $toolbar) {
   this.setup_results_list();
   this.setup_bulk_action_test();
   this.setup_bulk_action_update_ils_holding();
+  this.setup_bulk_action_delete();
 }
 
 function BulkContainerUpdate($update_form) {
@@ -85,11 +86,18 @@ BulkContainerSearch.prototype.setup_results_list = function(docs) {
 
 BulkContainerSearch.prototype.update_button_state = function() {
   var self = this;
+  var checked_boxes = $("tbody :checkbox:checked", self.$results_container);
+  var delete_btn = self.$toolbar.find(".btn");
 
-  if ($("tbody :checkbox:checked", self.$results_container).length > 0) {
-    self.$toolbar.find(".btn").removeClass("disabled").removeAttr("disabled");
+  if (checked_boxes.length > 0) {
+    var selected_records = $.makeArray(checked_boxes.map(function() {return $(this).val();}));
+    delete_btn.data("form-data", {
+      record_uris: selected_records
+    });
+    delete_btn.removeClass("disabled").removeAttr("disabled");
   } else {
-    self.$toolbar.find(".btn").addClass("disabled").attr("disabled", "disabled");
+    delete_btn.data("form-data", {});
+    delete_btn.addClass("disabled").attr("disabled", "disabled");
   }
 };
 
@@ -139,6 +147,19 @@ BulkContainerSearch.prototype.setup_bulk_action_update_ils_holding = function() 
   $link.on("click", function() {
     var updateUris = self.get_selection().map(function(c) { return c[0] });
     AS.openCustomModal("bulkUpdateModal", "Update ILS Holding IDs", AS.renderTemplate("bulk_action_update_ils_holding", {
+      selection: self.get_selection(),
+      updateUris: updateUris
+    }), 'full')
+  });
+};
+
+BulkContainerSearch.prototype.setup_bulk_action_delete = function() {
+  var self = this;
+  var $link = $("#bulkActionDelete", self.$toolbar);
+
+  $link.on("click", function() {
+    var updateUris = self.get_selection().map(function(c) { return c[0] });
+    AS.openCustomModal("bulkActionModal", "Delete Top Containers", AS.renderTemplate("bulk_action_delete", {
       selection: self.get_selection(),
       updateUris: updateUris
     }), 'full')
