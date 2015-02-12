@@ -4,7 +4,7 @@
     "$schema" => "http://www.archivesspace.org/archivesspace.json",
     "version" => 1,
     "type" => "object",
-    "uri" => "/repositories/:repo_id/container_profiles",
+    "uri" => "/container_profiles",
     "properties" => {
       "uri" => {"type" => "string", "required" => false},
       

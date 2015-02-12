@@ -1,10 +1,9 @@
 class ArchivesSpaceService < Sinatra::Base
 
-  Endpoint.post('/repositories/:repo_id/container_profiles/:id')
+  Endpoint.post('/container_profiles/:id')
     .description("Update a Container Profile")
     .params(["id", :id],
-            ["container_profile", JSONModel(:container_profile), "The updated record", :body => true],
-            ["repo_id", :repo_id])
+            ["container_profile", JSONModel(:container_profile), "The updated record", :body => true])
     .permissions([:manage_container_profile_record])
     .returns([200, :updated]) \
   do
@@ -12,10 +11,9 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
-  Endpoint.post('/repositories/:repo_id/container_profiles')
+  Endpoint.post('/container_profiles')
     .description("Create a Container_Profile")
-    .params(["container_profile", JSONModel(:container_profile), "The record to create", :body => true],
-            ["repo_id", :repo_id])
+    .params(["container_profile", JSONModel(:container_profile), "The record to create", :body => true])
     .permissions([:manage_container_profile_record])
     .returns([200, :created]) \
   do
@@ -23,23 +21,22 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
-  Endpoint.get('/repositories/:repo_id/container_profiles')
-    .description("Get a list of Container Profiles for a Repository")
-    .params(["repo_id", :repo_id])
+  Endpoint.get('/container_profiles')
+    .description("Get a list of Container Profiles")
+    .params()
     .paginated(true)
-    .permissions([:view_repository])
+    .permissions([])
     .returns([200, "[(:container_profile)]"]) \
   do
     handle_listing(ContainerProfile, params)
   end
 
 
-  Endpoint.get('/repositories/:repo_id/container_profiles/:id')
+  Endpoint.get('/container_profiles/:id')
     .description("Get a Container Profile by ID")
     .params(["id", :id],
-            ["repo_id", :repo_id],
             ["resolve", :resolve])
-    .permissions([:view_repository])
+    .permissions([])
     .returns([200, "(:container_profile)"]) \
   do
     json = ContainerProfile.to_jsonmodel(params[:id])
@@ -48,11 +45,10 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
-  Endpoint.delete('/repositories/:repo_id/container_profiles/:id')
+  Endpoint.delete('/container_profiles/:id')
     .description("Delete an Container Profile")
-    .params(["id", :id],
-            ["repo_id", :repo_id])
-    .permissions([:delete_archival_record])
+    .params(["id", :id])
+    .permissions([:manage_container_profile_record])
     .returns([200, :deleted]) \
   do
     handle_delete(ContainerProfile, params[:id])
