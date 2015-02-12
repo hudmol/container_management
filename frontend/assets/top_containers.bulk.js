@@ -107,12 +107,29 @@ BulkContainerSearch.prototype.setup_table_sorter = function() {
     selectorHeaders: "thead tr.sortable-columns th",
     // disable sort on the checkbox column
     headers: {
-        0: { sorter: false},
-        9: { sorter: false},
-        10: { sorter: false}
+        0: { sorter: false}
     },
     // default sort: Collection, Series, Indicator
-    sortList: [[1,0],[3,0],[4,0],[6,0]]
+    sortList: [[1,0],[2,0],[4,0]],
+    // customise text extraction to pull only the first collection/series
+    textExtraction: function(node) {
+      var $node = $(node);
+
+      if ($node.hasClass("top-container-collection")) {
+        return $node.find(".collection-identifier:first").text().trim();
+      } else if ($node.hasClass("top-container-series")) {
+        var level = $node.find(".series-level:first").text().trim();
+        var identifier = $node.find(".series-identifier:first").text().trim();
+
+        if ((level+identifier).length > 0) {
+          return level + "-" + identifier;
+        } else {
+          return "";
+        }
+      }
+
+      return $node.text().trim();
+    }
   };
   this.$results_container.find("table").tablesorter(tablesorter_opts);
 };
