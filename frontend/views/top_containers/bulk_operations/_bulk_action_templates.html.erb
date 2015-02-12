@@ -38,7 +38,6 @@
   <% end %>
 --></div>
 
-<<<<<<< HEAD
 <div id="bulk_action_delete"><!--
   <%= form_tag({:controller => :top_containers, :action => :batch_delete}, {:class => "form-horizontal", :id => "batch_delete_form" }) do |f| %>
     <div class="modal-body">
@@ -47,17 +46,16 @@
         <div class="selected-record-list well">
             <ul>
                 {for container in selection}
-                <li>${container[1]}</li>
+                <li>
+                  ${container.display_string}
+                  <input type="hidden" name="record_uris[]" value="${container.uri}">
+                </li>
                 {/for}
             </ul>
         </div>
-
-        {for uri in updateUris}
-        <input type="hidden" name="record_uris[]" value="${uri}">
-        {/for}
     </div>
     <div class="modal-footer">
-        <button type="submit" class="btn btn-primary">Delete ${selection.length} records</button>
+        <button type="submit" class="btn btn-danger">Delete ${selection.length} records</button>
         <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
     </div>
   <% end %>

@@ -150,10 +150,8 @@ BulkContainerSearch.prototype.setup_bulk_action_delete = function() {
   var $link = $("#bulkActionDelete", self.$toolbar);
 
   $link.on("click", function() {
-    var updateUris = self.get_selection().map(function(c) { return c[0] });
     AS.openCustomModal("bulkActionModal", "Delete Top Containers", AS.renderTemplate("bulk_action_delete", {
-      selection: self.get_selection(),
-      updateUris: updateUris
+      selection: self.get_selection()
     }), 'full')
   });
 };
