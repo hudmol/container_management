@@ -9,7 +9,6 @@ function BulkContainerSearch($search_form, $results_container, $toolbar) {
 
   this.setup_form();
   this.setup_results_list();
-  this.setup_bulk_action_delete();
 }
 
 BulkContainerSearch.prototype.setup_form = function() {
@@ -143,17 +142,6 @@ BulkContainerSearch.prototype.get_selection = function() {
   });
 
   return results;
-};
-
-BulkContainerSearch.prototype.setup_bulk_action_delete = function() {
-  var self = this;
-  var $link = $("#bulkActionDelete", self.$toolbar);
-
-  $link.on("click", function() {
-    AS.openCustomModal("bulkActionModal", "Delete Top Containers", AS.renderTemplate("bulk_action_delete", {
-      selection: self.get_selection()
-    }), 'full')
-  });
 };
 
 
@@ -304,6 +292,26 @@ BulkActionBarcodeRapidEntry.prototype.setup_form_submission = function($modal) {
   });
 };
 
+
+/***************************************************************************
+ * BulkActionDelete - bulk action for delete
+ *
+ */
+function BulkActionDelete(bulkContainerSearch) {
+  var self = this;
+
+  self.bulkContainerSearch = bulkContainerSearch;
+
+  var $link = $("#bulkActionDelete", self.bulkContainerSearch.$toolbar);
+
+  $link.on("click", function() {
+    AS.openCustomModal("bulkActionModal", "Delete Top Containers", AS.renderTemplate("bulk_action_delete", {
+      selection: self.bulkContainerSearch.get_selection()
+    }), 'full');
+  });
+}
+
+
 /***************************************************************************
  * Initialise all special features on this page
  *
@@ -317,4 +325,5 @@ $(function() {
 
   new BulkActionBarcodeRapidEntry(bulkContainerSearch);
   new BulkContainerUpdate(bulkContainerSearch);
+  new BulkActionDelete(bulkContainerSearch);
 });
