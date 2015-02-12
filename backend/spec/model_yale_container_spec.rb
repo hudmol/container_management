@@ -29,6 +29,18 @@ def build_instance(top_container_json)
 end
 
 
+def create_archival_object_with_rights(top_container_json, dates = [])
+  rights_statements = dates.map{|date| build(:json_rights_statement, {
+                                               :restriction_start_date => date[0],
+                                               :restriction_end_date => date[1]
+                                             })}
+  archival_object = create(:json_archival_object,
+                           :instances => [build_instance(top_container_json)],
+                           :rights_statements => rights_statements)
+  archival_object.save
+end
+
+
 describe 'Yale Container model' do
 
   it "supports all kinds of wonderful metadata" do
@@ -361,6 +373,32 @@ describe 'Yale Container model' do
 
       container1.refresh.system_mtime.should be > container1_original_mtime
       container2.refresh.system_mtime.should be > container2_original_mtime
+    end
+
+
+    it "can calculate a value for restricted based on rights statements in records that link to it" do
+      # we livin' in tha past
+      Time.stub!(:now).and_return(Time.at(0))
+
+      topcon1 = create(:json_top_container, {:restricted => nil})
+      create_archival_object_with_rights(topcon1, [["19720120", "19740809"]])
+      JSONModel(:top_container).find(topcon1.id).restricted.should eq(false)
+
+      create_archival_object_with_rights(topcon1, [["19690120", "19740809"]])
+      JSONModel(:top_container).find(topcon1.id).restricted.should eq(true)
+
+      topcon2 = create(:json_top_container, {:restricted => nil})
+      create_archival_object_with_rights(topcon2, [["", "19690720"]])
+      JSONModel(:top_container).find(topcon2.id).restricted.should eq(false)
+
+      create_archival_object_with_rights(topcon2, [["19631122", "19801208"]])
+      JSONModel(:top_container).find(topcon2.id).restricted.should eq(true)
+
+      # time passes
+      Time.stub!(:now).and_return(Time.new(1980, 12, 8))
+      JSONModel(:top_container).find(topcon2.id).restricted.should eq(true)
+      Time.stub!(:now).and_return(Time.new(1980, 12, 9))
+      JSONModel(:top_container).find(topcon2.id).restricted.should eq(false)
     end
 
   end

@@ -1,6 +1,9 @@
 module ReindexTopContainers
 
   def reindex_top_containers
+    # get out if we aren't part of a resource tree
+    # TODO: look at this - we probably need to touch this record's top containers at least
+    return unless self.root_record_id
     # Find any relationships between a top container and any instance within the current tree.
     tree_object_graph = self.class.root_model[self.root_record_id].object_graph
     top_container_link_rlshp = SubContainer.find_relationship(:top_container_link)

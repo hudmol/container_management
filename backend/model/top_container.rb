@@ -79,7 +79,8 @@ class TopContainer < Sequel::Model(:top_container)
       else
         obj
       end
-    }.uniq {|obj| obj.uri}
+    }.compact.uniq {|obj| obj.uri}
+    # added compact above because a test was bombing saying obj was nil. should investigate JJJ
   end
 
 
@@ -141,9 +142,29 @@ class TopContainer < Sequel::Model(:top_container)
         json['exported_to_ils'] = json['exported_to_ils'].getlocal.iso8601
       end
 
+      json['restricted'] = obj.restricted_by_rights?
     end
 
     jsons
+  end
+
+
+  def restricted_by_rights?
+    linked_archival_records.each do |ao|
+      ao.rights_statement.each do |rs|
+        if rs.active == 1
+          start = rs.restriction_start_date
+          start &&= start.to_time
+          enddd = rs.restriction_end_date
+          enddd &&= enddd.to_time
+
+          return true if !start && !enddd
+          return true if (start && start <= Time.now) && (!enddd || enddd >= Time.now)
+          return true if (enddd && enddd >= Time.now) && (!start || start <= Time.now)
+        end
+      end
+    end
+    false
   end
 
 
