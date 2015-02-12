@@ -20,6 +20,8 @@
   <thead>
     <tr class="sortable-columns">
       <th><% if multiselect %><%= check_box_tag "select_all" %><% end %></th>
+      <th>Resource/Accession</th>
+      <th>Series</th>
       <th>Container Profile</th>
       <th>Indicator</th>
       <th>Barcode</th>
@@ -28,7 +30,6 @@
       <th>ILS Item ID</th>
       <th>Restricted?</th>
       <th>Exported</th>
-      <th>Linked records</th>
       <% if show_edit_actions %><th><!-- Actions --></th><% end %>
     </tr>
   </thead>
@@ -43,6 +44,24 @@
             <%= radio_button_tag "linker-item", container_json["uri"], false, :"data-object" => container_json.to_json %>
           <% end %>
         </td>
+        <td class="top-container-collection">
+          <% if doc['collection_identifier_stored_u_sstr'] %>
+            <ul class="linked-records-listing count-<%= Array(doc['collection_identifier_stored_u_sstr']).length %>">
+              <% Array(doc['collection_identifier_stored_u_sstr']).zip(Array(doc['collection_display_string_u_sstr'])).each do |identifier, display| %>
+                <li><span class="collection-identifier"><%= identifier %></span> <span class="collection-display-string"><%= display %></span</li>
+              <% end %>
+            </ul>
+          <% end %>
+        </td>
+        <td class="top-container-series">
+          <% if doc['series_level_u_sstr'] %>
+            <ul class="linked-records-listing count-<%= Array(doc['series_level_u_sstr']).length %>">
+              <% Array(doc['series_level_u_sstr']).zip(Array(doc['series_identifier_stored_u_sstr'])).each do |level, identifier| %>
+                <li><span class="series-level"><%= level %></span> <span class="series-identifier"><%= identifier %></span></li>
+              <% end %>
+            </ul>
+          <% end %>
+        </td>
         <td><%= Array(doc['container_profile_display_string_u_sstr']).first %></td>
         <td><%= container_json['indicator'] %></td>
         <td><%= container_json['barcode'] %></td>
@@ -55,55 +74,6 @@
         <% else %>
           <td><%= container_json['exported_to_ils'] %></td>
         <% end %>
-
-        <!-- <td>
-        <ul>
-        <% Array(doc['collection_identifier_u_stext']).each do |id| %>
-            <li><%= id %></li>
-        <% end %>
-        </ul>
-        </td>
-        <td>
-        <ul>
-        <% Array(doc['collection_display_string_u_sstr']).each do |id| %>
-            <li><%= id %></li>
-        <% end %>
-        </ul>
-        </td>
-        <td>
-        <ul>
-        <% Array(doc['series_level_u_sstr']).each do |id| %>
-            <li><%= id %></li>
-        <% end %>
-        </ul>
-        </td>
-        <td>
-        <ul>
-        <% Array(doc['series_identifier_u_stext']).each do |id| %>
-            <li><%= id %></li>
-        <% end %>
-        </ul>
-        </td> -->
-
-
-         <td>
-            <dl>
-
-                <% if doc['collection_identifier_stored_u_sstr'] %>
-                    <dt>Collection</dt>
-                    <% Array(doc['collection_identifier_stored_u_sstr']).zip(Array(doc['collection_display_string_u_sstr'])).each do |identifier, display| %>
-                        <dd><%= identifier %> - <%= display %></dd>
-                    <% end %>
-                <% end %>
-
-                <% if doc['series_level_u_sstr'] %>
-                    <dt>Series</dt>
-                    <% Array(doc['series_level_u_sstr']).zip(Array(doc['series_identifier_stored_u_sstr'])).each do |level, identifier| %>
-                        <dd><%= level %> - <%= identifier %></dd>
-                    <% end %>
-                <% end %>
-            </dl>
-        </td>
 
         <% if show_edit_actions %>
         <td>

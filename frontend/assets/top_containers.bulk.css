@@ -1,3 +1,6 @@
+#bulk_operation_results .table-sortable th.header {
+    cursor: pointer;
+}
 #bulk_operation_results .table-sortable th.header.headerSortUp,
 #bulk_operation_results .table-sortable th.header.headerSortDown {
     padding-right: 20px;
@@ -28,4 +31,12 @@
 .selected-record-list {
     max-height: 180px;
     overflow: auto;
+}
+
+#bulk_operation_results .linked-records-listing {
+    margin: 0;
+    list-style-position: inside;
+}
+#bulk_operation_results .linked-records-listing.count-1 {
+    list-style: none;
 }
