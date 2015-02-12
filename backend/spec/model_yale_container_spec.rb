@@ -31,6 +31,19 @@ end
 
 describe 'Yale Container model' do
 
+  before(:all) do
+    $orig_barcode_config = AppConfig[:yale_containers_barcode_length]
+    AppConfig[:yale_containers_barcode_length] = {
+      :system_default => {:min => 0, :max => 255}
+    }
+  end
+
+
+  after(:all) do
+    AppConfig[:yale_containers_barcode_length] = $orig_barcode_config
+  end
+
+
   it "supports all kinds of wonderful metadata" do
     barcode = '12345678'
     ils_holding_id = '112358'
@@ -87,6 +100,28 @@ describe 'Yale Container model' do
     expect {
       create(:json_top_container, :barcode => "1234")
     }.to raise_error(ValidationException)
+  end
+
+
+  it "enforces barcode length according to config" do
+    orig_barcode_config = AppConfig[:yale_containers_barcode_length]
+    AppConfig[:yale_containers_barcode_length] = {
+      :system_default => {:min => 4, :max => 6}
+    }
+
+    expect {
+      create(:json_top_container, :barcode => "1234")
+    }.to_not raise_error(ValidationException)
+
+    expect {
+      create(:json_top_container, :barcode => "123")
+    }.to raise_error(ValidationException)
+
+    expect {
+      create(:json_top_container, :barcode => "1234567")
+    }.to raise_error(ValidationException)
+
+    AppConfig[:yale_containers_barcode_length] = orig_barcode_config
   end
 
 
