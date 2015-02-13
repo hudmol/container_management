@@ -178,7 +178,7 @@ class TopContainer < Sequel::Model(:top_container)
         end
       end
     end
-    restricted_items
+    restricted_items.uniq {|obj| obj.uri}
   end
 
 
