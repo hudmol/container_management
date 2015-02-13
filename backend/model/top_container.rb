@@ -142,14 +142,26 @@ class TopContainer < Sequel::Model(:top_container)
         json['exported_to_ils'] = json['exported_to_ils'].getlocal.iso8601
       end
 
-      json['restricted'] = obj.restricted_by_rights? if obj.override_restricted == 0
+      obj.rights_restricted_contents.each do |contents|
+        json['rights_restricted_contents'] ||= []
+        json['rights_restricted_contents'] << {
+          'ref' => contents.uri,
+          'type' => contents.class.my_jsonmodel.record_type,
+          'display_string' => find_title_for(contents)
+        }
+      end
+
+      if obj.override_restricted == 0
+        json['restricted'] = !json['rights_restricted_contents'].empty?
+      end
     end
 
     jsons
   end
 
 
-  def restricted_by_rights?
+  def rights_restricted_contents
+    restricted_items = []
     linked_archival_records.each do |ao|
       ao.rights_statement.each do |rs|
         if rs.active == 1
@@ -158,13 +170,15 @@ class TopContainer < Sequel::Model(:top_container)
           enddd = rs.restriction_end_date
           enddd &&= enddd.to_time
 
-          return true if !start && !enddd
-          return true if (start && start <= Time.now) && (!enddd || enddd >= Time.now)
-          return true if (enddd && enddd >= Time.now) && (!start || start <= Time.now)
+          if (!start && !enddd) ||
+              ((start && start <= Time.now) && (!enddd || enddd >= Time.now)) ||
+              ((enddd && enddd >= Time.now) && (!start || start <= Time.now))
+              restricted_items << ao
+          end
         end
       end
     end
-    false
+    restricted_items
   end
 
 
