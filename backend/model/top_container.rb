@@ -234,6 +234,9 @@ class TopContainer < Sequel::Model(:top_container)
 
     barcode_checker = BarcodeCheck.new(Repository[self.active_repository].repo_code)
 
+    # null out barcodes to avoid duplicate error as bulk updates are applied
+    TopContainer.filter(:id => barcode_data.map{|uri,_| my_jsonmodel.id_for(uri)}).update(:barcode => nil)
+
     barcode_data.each do |uri, barcode|
       unless barcode_checker.valid?(barcode)
         raise ValidationException.new(:errors => {"barcode" => "Length must be within the range set in configuration"})

@@ -429,6 +429,22 @@ describe 'Yale Container model' do
       }.to raise_error(Sequel::DatabaseError)
 
     end
+
+    it "avoids a duplicate barcode exception when switching barcodes" do
+      container1_json = create(:json_top_container, {:barcode => "11111111"})
+      container2_json = create(:json_top_container, {:barcode => "22222222"})
+
+      barcode_data = {}
+      barcode_data[container1_json.uri] = "22222222"
+      barcode_data[container2_json.uri] = "11111111"
+
+      expect {
+        TopContainer.bulk_update_barcodes(barcode_data)
+      }.to_not raise_error(Sequel::DatabaseError)
+
+      TopContainer[container1_json.id].barcode.should eq("22222222")
+      TopContainer[container2_json.id].barcode.should eq("11111111")
+    end
   end
 
 end
