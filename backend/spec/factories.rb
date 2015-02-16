@@ -7,7 +7,6 @@ FactoryGirl.define do
     barcode { generate(:alphanumstr) }
     ils_holding_id { generate(:alphanumstr) }
     ils_item_id { generate(:alphanumstr) }
-    restricted { false }
     exported_to_ils { Time.now.iso8601 }
   end
 

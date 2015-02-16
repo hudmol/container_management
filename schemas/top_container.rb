@@ -20,6 +20,31 @@
       "exported_to_ils" => {"type" => "string", "required" => false},
 
       "restricted" => {"type" => "boolean", "default" => false},
+      "override_restricted" => {"type" => "boolean", "default" => false},
+
+      "rights_restricted_contents" => {
+        "readonly" => "true",
+        "type" => "array",
+        "items" => {
+          "type" => "object",
+          "subtype" => "ref",
+          "properties" => {
+            "ref" => {
+              "type" => [
+                {"type" => "JSONModel(:resource) uri"},
+                {"type" => "JSONModel(:archival_object) uri"},
+                {"type" => "JSONModel(:accession) uri"}
+              ]
+            },
+            "display_string" => {"type" => "string"},
+            "type" => {"type" => "string"},
+            "_resolved" => {
+              "type" => "object",
+              "readonly" => "true"
+            }
+          }
+        }
+      },
 
       "container_locations" => {
         "type" => "array",

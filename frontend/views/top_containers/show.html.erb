@@ -33,7 +33,21 @@
           <%= readonly.label_and_textarea "exported_to_ils", :default => I18n.t("top_container.not_exported") %>
 
           <%= readonly.label_and_boolean "restricted" %>
+          <%= readonly.label_and_boolean "override_restricted" %>
 
+          <% if !@top_container["rights_restricted_contents"].empty? %>
+            <div class="control-group token-list">
+                <label class="control-label"><%= I18n.t("top_container.rights_restricted_contents") %></label>
+                <div class="controls">
+                    <% @top_container["rights_restricted_contents"].each do |ref| %>
+                    <%= render_token :object => ref,
+                                      :label => ref["display_string"],
+                                       :type => ref['type'],
+                                        :uri => ref["ref"] %>
+                    <% end %>
+                </div>
+            </div>
+          <% end %>
 
           <% if @top_container["container_locations"].length > 0 %>
             <hr>

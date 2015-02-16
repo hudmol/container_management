@@ -75,11 +75,18 @@ class TopContainer < Sequel::Model(:top_container)
   def collections
     linked_archival_records.map {|obj|
       if obj.respond_to?(:series)
-        obj.class.root_model[obj.root_record_id]
+        # An Archival Object
+        if obj.root_record_id
+          obj.class.root_model[obj.root_record_id]
+        else
+          # An Archival Object without a resource.  Doesn't really happen in
+          # normal usage, but the data model does support this...
+          nil
+        end
       else
         obj
       end
-    }.uniq {|obj| obj.uri}
+    }.compact.uniq {|obj| obj.uri}
   end
 
 
@@ -141,9 +148,26 @@ class TopContainer < Sequel::Model(:top_container)
         json['exported_to_ils'] = json['exported_to_ils'].getlocal.iso8601
       end
 
+      obj.rights_restricted_contents.each do |contents|
+        json['rights_restricted_contents'] ||= []
+        json['rights_restricted_contents'] << {
+          'ref' => contents.uri,
+          'type' => contents.class.my_jsonmodel.record_type,
+          'display_string' => find_title_for(contents)
+        }
+      end
+
+      if obj.override_restricted == 0
+        json['restricted'] = !json['rights_restricted_contents'].empty?
+      end
     end
 
     jsons
+  end
+
+
+  def rights_restricted_contents
+    linked_archival_records.select {|ao| ao.restricted_by_rights?}.uniq(&:uri)
   end
 
 

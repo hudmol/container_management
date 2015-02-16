@@ -29,7 +29,35 @@ def build_instance(top_container_json)
 end
 
 
+def create_archival_object_with_rights(top_container_json, dates = [])
+  rights_statements = dates.map{|date| build(:json_rights_statement, {
+                                               :restriction_start_date => date[0],
+                                               :restriction_end_date => date[1]
+                                             })}
+  archival_object = create(:json_archival_object,
+                           :instances => [build_instance(top_container_json)],
+                           :rights_statements => rights_statements)
+  archival_object.save
+end
+
+
+def stub_barcode_length(min, max)
+  AppConfig.stub(:[]).and_call_original
+  AppConfig.stub(:has_key?).and_call_original
+
+  AppConfig.stub(:has_key?).with(:yale_containers_barcode_length).and_return(true)
+  AppConfig.stub(:[]).with(:yale_containers_barcode_length).and_return({:system_default => {:min => min, :max => max}})
+end
+
+
+
 describe 'Yale Container model' do
+
+  before(:each) do
+    # Permissive default!
+    stub_barcode_length(0, 255)
+  end
+
 
   it "supports all kinds of wonderful metadata" do
     barcode = '12345678'
@@ -92,11 +120,7 @@ describe 'Yale Container model' do
 
   it "enforces barcode length according to config" do
 
-    AppConfig.stub(:[]).and_call_original
-    AppConfig.stub(:has_key?).and_call_original
-
-    AppConfig.stub(:has_key?).with(:yale_containers_barcode_length).and_return(true)
-    AppConfig.stub(:[]).with(:yale_containers_barcode_length).and_return({:system_default => {:min => 4, :max => 6}})
+    stub_barcode_length(4, 6)
 
     expect {
       create(:json_top_container, :barcode => "1234")
@@ -363,6 +387,46 @@ describe 'Yale Container model' do
       container2.refresh.system_mtime.should be > container2_original_mtime
     end
 
+
+    it "can calculate a value for restricted based on rights statements in records that link to it" do
+      # we livin' in tha past
+      Time.stub!(:now).and_return(Time.at(0))
+
+      topcon1 = create(:json_top_container, {:restricted => nil})
+      create_archival_object_with_rights(topcon1, [["19720120", "19740809"]])
+      JSONModel(:top_container).find(topcon1.id).restricted.should eq(false)
+
+      create_archival_object_with_rights(topcon1, [["19690120", "19740809"]])
+      JSONModel(:top_container).find(topcon1.id).restricted.should eq(true)
+
+      topcon2 = create(:json_top_container, {:restricted => nil})
+      create_archival_object_with_rights(topcon2, [["", "19690720"]])
+      JSONModel(:top_container).find(topcon2.id).restricted.should eq(false)
+
+      create_archival_object_with_rights(topcon2, [["19631122", "19801208"]])
+      JSONModel(:top_container).find(topcon2.id).restricted.should eq(true)
+
+      # time passes
+      Time.stub!(:now).and_return(Time.new(1980, 12, 8))
+      JSONModel(:top_container).find(topcon2.id).restricted.should eq(true)
+      Time.stub!(:now).and_return(Time.new(1980, 12, 9))
+      JSONModel(:top_container).find(topcon2.id).restricted.should eq(false)
+    end
+
+
+    it "allows the calculated value for restricted to be overridden" do
+      Time.stub!(:now).and_return(Time.at(0))
+
+      topcon1 = create(:json_top_container)
+      create_archival_object_with_rights(topcon1, [["19720120", "19740809"]])
+      JSONModel(:top_container).find(topcon1.id).restricted.should eq(false)
+
+      topcon1 = JSONModel(:top_container).find(topcon1.id)
+      topcon1.override_restricted = true
+      topcon1.restricted = true
+      topcon1.save
+      JSONModel(:top_container).find(topcon1.id).restricted.should eq(true)
+    end
   end
 
   describe "bulk action" do
@@ -382,10 +446,8 @@ describe 'Yale Container model' do
     end
 
     it "throws exception when attempt to update to an invalid barcode" do
-      orig_barcode_config = AppConfig[:yale_containers_barcode_length]
-      AppConfig[:yale_containers_barcode_length] = {
-        :system_default => {:min => 4, :max => 6}
-      }
+
+      stub_barcode_length(4, 6)
 
       container1_json = create(:json_top_container)
       container2_json = create(:json_top_container)
@@ -401,7 +463,6 @@ describe 'Yale Container model' do
         TopContainer.bulk_update_barcodes(barcode_data)
       }.to raise_error(Sequel::ValidationFailed)
 
-      AppConfig[:yale_containers_barcode_length] = orig_barcode_config
     end
 
     it "throws exception when attempt to set duplicate barcode" do
