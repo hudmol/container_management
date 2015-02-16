@@ -246,7 +246,7 @@ BulkActionBarcodeRapidEntry.prototype.show = function() {
 
 
 BulkActionBarcodeRapidEntry.prototype.setup_keyboard_handling = function($modal) {
-  $modal.find(":input:first").focus().select();
+  $modal.find("table :input:visible:first").focus().select();
 
   $(":input", $modal).
     on("focus",
