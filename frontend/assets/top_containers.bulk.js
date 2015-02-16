@@ -1,3 +1,7 @@
+/***************************************************************************
+ * BulkContainerSearch - provides all the behaviour to the ajax search
+ * and selection of records.
+ */
 function BulkContainerSearch($search_form, $results_container, $toolbar) {
   this.$search_form = $search_form;
   this.$results_container = $results_container;
@@ -5,15 +9,6 @@ function BulkContainerSearch($search_form, $results_container, $toolbar) {
 
   this.setup_form();
   this.setup_results_list();
-  this.setup_bulk_action_test();
-  this.setup_bulk_action_update_ils_holding();
-  this.setup_bulk_action_delete();
-}
-
-function BulkContainerUpdate($update_form) {
-  this.$update_form = $update_form;
-
-  this.setup_update_form();
 }
 
 BulkContainerSearch.prototype.setup_form = function() {
@@ -139,80 +134,200 @@ BulkContainerSearch.prototype.get_selection = function() {
   var results = [];
 
   self.$results_container.find("tbody :checkbox:checked").each(function(i, checkbox) {
-    results.push([checkbox.value, $(checkbox).data("display-string")]);
+    results.push({
+      uri: checkbox.value,
+      display_string: $(checkbox).data("display-string"),
+      row: $(checkbox).closest("tr")
+    });
   });
 
   return results;
 };
 
-BulkContainerSearch.prototype.setup_bulk_action_test = function() {
-  var self = this;
-  var $link = $("#bulkActionTestSelection", self.$toolbar);
 
-  $link.on("click", function() {
-    AS.openQuickModal("Test Selection", AS.renderTemplate("bulk_action_test_selection", {
-      selection: self.get_selection()
-    }))
-  });
+/***************************************************************************
+ * BulkContainerUpdate - ILS bulk action
+ *
+ */
+function BulkContainerUpdate(bulkContainerSearch) {
+  this.bulkContainerSearch = bulkContainerSearch;
+
+  this.setup_menu_item();
 };
 
 
-BulkContainerSearch.prototype.setup_bulk_action_update_ils_holding = function() {
-  var self = this;
-  var $link = $("#bulkActionUpdateIlsHolding", self.$toolbar);
-
-  $link.on("click", function() {
-    var updateUris = self.get_selection().map(function(c) { return c[0] });
-    AS.openCustomModal("bulkUpdateModal", "Update ILS Holding IDs", AS.renderTemplate("bulk_action_update_ils_holding", {
-      selection: self.get_selection(),
-      updateUris: updateUris
-    }), 'full')
-  });
-};
-
-BulkContainerSearch.prototype.setup_bulk_action_delete = function() {
-  var self = this;
-  var $link = $("#bulkActionDelete", self.$toolbar);
-
-  $link.on("click", function() {
-    var updateUris = self.get_selection().map(function(c) { return c[0] });
-    AS.openCustomModal("bulkActionModal", "Delete Top Containers", AS.renderTemplate("bulk_action_delete", {
-      selection: self.get_selection(),
-      updateUris: updateUris
-    }), 'full')
-  });
-};
-
-BulkContainerUpdate.prototype.setup_update_form = function() {
+BulkContainerUpdate.prototype.setup_update_form = function($modal) {
   var self = this;
 
-  this.$update_form.on("submit", function(event) {
+  var $form = $modal.find("form");
+
+  $form.on("submit", function(event) {
     event.preventDefault();
-    self.perform_update(self.$update_form.serializeArray());
+    self.perform_update($form, $modal);
   });
 };
 
-BulkContainerUpdate.prototype.perform_update = function(data) {
+
+BulkContainerUpdate.prototype.perform_update = function($form, $modal) {
   var self = this;
 
   $.ajax({
-	  url:"/plugins/top_containers/bulk_operations/update",
-	      data: data,
-	      type: "post",
-	      success: function(html) {
-	      $('#alertBucket').replaceWith(html);
-	  },
-	      error: function(jqXHR, textStatus, errorThrown) {
-	      $('#alertBucket').replaceWith('<div id="alertBucket" class="alert alert-error">' + jqXHR.responseText + '</div>');
-	  }
-      });
+    url:"/plugins/top_containers/bulk_operations/update",
+    data: $form.serializeArray(),
+    type: "post",
+    success: function(html) {
+      $form.replaceWith(html);
+      $modal.trigger("resize");
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      var error = AS.renderTemplate("template_bulk_operation_error_message", {message: jqXHR.responseText});
+      $('#alertBucket').replaceWith(error);
+    }
+  });
+};
+
+BulkContainerUpdate.prototype.setup_menu_item = function() {
+  var self = this;
+  self.$link = $("#bulkActionUpdateIlsHolding", self.$toolbar);
+
+  self.$link.on("click", function() {
+    self.show();
+  });
 };
 
 
+BulkContainerUpdate.prototype.show = function() {
+  var dialog_content = AS.renderTemplate("bulk_action_update_ils_holding", {
+    selection: this.bulkContainerSearch.get_selection()
+  });
+
+
+  var $modal = AS.openCustomModal("bulkUpdateModal", this.$link.text(), dialog_content, 'full');
+
+  this.setup_update_form($modal);
+};
+
+
+/***************************************************************************
+ * BulkActionBarcodeRapidEntry - bulk action for barcode rapid entry
+ *
+ */
+
+function BulkActionBarcodeRapidEntry(bulkContainerSearch) {
+  this.TEMPLATE_DIALOG_ID = "template_bulk_barcode_action_dialog";
+  this.MENU_ID = "showBulkActionRapidBarcodeEntry";
+
+  this.bulkContainerSearch = bulkContainerSearch;
+
+  this.setup_menu_item();
+}
+
+
+BulkActionBarcodeRapidEntry.prototype.setup_menu_item = function() {
+  var self = this;
+
+  self.$menuItem = $("#" + self.MENU_ID, self.bulkContainerSearch.$toolbar);
+
+  self.$menuItem.on("click", function(event) {
+    self.show();
+  });
+};
+
+
+BulkActionBarcodeRapidEntry.prototype.show = function() {
+  var dialog_content = AS.renderTemplate(this.TEMPLATE_DIALOG_ID, {
+    selection: this.bulkContainerSearch.get_selection()
+  });
+  var $modal = AS.openCustomModal("bulkActionBarcodeRapidEntryModal", this.$menuItem.text(), dialog_content, "full");
+
+  this.setup_keyboard_handling($modal);
+  this.setup_form_submission($modal);
+};
+
+
+BulkActionBarcodeRapidEntry.prototype.setup_keyboard_handling = function($modal) {
+  $modal.find("table :input:visible:first").focus().select();
+
+  $(":input", $modal).
+    on("focus",
+    function() {
+      $(this).ScrollTo({
+        duration: 0,
+        offsetTop: 400
+      });
+    }).
+    on("keyup keypress",
+    function(event) {
+      if (event.keyCode == 13) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        $(":input", $(this).closest("tr").next()).focus().select();
+        return false;
+      }
+    }
+  );
+};
+
+
+BulkActionBarcodeRapidEntry.prototype.setup_form_submission = function($modal) {
+  var self = this;
+  var $form = $modal.find("form");
+
+  $form.ajaxForm({
+    dataType: "html",
+    type: "POST",
+    beforeSubmit: function() {
+      $form.find(":submit").addClass("disabled").attr("disabled","disabled");
+    },
+    success: function(html) {
+      $form.replaceWith(html);
+      $modal.trigger("resize");
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      var error = $("<div>").attr("id", "alertBucket").html(jqXHR.responseText);
+      $('#alertBucket').replaceWith(error);
+      var uri = $('.alert-error:first', '#alertBucket').data("uri");
+      if (uri) {
+        $(":input[value='"+uri+"']", $form).closest("td").addClass("control-group").addClass("error");
+      }
+      $form.find(":submit").removeClass("disabled").removeAttr("disabled");
+    }
+  });
+};
+
+
+/***************************************************************************
+ * BulkActionDelete - bulk action for delete
+ *
+ */
+function BulkActionDelete(bulkContainerSearch) {
+  var self = this;
+
+  self.bulkContainerSearch = bulkContainerSearch;
+
+  var $link = $("#bulkActionDelete", self.bulkContainerSearch.$toolbar);
+
+  $link.on("click", function() {
+    AS.openCustomModal("bulkActionModal", "Delete Top Containers", AS.renderTemplate("bulk_action_delete", {
+      selection: self.bulkContainerSearch.get_selection()
+    }), 'full');
+  });
+}
+
+
+/***************************************************************************
+ * Initialise all special features on this page
+ *
+ */
 $(function() {
 
-  new BulkContainerSearch($("#bulk_operation_form"),
-                          $("#bulk_operation_results"),
-                          $(".record-toolbar.bulk-operation-toolbar"));
+  var bulkContainerSearch = new BulkContainerSearch(
+                                                  $("#bulk_operation_form"),
+                                                  $("#bulk_operation_results"),
+                                                  $(".record-toolbar.bulk-operation-toolbar"));
 
+  new BulkActionBarcodeRapidEntry(bulkContainerSearch);
+  new BulkContainerUpdate(bulkContainerSearch);
+  new BulkActionDelete(bulkContainerSearch);
 });

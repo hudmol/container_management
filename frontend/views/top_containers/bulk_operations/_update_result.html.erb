@@ -1,8 +1,0 @@
-<% can_edit = user_can?("manage_container") %>
-
-<% if result.has_key?('records_updated') %>
-  <div id="alertBucket" class="alert alert-success">Successfully updated <%= result['records_updated'] %> records.</div>
-<% else %>
-  <div id="alertBucket" class="alert alert-error">There seems to have been a problem with the update: <%= result['error'] %></div>
-<% end %>
-
