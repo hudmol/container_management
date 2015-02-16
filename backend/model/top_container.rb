@@ -167,24 +167,7 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def rights_restricted_contents
-    restricted_items = []
-    linked_archival_records.each do |ao|
-      ao.rights_statement.each do |rs|
-        if rs.active == 1
-          start = rs.restriction_start_date
-          start &&= start.to_time
-          enddd = rs.restriction_end_date
-          enddd &&= enddd.to_time
-
-          if (!start && !enddd) ||
-              ((start && start <= Time.now) && (!enddd || enddd >= Time.now)) ||
-              ((enddd && enddd >= Time.now) && (!start || start <= Time.now))
-              restricted_items << ao
-          end
-        end
-      end
-    end
-    restricted_items.uniq {|obj| obj.uri}
+    linked_archival_records.select {|ao| ao.restricted_by_rights?}.uniq(&:uri)
   end
 
 

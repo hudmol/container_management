@@ -41,6 +41,16 @@ def create_archival_object_with_rights(top_container_json, dates = [])
 end
 
 
+def stub_barcode_length(min, max)
+  AppConfig.stub(:[]).and_call_original
+  AppConfig.stub(:has_key?).and_call_original
+
+  AppConfig.stub(:has_key?).with(:yale_containers_barcode_length).and_return(true)
+  AppConfig.stub(:[]).with(:yale_containers_barcode_length).and_return({:system_default => {:min => min, :max => max}})
+end
+
+
+
 describe 'Yale Container model' do
 
   it "supports all kinds of wonderful metadata" do
@@ -104,11 +114,7 @@ describe 'Yale Container model' do
 
   it "enforces barcode length according to config" do
 
-    AppConfig.stub(:[]).and_call_original
-    AppConfig.stub(:has_key?).and_call_original
-
-    AppConfig.stub(:has_key?).with(:yale_containers_barcode_length).and_return(true)
-    AppConfig.stub(:[]).with(:yale_containers_barcode_length).and_return({:system_default => {:min => 4, :max => 6}})
+    stub_barcode_length(4, 6)
 
     expect {
       create(:json_top_container, :barcode => "1234")
@@ -434,10 +440,8 @@ describe 'Yale Container model' do
     end
 
     it "throws exception when attempt to update to an invalid barcode" do
-      orig_barcode_config = AppConfig[:yale_containers_barcode_length]
-      AppConfig[:yale_containers_barcode_length] = {
-        :system_default => {:min => 4, :max => 6}
-      }
+
+      stub_barcode_length(4, 6)
 
       container1_json = create(:json_top_container)
       container2_json = create(:json_top_container)
@@ -453,7 +457,6 @@ describe 'Yale Container model' do
         TopContainer.bulk_update_barcodes(barcode_data)
       }.to raise_error(Sequel::ValidationFailed)
 
-      AppConfig[:yale_containers_barcode_length] = orig_barcode_config
     end
 
     it "throws exception when attempt to set duplicate barcode" do

@@ -1,2 +1,3 @@
 ArchivalObject.include(ReindexTopContainers)
 ArchivalObject.include(ArchivalObjectSeries)
+ArchivalObject.include(RightsStatementRestrictions)
