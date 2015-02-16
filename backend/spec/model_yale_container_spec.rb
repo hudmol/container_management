@@ -53,6 +53,12 @@ end
 
 describe 'Yale Container model' do
 
+  before(:each) do
+    # Permissive default!
+    stub_barcode_length(0, 255)
+  end
+
+
   it "supports all kinds of wonderful metadata" do
     barcode = '12345678'
     ils_holding_id = '112358'
