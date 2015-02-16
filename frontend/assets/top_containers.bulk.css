@@ -33,10 +33,12 @@
     overflow: auto;
 }
 
-#bulk_operation_results .linked-records-listing {
+#bulk_operation_results .linked-records-listing,
+#bulkActionBarcodeRapidEntryModal .linked-records-listing {
     margin: 0;
     list-style-position: inside;
 }
-#bulk_operation_results .linked-records-listing.count-1 {
+#bulk_operation_results .linked-records-listing.count-1,
+#bulkActionBarcodeRapidEntryModal .linked-records-listing.count-1 {
     list-style: none;
 }

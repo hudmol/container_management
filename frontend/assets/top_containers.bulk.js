@@ -279,6 +279,7 @@ BulkActionBarcodeRapidEntry.prototype.setup_form_submission = function($modal) {
     type: "POST",
     beforeSubmit: function() {
       $form.find(":submit").addClass("disabled").attr("disabled","disabled");
+      $form.find(".error").removeClass("error");
     },
     success: function(html) {
       $form.replaceWith(html);

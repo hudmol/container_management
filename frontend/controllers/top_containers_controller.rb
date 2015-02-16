@@ -137,7 +137,7 @@ class TopContainersController < ApplicationController
   def update_barcodes
     update_uris = params[:update_uris]
     barcode_data = {}
-    update_uris.map{|uri| barcode_data[uri] = params[uri]}
+    update_uris.map{|uri| barcode_data[uri] = params[uri].blank? ? nil : params[uri]}
 
     post_uri = "#{JSONModel::HTTP.backend_url}/repositories/#{session[:repo_id]}/top_containers/bulk/barcodes"
 
