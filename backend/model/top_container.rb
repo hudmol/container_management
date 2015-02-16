@@ -75,12 +75,18 @@ class TopContainer < Sequel::Model(:top_container)
   def collections
     linked_archival_records.map {|obj|
       if obj.respond_to?(:series)
-        obj.class.root_model[obj.root_record_id]
+        # An Archival Object
+        if obj.root_record_id
+          obj.class.root_model[obj.root_record_id]
+        else
+          # An Archival Object without a resource.  Doesn't really happen in
+          # normal usage, but the data model does support this...
+          nil
+        end
       else
         obj
       end
     }.compact.uniq {|obj| obj.uri}
-    # added compact above because a test was bombing saying obj was nil. should investigate JJJ
   end
 
 
