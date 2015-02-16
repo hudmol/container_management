@@ -287,6 +287,10 @@ BulkActionBarcodeRapidEntry.prototype.setup_form_submission = function($modal) {
     error: function(jqXHR, textStatus, errorThrown) {
       var error = $("<div>").attr("id", "alertBucket").html(jqXHR.responseText);
       $('#alertBucket').replaceWith(error);
+      var uri = $('.alert-error:first', '#alertBucket').data("uri");
+      if (uri) {
+        $(":input[value='"+uri+"']", $form).closest("td").addClass("control-group").addClass("error");
+      }
       $form.find(":submit").removeClass("disabled").removeAttr("disabled");
     }
   });

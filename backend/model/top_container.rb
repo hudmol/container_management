@@ -232,18 +232,17 @@ class TopContainer < Sequel::Model(:top_container)
   def self.bulk_update_barcodes(barcode_data)
     updated = []
 
-    barcode_checker = BarcodeCheck.new(Repository[self.active_repository].repo_code)
-
     # null out barcodes to avoid duplicate error as bulk updates are applied
     TopContainer.filter(:id => barcode_data.map{|uri,_| my_jsonmodel.id_for(uri)}).update(:barcode => nil)
 
     barcode_data.each do |uri, barcode|
-      unless barcode_checker.valid?(barcode)
-        raise ValidationException.new(:errors => {"barcode" => "Length must be within the range set in configuration"})
-      end
-
       id = my_jsonmodel.id_for(uri)
-      TopContainer.filter(:id => id).update(:barcode => barcode, :system_mtime => Time.now)
+
+      top_container = TopContainer[id]
+      top_container.barcode = barcode
+      top_container.system_mtime = Time.now
+      top_container.save(:columns => [:barcode, :system_mtime])
+
       updated << id
     end
 

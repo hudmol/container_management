@@ -100,8 +100,12 @@ class ArchivesSpaceService < Sinatra::Base
   .permissions([:manage_container])
   .returns([200, :updated]) \
   do
-    updated = TopContainer.bulk_update_barcodes(ASUtils.json_parse(params[:barcode_data]))
-    json_response(:updated => updated)
+    begin
+      updated = TopContainer.bulk_update_barcodes(ASUtils.json_parse(params[:barcode_data]))
+      json_response(:updated => updated)
+    rescue Sequel::ValidationFailed => e
+      json_response({:error => e.errors, :uri => e.model.uri}, 400)
+    end
   end
 
 end

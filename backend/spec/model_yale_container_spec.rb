@@ -411,7 +411,7 @@ describe 'Yale Container model' do
 
       expect {
         TopContainer.bulk_update_barcodes(barcode_data)
-      }.to raise_error(ValidationException)
+      }.to raise_error(Sequel::ValidationFailed)
 
       AppConfig[:yale_containers_barcode_length] = orig_barcode_config
     end
@@ -426,7 +426,7 @@ describe 'Yale Container model' do
 
       expect {
         TopContainer.bulk_update_barcodes(barcode_data)
-      }.to raise_error(Sequel::DatabaseError)
+      }.to raise_error(Sequel::ValidationFailed)
 
     end
 

@@ -145,9 +145,7 @@ class TopContainersController < ApplicationController
     result = ASUtils.json_parse(response.body)
 
     if response.code =~ /^4/
-      # massage errors to use arrays so play nice in message template
-      result['error'].clone.each {|attr, errors| result['error'][attr] = Array(errors)}
-      return render_aspace_partial :partial => 'shared/quick_messages', :locals => {:exceptions => result, :jsonmodel => "top_container"}, :status => 500
+      return render_aspace_partial :partial => 'top_containers/bulk_operations/error_messages', :locals => {:exceptions => result, :jsonmodel => "top_container"}, :status => 500
     end
 
     render_aspace_partial :partial => "top_containers/bulk_operations/bulk_action_success", :locals => {:result => result}
