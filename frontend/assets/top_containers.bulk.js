@@ -146,17 +146,18 @@ BulkContainerSearch.prototype.get_selection = function() {
 
 
 /***************************************************************************
- * BulkContainerUpdate - ILS bulk action
+ * BulkActionIlsHoldingUpdate - ILS bulk action
  *
  */
-function BulkContainerUpdate(bulkContainerSearch) {
+function BulkActionIlsHoldingUpdate(bulkContainerSearch) {
   this.bulkContainerSearch = bulkContainerSearch;
+  this.MENU_ID = "bulkActionUpdateIlsHolding";
 
   this.setup_menu_item();
 };
 
 
-BulkContainerUpdate.prototype.setup_update_form = function($modal) {
+BulkActionIlsHoldingUpdate.prototype.setup_update_form = function($modal) {
   var self = this;
 
   var $form = $modal.find("form");
@@ -168,7 +169,7 @@ BulkContainerUpdate.prototype.setup_update_form = function($modal) {
 };
 
 
-BulkContainerUpdate.prototype.perform_update = function($form, $modal) {
+BulkActionIlsHoldingUpdate.prototype.perform_update = function($form, $modal) {
   var self = this;
 
   $.ajax({
@@ -186,23 +187,24 @@ BulkContainerUpdate.prototype.perform_update = function($form, $modal) {
   });
 };
 
-BulkContainerUpdate.prototype.setup_menu_item = function() {
+BulkActionIlsHoldingUpdate.prototype.setup_menu_item = function() {
   var self = this;
-  self.$link = $("#bulkActionUpdateIlsHolding", self.$toolbar);
 
-  self.$link.on("click", function() {
+  self.$menuItem = $("#" + self.MENU_ID, self.bulkContainerSearch.$toolbar);
+
+  self.$menuItem.on("click", function(event) {
     self.show();
   });
 };
 
 
-BulkContainerUpdate.prototype.show = function() {
+BulkActionIlsHoldingUpdate.prototype.show = function() {
   var dialog_content = AS.renderTemplate("bulk_action_update_ils_holding", {
     selection: this.bulkContainerSearch.get_selection()
   });
 
 
-  var $modal = AS.openCustomModal("bulkUpdateModal", this.$link.text(), dialog_content, 'full');
+  var $modal = AS.openCustomModal("bulkUpdateModal", this.$menuItem.text(), dialog_content, 'full');
 
   this.setup_update_form($modal);
 };
@@ -329,6 +331,6 @@ $(function() {
                                                   $(".record-toolbar.bulk-operation-toolbar"));
 
   new BulkActionBarcodeRapidEntry(bulkContainerSearch);
-  new BulkContainerUpdate(bulkContainerSearch);
+  new BulkActionIlsHoldingUpdate(bulkContainerSearch);
   new BulkActionDelete(bulkContainerSearch);
 });
