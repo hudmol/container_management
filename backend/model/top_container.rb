@@ -115,7 +115,13 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def display_string
-    ["Container", "#{indicator}:", series_label, format_barcode].compact.join(" ")
+    resource = collections.first
+    resource &&= resource.title
+    container_profile = related_records(:top_container_profile)
+    container_profile &&= container_profile.name
+    container_bit = ["Container", "#{indicator}", format_barcode].compact.join(" ")
+
+    [resource, series_label, container_bit, container_profile].compact.join(", ")
   end
 
 

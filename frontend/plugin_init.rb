@@ -15,6 +15,19 @@ Rails.application.config.after_initialize do
 
   end
 
+
+  SearchHelper.class_eval do
+
+    alias_method :can_edit_search_result_pre_yale_container?, :can_edit_search_result?
+
+    def can_edit_search_result?(record)
+      return user_can?('manage_container', record['id']) if record['primary_type'] === "top_container"
+      can_edit_search_result_pre_yale_container?(record)
+    end
+
+  end
+
+
   # force load our JSONModels so the are registered rather than lazy initialised
   # we need this for parse_reference to work
   JSONModel(:top_container)
