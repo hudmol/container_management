@@ -258,7 +258,7 @@ BulkActionBarcodeRapidEntry.prototype.setup_keyboard_handling = function($modal)
         offsetTop: 400
       });
     }).
-    on("keyup keypress",
+    on("keypress",
     function(event) {
       if (event.keyCode == 13) {
         event.stopPropagation();
