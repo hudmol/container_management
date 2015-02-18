@@ -7,12 +7,16 @@ class ArchivesSpaceService < Sinatra::Base
   .permissions([:view_repository])
   .returns([200, "[(:top_container)]"]) \
   do
+    search_params = params.merge(:type => ['top_container'])
 
     [
       200,
       {'Content-Type' => 'application/json'},
       Enumerator.new do |y|
-        TopContainer.search_stream(params.merge(:type => ['top_container']), params[:repo_id]) do |response|
+        # Need to use the captured 'search_params' here because Sinatra will
+        # have reset 'params' to the original version by the time the enumerator
+        # runs.
+        TopContainer.search_stream(search_params, search_params[:repo_id]) do |response|
           y << response.body
         end
       end
