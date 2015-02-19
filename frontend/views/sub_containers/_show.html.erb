@@ -2,7 +2,7 @@
   <label class="control-label"><%= I18n.t("top_container._singular") %></label>
   <div class="controls">
     <%= render_token :object => sub_container["top_container"]["_resolved"],
-                     :label => sub_container["top_container"]["_resolved"]["display_string"],
+                     :label => sub_container["top_container"]["_resolved"]["short_display_string"],
                      :type => "top_container",
                      :uri => sub_container["top_container"]["ref"] %>
   </div>
