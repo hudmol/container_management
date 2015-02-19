@@ -125,8 +125,8 @@ class TopContainersController < ApplicationController
     if params['ils_holding_id']
       post_params['ils_holding_id'] = params['ils_holding_id']
       post_uri += 'ils_holding_id'
-    elsif params['container_profile']
-      post_params['container_profile_uri'] = params['container_profile']['ref']
+    elsif params['container_profile_uri']
+      post_params['container_profile_uri'] = params['container_profile'] ? params['container_profile']['ref'] : ""
       post_uri += 'container_profile'
     else
       render :text => "You must provide a field to update.", :status => 500

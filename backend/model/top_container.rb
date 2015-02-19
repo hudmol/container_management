@@ -267,23 +267,23 @@ class TopContainer < Sequel::Model(:top_container)
 
   def self.bulk_update_container_profile(ids, container_profile_uri)
     out = {}
-    cp_id = JSONModel(:container_profile).id_for(container_profile_uri)
+    cp_id = container_profile_uri.empty? ? false : JSONModel(:container_profile).id_for(container_profile_uri)
     now = Time.now
     begin
       DB.open do |db|
         db[:top_container_profile_rlshp].filter(:top_container_id => ids).delete
-        
         ids.each do |id|
-          db[:top_container_profile_rlshp].insert(:top_container_id => id,
-                                                  :container_profile_id => cp_id,
-                                                  :aspace_relationship_position => 1,
-                                                  :system_mtime => now,
-                                                  :user_mtime => now)
+          if cp_id
+            db[:top_container_profile_rlshp].insert(:top_container_id => id,
+                                                    :container_profile_id => cp_id,
+                                                    :aspace_relationship_position => 1,
+                                                    :system_mtime => now,
+                                                    :user_mtime => now)
+          end
           db[:top_container].filter(:id => id).update(:system_mtime => now)
           out[:records_updated] ||= 0
           out[:records_updated] += 1
         end
-        db[:container_profile].filter(:id => cp_id).update(:system_mtime => now)
       end
     rescue
       out[:error] = $!

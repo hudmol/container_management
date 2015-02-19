@@ -54,6 +54,7 @@
         {for container in selection}
           <input type="hidden" name="update_uris[]" value="${container.uri}">
         {/for}
+        <input type="hidden" name="container_profile_uri" value="">
         <div class="span8">
           <div class="control-group">
             <label class="control-label" for="container_profile"><%= I18n.t("container_profile._singular") %></label>

@@ -533,6 +533,23 @@ describe 'Yale Container model' do
       results[:error].should_not be_nil
     end
 
+
+    it "will happily remove container profiles via bulk update" do
+      container_profile1 = create(:json_container_profile)
+
+      container1 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+      container2 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+
+      results = TopContainer.bulk_update_container_profile([container1.id, container2.id], "")
+
+      results[:records_updated].should eq(2)
+
+      json = JSONModel(:top_container).find(container1.id)
+      json['container_profile'].should be_nil
+    end
+
   end
 
 end
