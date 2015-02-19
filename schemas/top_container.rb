@@ -12,6 +12,7 @@
       "indicator" => {"type" => "string", "maxLength" => 255, "minLength" => 1, "ifmissing" => "error" },
 
       "display_string" => {"type" => "string", "readonly" => true},
+      "long_display_string" => {"type" => "string", "readonly" => true},
 
       "barcode" => {"type" => "string", "maxLength" => 255},
 

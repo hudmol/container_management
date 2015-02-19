@@ -119,11 +119,23 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def long_display_string
+    resource = collections.first
+    resource &&= resource.title
+    container_profile = related_records(:top_container_profile)
+    container_profile &&= container_profile.name
+    container_bit = ["Container", "#{indicator}", format_barcode].compact.join(" ")
+
+    [resource, series_label, container_bit, container_profile].compact.join(", ")
+  end
+
+
   def self.sequel_to_jsonmodel(objs, opts = {})
     jsons = super
 
     jsons.zip(objs).each do |json, obj|
       json['display_string'] = obj.display_string
+      json['long_display_string'] = obj.long_display_string
 
       obj.series.each do |series|
         json['series'] ||= []
