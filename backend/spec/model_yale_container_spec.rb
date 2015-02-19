@@ -512,7 +512,7 @@ describe 'Yale Container model' do
       results = TopContainer.bulk_update_container_profile([container1.id, container2.id, container3.id, container4.id],
                                                            container_profile2.uri)
 
-      results.should include(container1.id, container2.id, container3.id, container4.id)
+      results[:records_updated].should eq(4)
 
       json = JSONModel(:top_container).find(container1.id)
       json['container_profile']['ref'].should eq(container_profile2.uri)
@@ -527,10 +527,10 @@ describe 'Yale Container model' do
       container2 = create(:json_top_container,
                           'container_profile' => {'ref' => container_profile1.uri})
 
-      expect {
-        TopContainer.bulk_update_container_profile([container1.id, container2.id],
-                                                   "/container_profiles/99")
-      }.to raise_error
+      results = TopContainer.bulk_update_container_profile([container1.id, container2.id],
+                                                           "/container_profiles/99")
+
+      results[:error].should_not be_nil
     end
 
   end
