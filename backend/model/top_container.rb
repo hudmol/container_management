@@ -114,12 +114,12 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
-  def short_display_string
+  def display_string
     ["Container", "#{indicator}:", series_label, format_barcode].compact.join(" ")
   end
 
 
-  def display_string
+  def long_display_string
     resource = collections.first
     resource &&= resource.title
     container_profile = related_records(:top_container_profile)
@@ -135,7 +135,7 @@ class TopContainer < Sequel::Model(:top_container)
 
     jsons.zip(objs).each do |json, obj|
       json['display_string'] = obj.display_string
-      json['short_display_string'] = obj.short_display_string
+      json['long_display_string'] = obj.long_display_string
 
       obj.series.each do |series|
         json['series'] ||= []
