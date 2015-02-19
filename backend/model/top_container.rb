@@ -265,6 +265,27 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def self.bulk_update_container_profile(ids, container_profile_uri)
+    updated = []
+    cp_id = JSONModel(:container_profile).id_for(container_profile_uri)
+    now = Time.now
+
+    DB.open do |db|
+      db[:top_container_profile_rlshp].filter(:top_container_id => ids).delete
+
+      ids.each do |id|
+        db[:top_container_profile_rlshp].insert(:top_container_id => id,
+                                                :container_profile_id => cp_id,
+                                                :system_mtime => now,
+                                                :user_mtime => now)
+        updated << id
+      end
+    end
+
+    updated
+  end
+
+
   def self.bulk_update_barcodes(barcode_data)
     updated = []
 

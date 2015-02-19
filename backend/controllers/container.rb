@@ -85,7 +85,7 @@ class ArchivesSpaceService < Sinatra::Base
 
 
   Endpoint.post('/repositories/:repo_id/top_containers/batch/ils_holding_id')
-    .description("Update ild_holding_id for a batch of yale containers")
+    .description("Update ils_holding_id for a batch of yale containers")
     .params(["ids", [Integer]],
             ["ils_holding_id", String, "Value to set for ils_holding_id"],
             ["repo_id", :repo_id])
@@ -93,6 +93,19 @@ class ArchivesSpaceService < Sinatra::Base
     .returns([200, :updated]) \
   do
     result = TopContainer.batch_update(params[:ids], :ils_holding_id => params[:ils_holding_id])
+    json_response(result)
+  end
+
+
+  Endpoint.post('/repositories/:repo_id/top_containers/batch/container_profile')
+    .description("Update container profile for a batch of yale containers")
+    .params(["ids", [Integer]],
+            ["container_profile_uri", String, "The uri of the container profile"],
+            ["repo_id", :repo_id])
+    .permissions([:manage_container])
+    .returns([200, :updated]) \
+  do
+    result = TopContainer.bulk_update_container_profile(params[:ids], params[:container_profile_uri])
     json_response(result)
   end
 

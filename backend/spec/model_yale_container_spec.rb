@@ -494,6 +494,45 @@ describe 'Yale Container model' do
       TopContainer[container1_json.id].barcode.should eq("22222222")
       TopContainer[container2_json.id].barcode.should eq("11111111")
     end
+
+
+    it "can bulk update container profile" do
+      container_profile1 = create(:json_container_profile)
+      container_profile2 = create(:json_container_profile)
+
+      container1 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+      container2 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+      container3 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile2.uri})
+      container4 = create(:json_top_container,
+                          'container_profile' => nil)
+
+      results = TopContainer.bulk_update_container_profile([container1.id, container2.id, container3.id, container4.id],
+                                                           container_profile2.uri)
+
+      results.should include(container1.id, container2.id, container3.id, container4.id)
+
+      json = JSONModel(:top_container).find(container1.id)
+      json['container_profile']['ref'].should eq(container_profile2.uri)
+    end
+
+
+    it "objects if you try to bulk update to an non-existent container profile" do
+      container_profile1 = create(:json_container_profile)
+
+      container1 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+      container2 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+
+      expect {
+        TopContainer.bulk_update_container_profile([container1.id, container2.id],
+                                                   "/container_profiles/99")
+      }.to raise_error
+    end
+
   end
 
 end
