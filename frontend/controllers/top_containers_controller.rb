@@ -87,8 +87,6 @@ class TopContainersController < ApplicationController
   def typeahead
     search_params = params_for_backend_search
 
-    search_params = search_params.merge(search_filter_for(params[:uri]))
-
     render :json => Search.all(session[:repo_id], search_params)
   end
 
@@ -167,24 +165,6 @@ class TopContainersController < ApplicationController
   def barcode_length_range
     check = BarcodeCheck.new(current_repo[:repo_code])
     "#{check.min}-#{check.max}"
-  end
-
-
-  def search_filter_for(uri)
-    return {} if uri.blank?
-
-    parsed = JSONModel.parse_reference(uri)
-
-    if parsed[:type] == "archival_object"
-      series_uri = JSONModel(:archival_object).find(parsed[:id]).series['ref']
-      return {
-        "filter_term[]" => [{"series_uri_u_sstr" => series_uri}.to_json]
-      }
-    end
-
-    return {
-      "filter_term[]" => [{"collection_uri_u_sstr" => uri}.to_json]
-    }
   end
 
 
