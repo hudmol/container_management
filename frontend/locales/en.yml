@@ -4,7 +4,8 @@ en:
       label: Manage Top Containers
     container_profiles:
       label: Manage Container Profiles
-
+    extent_calculator:
+      label: Extent Calculator
 
   instance_container:
     container: Container
