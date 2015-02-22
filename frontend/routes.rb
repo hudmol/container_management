@@ -13,4 +13,6 @@ ArchivesSpace::Application.routes.draw do
 
   match('/plugins/container_profiles/:id' => 'container_profiles#update', :via => [:post])
   match('/plugins/container_profiles/:id/delete' => 'container_profiles#delete', :via => [:post])
+
+  match('/plugins/extent_calculator' => 'extent_calculator#index', :via => [:get])
 end

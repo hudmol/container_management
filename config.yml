@@ -1,2 +1,2 @@
 system_menu_controller: container_profiles
-repository_menu_controller: [top_containers, extent_calculator]
+repository_menu_controller: top_containers
