@@ -274,25 +274,22 @@ class TopContainer < Sequel::Model(:top_container)
       # Clear all existing container profile links
       relationship.handle_delete(relationship.find_by_participant_ids(TopContainer, ids).map(&:id))
 
-      if container_profile_uri.empty?
-        # Nothing more to do
-        return out
-      end
+      unless container_profile_uri.empty?
+        container_profile = ContainerProfile[JSONModel(:container_profile).id_for(container_profile_uri)]
 
-      container_profile = ContainerProfile[JSONModel(:container_profile).id_for(container_profile_uri)]
+        raise "Container profile not found: #{container_profile_uri}" if !container_profile
 
-      raise "Container profile not found: #{container_profile_uri}" if !container_profile
+        now = Time.now
 
-      now = Time.now
+        ids.each do |id|
+          top_container = TopContainer[id]
 
-      ids.each do |id|
-        top_container = TopContainer[id]
-
-        relationship.relate(top_container, container_profile, {
-                              :aspace_relationship_position => 1,
-                              :system_mtime => now,
-                              :user_mtime => now
-                            })
+          relationship.relate(top_container, container_profile, {
+                                :aspace_relationship_position => 1,
+                                :system_mtime => now,
+                                :user_mtime => now
+                              })
+        end
       end
 
       TopContainer.update_mtime_for_ids(ids)
