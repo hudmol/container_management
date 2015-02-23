@@ -20,7 +20,7 @@
         </div>
 
         {for container in selection}
-          <input type="hidden" name="updateUri[]" value="${container.uri}">
+          <input type="hidden" name="update_uris[]" value="${container.uri}">
         {/for}
         <div class="span4">
             <div class="control-group">
@@ -29,6 +29,39 @@
                     <%= text_field_tag "ils_holding_id", params["ils_holding_id"], :style => "width: 80%;" %>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Update ${selection.length} records</button>
+        <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
+    </div>
+  <% end %>
+--></div>
+
+<div id="bulk_action_update_container_profile"><!--
+  <%= form_tag({:controller => :top_containers, :action => :bulk_operation_update}, {:class => "form-horizontal", :id => "bulk_update_form" }) do |f| %>
+    <div class="modal-body">
+        <div class="alert alert-info" id="alertBucket">Choose a Container Profile for all selected containers.</div>
+
+        <div class="selected-record-list well">
+            <ul>
+                {for container in selection}
+                <li>${container.display_string}</li>
+                {/for}
+            </ul>
+        </div>
+
+        {for container in selection}
+          <input type="hidden" name="update_uris[]" value="${container.uri}">
+        {/for}
+        <input type="hidden" name="container_profile_uri" value="">
+        <div class="span8">
+          <div class="control-group">
+            <label class="control-label" for="container_profile"><%= I18n.t("container_profile._singular") %></label>
+            <div class="controls">
+              <%= render_aspace_partial :partial => "top_containers/bulk_operations/container_profile_linker" %>
+            </div>
+          </div>
         </div>
     </div>
     <div class="modal-footer">

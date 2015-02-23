@@ -119,11 +119,20 @@ class TopContainersController < ApplicationController
 
 
   def bulk_operation_update
-    response = JSONModel::HTTP::post_form("/repositories/#{session[:repo_id]}/top_containers/batch/ils_holding_id",
-                                          {
-                                            'ils_holding_id' => params['ils_holding_id'],
-                                            'ids[]' => params['updateUri'].map {|uri| JSONModel(:top_container).id_for(uri) }
-                                          })
+    post_params = {'ids[]' => params['update_uris'].map {|uri| JSONModel(:top_container).id_for(uri)}}
+    post_uri = "/repositories/#{session[:repo_id]}/top_containers/batch/"
+
+    if params['ils_holding_id']
+      post_params['ils_holding_id'] = params['ils_holding_id']
+      post_uri += 'ils_holding_id'
+    elsif params['container_profile_uri']
+      post_params['container_profile_uri'] = params['container_profile'] ? params['container_profile']['ref'] : ""
+      post_uri += 'container_profile'
+    else
+      render :text => "You must provide a field to update.", :status => 500
+    end
+      
+    response = JSONModel::HTTP::post_form(post_uri, post_params)
     result = ASUtils.json_parse(response.body)
 
     if result.has_key?('records_updated')

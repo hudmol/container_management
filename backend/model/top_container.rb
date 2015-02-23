@@ -265,6 +265,47 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def self.bulk_update_container_profile(ids, container_profile_uri)
+    out = {:records_updated => ids.length}
+
+    relationship = TopContainer.find_relationship(:top_container_profile)
+
+    begin
+      # Clear all existing container profile links
+      relationship.handle_delete(relationship.find_by_participant_ids(TopContainer, ids).map(&:id))
+
+      unless container_profile_uri.empty?
+        container_profile = ContainerProfile[JSONModel(:container_profile).id_for(container_profile_uri)]
+
+        raise "Container profile not found: #{container_profile_uri}" if !container_profile
+
+        now = Time.now
+
+        ids.each do |id|
+          top_container = TopContainer[id]
+
+          relationship.relate(top_container, container_profile, {
+                                :aspace_relationship_position => 1,
+                                :system_mtime => now,
+                                :user_mtime => now
+                              })
+        end
+      end
+
+      TopContainer.update_mtime_for_ids(ids)
+
+    rescue
+      Log.exception($!)
+
+      # This is going to roll back, so nothing will be updated.
+      out[:records_updated] = 0
+      out[:error] = $!
+    end
+
+    out
+  end
+
+
   def self.bulk_update_barcodes(barcode_data)
     updated = []
 

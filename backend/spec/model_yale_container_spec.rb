@@ -494,6 +494,62 @@ describe 'Yale Container model' do
       TopContainer[container1_json.id].barcode.should eq("22222222")
       TopContainer[container2_json.id].barcode.should eq("11111111")
     end
+
+
+    it "can bulk update container profile" do
+      container_profile1 = create(:json_container_profile)
+      container_profile2 = create(:json_container_profile)
+
+      container1 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+      container2 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+      container3 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile2.uri})
+      container4 = create(:json_top_container,
+                          'container_profile' => nil)
+
+      results = TopContainer.bulk_update_container_profile([container1.id, container2.id, container3.id, container4.id],
+                                                           container_profile2.uri)
+
+      results[:records_updated].should eq(4)
+
+      json = JSONModel(:top_container).find(container1.id)
+      json['container_profile']['ref'].should eq(container_profile2.uri)
+    end
+
+
+    it "objects if you try to bulk update to an non-existent container profile" do
+      container_profile1 = create(:json_container_profile)
+
+      container1 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+      container2 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+
+      results = TopContainer.bulk_update_container_profile([container1.id, container2.id],
+                                                           "/container_profiles/99")
+
+      results[:error].should_not be_nil
+    end
+
+
+    it "will happily remove container profiles via bulk update" do
+      container_profile1 = create(:json_container_profile)
+
+      container1 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+      container2 = create(:json_top_container,
+                          'container_profile' => {'ref' => container_profile1.uri})
+
+      results = TopContainer.bulk_update_container_profile([container1.id, container2.id], "")
+
+      results[:records_updated].should eq(2)
+
+      json = JSONModel(:top_container).find(container1.id)
+      json['container_profile'].should be_nil
+    end
+
   end
 
 end
