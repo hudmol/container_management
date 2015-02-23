@@ -5,7 +5,7 @@
   <div class="span12">
     <h1><%= I18n.t("top_container._plural") %></h1>
     <%= render_aspace_partial :partial => "shared/flash_messages" %>
-    <%= form_tag(form_target, {:class => "form-horizontal", :id => "bulk_operation_form"}) do |f| %>
+    <%= form_tag(form_target, {:method => "POST", :class => "form-horizontal", :id => "bulk_operation_form"}) do |f| %>
       <div class="span8">
         <div class="control-group">
           <label class="control-label" for="q">Keyword</label>
