@@ -226,6 +226,8 @@ BulkActionContainerProfileUpdate.prototype.setup_update_form = function($modal) 
 
   var $form = $modal.find("form");
 
+  $(document).trigger("loadedrecordform.aspace", [$form]);
+
   $form.on("submit", function(event) {
     event.preventDefault();
     self.perform_update($form, $modal);
