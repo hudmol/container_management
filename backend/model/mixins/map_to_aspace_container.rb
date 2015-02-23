@@ -30,6 +30,14 @@ module MapToAspaceContainer
   end
 
 
+  def update_from_json(json, extra_values = {}, apply_nested_records = true)
+    self.class.map_aspace_json_to_yale_containers(json)
+
+    super
+  end
+
+
+
   module ClassMethods
 
     def create_from_json(json, extra_values = {})
@@ -53,8 +61,6 @@ module MapToAspaceContainer
       jsons
     end
 
-
-    private
 
     def map_yale_container_to_aspace_json(instance_json, instance_object)
       mapper = MapToAspaceContainer.mapper_to_aspace_json.new(instance_json, instance_object)

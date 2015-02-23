@@ -1,7 +1,5 @@
 class AspaceJsonToYaleContainerMapper
 
-  DEFAULT_INDICATOR = '1'
-
   def initialize(json)
     @json = json
   end
@@ -9,8 +7,12 @@ class AspaceJsonToYaleContainerMapper
 
   def call
     @json['instances'].each do |instance|
-      # Nothing to do if we already have one!
-      next if instance['sub_container']
+
+      if instance['sub_container']
+        # Just need to make sure there are no conflicting ArchivesSpace containers
+        instance.delete('container')
+        next
+      end
 
       top_container = get_or_create_top_container(instance)
 
@@ -40,6 +42,15 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
+  def get_default_indicator
+    if AppConfig.has_key?(:yale_containers_default_indicator)
+      AppConfig[:yale_containers_default_indicator]
+    else
+      '1'
+    end
+  end
+
+
   def try_matching_barcode(container)
     # If we have a barcode, attempt to locate an existing top container
     barcode = container['barcode_1']
@@ -48,7 +59,7 @@ class AspaceJsonToYaleContainerMapper
       if (top_container = TopContainer[:barcode => barcode])
         top_container
       else
-        indicator = container['indicator_1'] || DEFAULT_INDICATOR
+        indicator = container['indicator_1'] || get_default_indicator
         TopContainer.create_from_json(JSONModel(:top_container).from_hash('barcode' => barcode, 'indicator' => indicator))
       end
     else

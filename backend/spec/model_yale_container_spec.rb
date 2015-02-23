@@ -283,6 +283,7 @@ describe 'Yale Container model' do
 
       json = Accession.to_jsonmodel(accession.id)
       json.title = "New accession title"
+
       accession.update_from_json(json)
 
       top_container.refresh.system_mtime.should be > original_mtime

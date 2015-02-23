@@ -3,6 +3,18 @@ require_relative 'factories'
 require_relative 'container_spec_helper'
 
 
+DEFAULT_INDICATOR = 'default_indicator'
+
+
+def stub_default_indicator
+  AppConfig.stub(:[]).and_call_original
+  AppConfig.stub(:has_key?).and_call_original
+
+  AppConfig.stub(:has_key?).with(:yale_containers_default_indicator).and_return(true)
+  AppConfig.stub(:[]).with(:yale_containers_default_indicator).and_return(DEFAULT_INDICATOR)
+end
+
+
 describe 'Yale Container compatibility' do
 
   describe "mapping yale containers to archivesspace containers" do
@@ -31,6 +43,7 @@ describe 'Yale Container compatibility' do
 
       generated_container = Accession.to_jsonmodel(accession.id)['instances'].first['container']
 
+      # FIXME: not sure if type_1 will actually get mapped this way.  Might just be "Box".
       generated_container['type_1'].should eq('carton')
       generated_container['indicator_1'].should eq('1000')
       generated_container['barcode_1'].should eq('9999')
@@ -93,6 +106,8 @@ describe 'Yale Container compatibility' do
 
 
     it "creates a top container with a barcode if none already exists, defaulting the indicator if absent" do
+      stub_default_indicator
+
       instance = JSONModel(:instance).from_hash("instance_type" => "text",
                                                 "container" => {
                                                   "barcode_1" => '12345678',
@@ -101,10 +116,11 @@ describe 'Yale Container compatibility' do
       accession = create_accession({"instances" => [instance]})
 
       created = TopContainer[:barcode => '12345678']
-      created.indicator.should eq('1')
+      created.indicator.should eq(DEFAULT_INDICATOR)
     end
 
 
+    # FIXME: if we can't match on a series, try the whole resource
     it "finds an existing top container linked within the same series where the ind_1 matches" do
       container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234'))
 
