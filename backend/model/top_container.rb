@@ -266,28 +266,45 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def self.bulk_update_container_profile(ids, container_profile_uri)
-    out = {}
-    cp_id = container_profile_uri.empty? ? false : JSONModel(:container_profile).id_for(container_profile_uri)
-    now = Time.now
+    out = {:records_updated => ids.length}
+
+    relationship = TopContainer.find_relationship(:top_container_profile)
+
     begin
-      DB.open do |db|
-        db[:top_container_profile_rlshp].filter(:top_container_id => ids).delete
-        ids.each do |id|
-          if cp_id
-            db[:top_container_profile_rlshp].insert(:top_container_id => id,
-                                                    :container_profile_id => cp_id,
-                                                    :aspace_relationship_position => 1,
-                                                    :system_mtime => now,
-                                                    :user_mtime => now)
-          end
-          db[:top_container].filter(:id => id).update(:system_mtime => now)
-          out[:records_updated] ||= 0
-          out[:records_updated] += 1
-        end
+      # Clear all existing container profile links
+      relationship.handle_delete(relationship.find_by_participant_ids(TopContainer, ids).map(&:id))
+
+      if container_profile_uri.empty?
+        # Nothing more to do
+        return out
       end
+
+      container_profile = ContainerProfile[JSONModel(:container_profile).id_for(container_profile_uri)]
+
+      raise "Container profile not found: #{container_profile_uri}" if !container_profile
+
+      now = Time.now
+
+      ids.each do |id|
+        top_container = TopContainer[id]
+
+        relationship.relate(top_container, container_profile, {
+                              :aspace_relationship_position => 1,
+                              :system_mtime => now,
+                              :user_mtime => now
+                            })
+      end
+
+      TopContainer.update_mtime_for_ids(ids)
+
     rescue
+      Log.exception($!)
+
+      # This is going to roll back, so nothing will be updated.
+      out[:records_updated] = 0
       out[:error] = $!
     end
+
     out
   end
 
