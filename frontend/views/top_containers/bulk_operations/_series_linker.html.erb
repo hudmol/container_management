@@ -12,8 +12,8 @@
 <div class="input-append linker-wrapper">
   <input type="text" class="linker"
          id="series"
-         data-label="Series"
-         data-label_plural="Series"
+         data-label="<%= I18n.t("top_container._frontend.bulk_operations.series") %>"
+         data-label_plural="<%= I18n.t("top_container._frontend.bulk_operations.series") %>"
          data-name="ref"
          data-path="series"
          data-url="<%= url_for  :controller => :search, :action => :do_search, :format => :json %>"

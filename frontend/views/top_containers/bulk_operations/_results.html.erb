@@ -8,14 +8,14 @@
   rows = results['responseHeader']['params']['rows'].to_i
 %>
 <% if rows < num_found %>
-  <div class="alert alert-warning">Not all results have been listed. Please refine your search.</div>
-  <p>Showing <strong><%= [rows, num_found].min %></strong> of <strong><%= num_found %></strong> matching results</p>
+  <div class="alert alert-warning"><%= I18n.t("top_container._frontend.messages.max_results_limit_reached") %></div>
+  <p><%= I18n.t("top_container._frontend.messages.max_results_limit_details", {:visible => [rows, num_found].min, :results => num_found}) %></p>
 <% else %>
-  <p>Matching results: <strong><%= num_found %></strong></p>
+  <p><%= I18n.t("top_container._frontend.messages.results_summary", {:num_found => num_found}) %></p>
 <% end %>
 
 <p>
-  <small>Click a column to set the sort ordering.  Hold shift to sort by multiple columns.</small>
+  <small><%= I18n.t("top_container._frontend.messages.bulk_selection_sort_help") %></small>
   <br/>
   <small><%= I18n.t("search_results.help.row_selection") %></small>
 </p>
@@ -24,16 +24,16 @@
   <thead>
     <tr class="sortable-columns">
       <th><% if multiselect %><%= check_box_tag "select_all" %><% end %></th>
-      <th>Resource/Accession</th>
-      <th>Series</th>
-      <th>Container Profile</th>
-      <th>Indicator</th>
-      <th>Barcode</th>
-      <th>Current Location</th>
-      <th>ILS Holding ID</th>
-      <th>ILS Item ID</th>
-      <th>Restricted?</th>
-      <th>Exported</th>
+      <th><%= I18n.t("top_container._frontend.bulk_operations.collection_singular") %></th>
+      <th><%= I18n.t("top_container._frontend.bulk_operations.series") %></th>
+      <th><%= I18n.t("container_profile._singular") %></th>
+      <th><%= I18n.t("top_container.indicator") %></th>
+      <th><%= I18n.t("top_container.barcode") %></th>
+      <th><%= I18n.t("top_container._frontend.bulk_operations.current_location") %></th>
+      <th><%= I18n.t("top_container.ils_holding_id") %></th>
+      <th><%= I18n.t("top_container.ils_item_id") %></th>
+      <th><%= I18n.t("top_container.restricted") %></th>
+      <th><%= I18n.t("top_container.exported_to_ils") %></th>
       <% if show_edit_actions %><th><!-- Actions --></th><% end %>
     </tr>
   </thead>
