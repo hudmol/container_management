@@ -525,6 +525,42 @@ describe 'Yale Container model' do
       json['container_profile'].should be_nil
     end
 
+
+    it "can bulk update location" do
+      location1 = create(:json_location, :temporary => nil)
+      location2 = create(:json_location, :temporary => nil)
+
+      container_location1 = JSONModel(:container_location).from_hash(
+                                                                     'status' => 'current',
+                                                                     'start_date' => '2000-01-01',
+                                                                     'ref' => location1.uri
+                                                                    )
+
+      container_location2 = JSONModel(:container_location).from_hash(
+                                                                     'status' => 'current',
+                                                                     'start_date' => '2000-01-01',
+                                                                     'ref' => location2.uri
+                                                                    )
+
+      container1 = create(:json_top_container, 'container_locations' => [container_location1])
+      container2 = create(:json_top_container, 'container_locations' => [container_location1])
+      container3 = create(:json_top_container, 'container_locations' => [container_location2])
+      container4 = create(:json_top_container, 'container_locations' => nil)
+
+      results = TopContainer.bulk_update_location([container1.id, container2.id, container3.id, container4.id],
+                                                  location2.uri)
+
+      results[:records_updated].should eq(4)
+
+      json = JSONModel(:top_container).find(container1.id)
+      json['container_locations'].length.should eq(1)
+      json['container_locations'][0]['ref'].should eq(location2.uri)
+
+      json = JSONModel(:top_container).find(container4.id)
+      json['container_locations'].length.should eq(1)
+      json['container_locations'][0]['ref'].should eq(location2.uri)
+    end
+
   end
 
 

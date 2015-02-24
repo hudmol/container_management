@@ -320,6 +320,45 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def self.bulk_update_location(ids, location_uri)
+    out = {:records_updated => ids.length}
+
+    relationship = TopContainer.find_relationship(:top_container_housed_at)
+
+    begin
+      relationship.handle_delete(relationship.find_by_participant_ids(TopContainer, ids).keep_if{|v| v.status == 'current'}.map(&:id))
+
+      location = Location[JSONModel(:location).id_for(location_uri)]
+
+      raise "Location not found: #{location_uri}" if !location
+
+      now = Time.now
+
+      ids.each do |id|
+        top_container = TopContainer[id]
+
+        relationship.relate(top_container, location, {
+                              :status => 'current',
+                              :start_date => now.iso8601,
+                              :aspace_relationship_position => 0,
+                              :system_mtime => now,
+                              :user_mtime => now
+                            })
+      end
+
+      TopContainer.update_mtime_for_ids(ids)
+
+    rescue
+      Log.exception($!)
+
+      out[:records_updated] = 0
+      out[:error] = $!
+    end
+
+    out
+  end
+
+
   def self.bulk_update_barcodes(barcode_data)
     updated = []
 
