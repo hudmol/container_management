@@ -57,8 +57,33 @@ en:
         created: Top Container Created
         updated: Top Container Updated
         filter_required: Please provide a filter
+        max_results_limit_reached: Not all results have been listed. Please refine your search.
+        max_results_limit_details: "Showing <strong>%{visible}</strong> of <strong>%{num_found}</strong> matching results"
+        results_summary: "Matching results: <strong>%{num_found}</strong>"
+        bulk_selection_sort_help: Click a column to set the sort ordering.  Hold shift to sort by multiple columns.
+        bulk_action_success: Top Containers successfully updated
+        bulk_action_success_info: Please be aware it may take a moment before changes are reflected in the search results.
       bulk_operations:
         title: Bulk Operations
+        collection_singular: Resource/Accession
+        collection_plural: Resources/Accessions
+        series: Series
+        current_location: Current Location
+        keyword_criteria: Keyword
+        exported_to_ils_true: "Yes"
+        exported_to_ils_false: "No"
+        search: Search
+        update_ils_holding_ids: Update ILS Holding IDs
+        update_ils_holding_ids_help: Enter a value for ILS Holding ID for all selected containers.
+        update_container_profiles: Update Container Profiles
+        update_container_profiles_help: Choose a Container Profile for all selected containers.
+        rapid_barcode_entry: Rapid Barcode Entry
+        rapid_barcode_entry_existing_barcode: Existing Barcode
+        rapid_barcode_entry_new_barcode: New Barcode
+        batch_delete: Delete Top Containers
+        batch_delete_help: Delete all selected containers.
+        update_n_records: "Update %{n} records"
+        delete_n_records: "Delete %{n} records"
 
   container_profile:
     _singular: Container Profile

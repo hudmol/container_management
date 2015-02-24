@@ -2,14 +2,14 @@
   <div class="pull-right">
     <div id="bulkActions" class="btn-group">
       <a class="btn btn-small dropdown-toggle disabled" data-toggle="dropdown" href="#">
-        Bulk Operations
+        <%= I18n.t("top_container._frontend.bulk_operations.title") %>
         <span class="caret"></span>
       </a>
       <ul class="dropdown-menu pull-right">
-        <li><a id="bulkActionUpdateIlsHolding" href="javascript:void(0)">Update ILS Holding IDs</a></li>
-        <li><a id="bulkActionUpdateContainerProfile" href="javascript:void(0)">Update Container Profiles</a></li>
-        <li><a id="showBulkActionRapidBarcodeEntry" href="javascript:void(0);">Rapid Barcode Entry</a></li>
-        <li><a id="bulkActionDelete" href="javascript:void(0)"><span class="text-error">Delete Top Containers</span></a></li>
+        <li><a id="bulkActionUpdateIlsHolding" href="javascript:void(0)"><%= I18n.t("top_container._frontend.bulk_operations.update_ils_holding_ids")%></a></li>
+        <li><a id="bulkActionUpdateContainerProfile" href="javascript:void(0)"><%= I18n.t("top_container._frontend.bulk_operations.update_container_profiles")%></a></li>
+        <li><a id="showBulkActionRapidBarcodeEntry" href="javascript:void(0);"><%= I18n.t("top_container._frontend.bulk_operations.rapid_barcode_entry")%></a></li>
+        <li><a id="bulkActionDelete" href="javascript:void(0)"><span class="text-error"><%= I18n.t("top_container._frontend.bulk_operations.batch_delete")%></span></a></li>
       </ul>
     </div>
   </div>

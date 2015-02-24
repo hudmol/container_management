@@ -4,17 +4,16 @@
 <div class="row-fluid">
   <div class="span12">
     <h1><%= I18n.t("top_container._plural") %></h1>
-    <%= render_aspace_partial :partial => "shared/flash_messages" %>
-    <%= form_tag(form_target, {:method => "POST", :class => "form-horizontal", :id => "bulk_operation_form"}) do |f| %>
+    <%= form_tag(form_target, {:class => "form-horizontal", :id => "bulk_operation_form"}) do |f| %>
       <div class="span8">
         <div class="control-group">
-          <label class="control-label" for="q">Keyword</label>
+          <label class="control-label" for="q"><%= I18n.t("top_container._frontend.bulk_operations.keyword_criteria") %></label>
           <div class="controls">
             <%= text_field_tag "q", params["q"], :style => "width: 100%;" %>
           </div>
         </div>
         <div class="control-group">
-          <label class="control-label" for="collection">Resource/Accession</label>
+          <label class="control-label" for="collection"><%= I18n.t("top_container._frontend.bulk_operations.collection_singular") %></label>
           <div class="controls">
             <%= render_aspace_partial :partial => "top_containers/bulk_operations/collection_linker" %>
           </div>
@@ -34,12 +33,12 @@
         <div class="control-group">
           <label class="control-label" for="location"><%= I18n.t("top_container.exported_to_ils") %></label>
           <div class="controls">
-            <select name="exported"><option></option><option value="yes">Yes</option><option value="no">No</option></select>
+            <select name="exported"><option></option><option value="yes"><%= I18n.t("top_container._frontend.bulk_operations.exported_to_ils_true") %></option><option value="no"><%= I18n.t("top_container._frontend.bulk_operations.exported_to_ils_false") %></option></select>
           </div>
         </div>
         <div class="control-group">
           <div class="controls">
-            <%= submit_tag "Search", :class => "btn btn-primary pull-right" %>
+            <%= submit_tag I18n.t("top_container._frontend.bulk_operations.search"), :class => "btn btn-primary pull-right" %>
           </div>
         </div>
       </div>

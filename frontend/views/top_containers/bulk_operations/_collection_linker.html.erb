@@ -12,8 +12,8 @@
 <div class="input-append linker-wrapper">
   <input type="text" class="linker"
          id="collection"
-         data-label="Collection"
-         data-label_plural="Collections"
+         data-label="<%= I18n.t("top_container._frontend.bulk_operations.collection_singular") %>"
+         data-label_plural="<%= I18n.t("top_container._frontend.bulk_operations.collection_plural") %>"
          data-name="ref"
          data-path="collection"
          data-url="<%= url_for  :controller => :search, :action => :do_search, :format => :json %>"
