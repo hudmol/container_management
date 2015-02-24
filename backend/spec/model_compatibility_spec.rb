@@ -187,5 +187,24 @@ describe 'Yale Container compatibility' do
   end
 
 
+  it "throws an exception if the incoming record has different field values to the top container we're linking against" do
+    container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234', 'barcode' => '12345678'))
+
+    instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                              "container" => {
+                                                "barcode_1" => '12345678',
+                                                "indicator_1" => 'different_to_1234'
+                                              })
+
+    expect {
+      accession = create_accession({"instances" => [instance]})
+    }.to raise_error(ValidationException)
+
+  end
+
+
+
+  xit "maps location records"
+
 
 end

@@ -16,6 +16,8 @@ class AspaceJsonToYaleContainerMapper
 
       top_container = get_or_create_top_container(instance)
 
+      ensure_harmonious_values(top_container, instance['container'])
+
       instance['sub_container'] = {
         'top_container' => {'ref' => top_container.uri}
       }
@@ -125,6 +127,21 @@ class AspaceJsonToYaleContainerMapper
       TopContainer[:indicator => indicator, :id => top_container_ids]
     end
 
+  end
+
+
+  # FIXME: check locations
+  def ensure_harmonious_values(top_container, aspace_container)
+    {:indicator => 'indicator_1',
+     :barcode => 'barcode_1'}.each do |top_container_property, aspace_property|
+      if aspace_container[aspace_property] && top_container[top_container_property] != aspace_container[aspace_property]
+        raise ValidationException.new(:errors => ["Mismatch when mapping between #{top_container_property} and #{aspace_property}"],
+                                      :object_context => {
+                                        :top_container => top_container,
+                                        :aspace_container => aspace_container
+                                      })
+      end
+    end
   end
 
 end
