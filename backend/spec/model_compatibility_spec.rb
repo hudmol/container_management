@@ -120,7 +120,6 @@ describe 'Yale Container compatibility' do
     end
 
 
-    # FIXME: if we can't match on a series, try the whole resource
     it "finds an existing top container linked within the same series where the ind_1 matches" do
       container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234'))
 
@@ -139,21 +138,50 @@ describe 'Yale Container compatibility' do
 
       # and it's magically linked up with the right container
       ArchivalObject.to_jsonmodel(new_ao.id)['instances'].first['sub_container']['top_container']['ref'].should eq(container.uri)
-
-      # a top-level AO in a different series doesn't match, though
-      another_ao = create(:json_archival_object,
-                          "resource" => {"ref" => resource.uri},
-                          "parent" => nil,
-                          "instances" => [JSONModel(:instance).from_hash("instance_type" => "text",
-                                                                         "container" => {
-                                                                           "type_1" => 'box',
-                                                                           "indicator_1" => '1234'
-                                                                         })])
-
-
-      ArchivalObject.to_jsonmodel(another_ao.id)['instances'].first['sub_container']['top_container']['ref'].should_not eq(container.uri)
     end
 
+
+
+    it "finds an existing top container linked within the same resource if it can't find one in the series" do
+      container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234'))
+
+      # child links to our top container
+      (resource, grandparent, parent, child) = create_tree(container)
+
+      # create a new archival object under grandparent with an instance with the same indicator
+      new_ao = create(:json_archival_object,
+                      "resource" => {"ref" => resource.uri},
+                      "instances" => [JSONModel(:instance).from_hash("instance_type" => "text",
+                                                                     "container" => {
+                                                                       "type_1" => 'box',
+                                                                       "indicator_1" => '1234'
+                                                                     })])
+
+      # and it's magically linked up with the right container (from the different series)
+      ArchivalObject.to_jsonmodel(new_ao.id)['instances'].first['sub_container']['top_container']['ref'].should eq(container.uri)
+    end
+
+
+    it "updates and links the top container even if we're updating the series AO" do
+      container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234'))
+
+      # child links to our top container
+      (resource, grandparent, parent, child) = create_tree(container)
+
+
+      json = ArchivalObject.to_jsonmodel(grandparent.id)
+
+      json['instances'] =  [JSONModel(:instance).from_hash("instance_type" => "text",
+                                                           "container" => {
+                                                             "type_1" => 'box',
+                                                             "indicator_1" => '1234'
+                                                           })]
+
+      ArchivalObject[grandparent.id].update_from_json(json)
+
+      # and it's magically linked up with the right container (from within the current series)
+      ArchivalObject.to_jsonmodel(grandparent.id)['instances'].first['sub_container']['top_container']['ref'].should eq(container.uri)
+    end
 
 
   end

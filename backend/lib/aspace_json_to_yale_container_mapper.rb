@@ -29,7 +29,8 @@ class AspaceJsonToYaleContainerMapper
     container = instance['container']
 
     result = (try_matching_barcode(container) ||
-              try_matching_indicator_within_series(container))
+              try_matching_indicator_within_series(container) ||
+              try_matching_indicator_within_resource(container))
 
     if result
       result
@@ -71,24 +72,59 @@ class AspaceJsonToYaleContainerMapper
   def try_matching_indicator_within_series(container)
     indicator = container['indicator_1']
 
-    if indicator && @json['parent'] && @json.is_a?(JSONModel(:archival_object))
+    return nil if !indicator || !@json.is_a?(JSONModel(:archival_object))
 
-      parent_ao = ArchivalObject[JSONModel(:archival_object).id_for(@json['parent']['ref'])]
-      series = parent_ao.series
+    ao = if @json['uri']
+           ArchivalObject[JSONModel(:archival_object).id_for(@json['uri'])]
+         elsif @json['parent']
+           ArchivalObject[JSONModel(:archival_object).id_for(@json['parent']['ref'])]
+         else
+           nil
+         end
 
-      series_object_graph = series.object_graph
-
-      top_container_link_rlshp = SubContainer.find_relationship(:top_container_link)
-      relationship_ids = series_object_graph.ids_for(top_container_link_rlshp)
-
-      DB.open do |db|
-        top_container_ids = db[:top_container_link_rlshp].filter(:id => relationship_ids).select(:top_container_id)
-        TopContainer[:indicator => indicator, :id => top_container_ids]
-      end
-
+    if ao
+      find_top_container_for_indicator(ao.series, indicator)
     else
       nil
     end
+  end
+
+
+  def try_matching_indicator_within_resource(container)
+    indicator = container['indicator_1']
+
+    return nil if !indicator
+
+    top_record = if @json.is_a?(JSONModel(:archival_object)) && @json['resource']
+                   Resource[JSONModel(:resource).id_for(@json['resource']['ref'])]
+                 elsif @json.is_a?(JSONModel(:resource)) && @json['uri']
+                   Resource[JSONModel(:resource).id_for(@json['uri'])]
+                 elsif @json.is_a?(JSONModel(:accession)) && @json['uri']
+                   Accession[JSONModel(:accession).id_for(@json['uri'])]
+                 else
+                   nil
+                 end
+
+    if top_record
+      find_top_container_for_indicator(top_record, indicator)
+    else
+      nil
+    end
+
+  end
+
+
+  def find_top_container_for_indicator(top_record, indicator)
+    object_graph = top_record.object_graph
+
+    top_container_link_rlshp = SubContainer.find_relationship(:top_container_link)
+    relationship_ids = object_graph.ids_for(top_container_link_rlshp)
+
+    DB.open do |db|
+      top_container_ids = db[:top_container_link_rlshp].filter(:id => relationship_ids).select(:top_container_id)
+      TopContainer[:indicator => indicator, :id => top_container_ids]
+    end
+
   end
 
 end
