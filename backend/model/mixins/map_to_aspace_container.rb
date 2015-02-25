@@ -5,7 +5,6 @@ module MapToAspaceContainer
   end
 
 
-  # FIXME Test this...
   def self.mapper_to_aspace_json
     if AppConfig.has_key?(:map_to_aspace_container_class)
       @mapper_to_aspace_json ||= Kernel.const_get(AppConfig[:map_to_aspace_container_class].intern)

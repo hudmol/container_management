@@ -19,13 +19,21 @@ class AspaceJsonToYaleContainerMapper
       ensure_harmonious_values(top_container, instance['container'])
 
       instance['sub_container'] = {
-        'top_container' => {'ref' => top_container.uri}
+        'top_container' => {'ref' => top_container.uri},
+        'type_2' => instance['container']['type_2'],
+        'indicator_2' => instance['container']['indicator_2'],
+        'type_3' => instance['container']['type_3'],
+        'indicator_3' => instance['container']['indicator_3'],
       }
+
+      # No need for the original value now.
+      instance.delete('container')
     end
   end
 
 
   private
+
 
   def get_or_create_top_container(instance)
     container = instance['container']
@@ -55,7 +63,7 @@ class AspaceJsonToYaleContainerMapper
 
 
   def try_matching_barcode(container)
-    # If we have a barcode, attempt to locate an existing top container
+    # If we have a barcode, attempt to locate an existing top container but create one if needed
     barcode = container['barcode_1']
 
     if barcode
@@ -63,7 +71,10 @@ class AspaceJsonToYaleContainerMapper
         top_container
       else
         indicator = container['indicator_1'] || get_default_indicator
-        TopContainer.create_from_json(JSONModel(:top_container).from_hash('barcode' => barcode, 'indicator' => indicator))
+        TopContainer.create_from_json(JSONModel(:top_container).from_hash('barcode' => barcode,
+                                                                          'indicator' => indicator,
+                                                                          'container_locations' => container['container_locations']
+                                                                         ))
       end
     else
       nil

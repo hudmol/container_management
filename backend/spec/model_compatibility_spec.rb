@@ -175,7 +175,7 @@ describe 'Yale Container compatibility' do
                                                            "container" => {
                                                              "type_1" => 'box',
                                                              "indicator_1" => '1234'
-                                                           })]
+                                                           }).to_hash]
 
       ArchivalObject[grandparent.id].update_from_json(json)
 
@@ -204,7 +204,51 @@ describe 'Yale Container compatibility' do
 
 
 
-  xit "maps location records"
+  it "maps location records when creating a new top container" do
+    location = create(:json_location)
+
+    instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                              "container" => {
+                                                "barcode_1" => '12345678',
+                                                "indicator_1" => '123',
+                                                "container_locations" => [
+                                                  JSONModel(:container_location).from_hash('status' => 'current',
+                                                                                           'start_date' => '2000-01-01',
+                                                                                           'ref' => location.uri)
+                                                ]
+                                              })
+
+    accession = create_accession({"instances" => [instance]})
+
+    created = TopContainer[:barcode => '12345678']
+    TopContainer.to_jsonmodel(created.id)['container_locations'][0]['ref'].should eq(location.uri)
+  end
+
+  # THINKME: do we add missing?  Or throw an error?
+  xit "checks for differences in location records when re-using top containers"
+
+
+  it "creates a subcontainer with type_{2,3}/indicator_{2,3}" do
+    instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                              "container" => {
+                                                "barcode_1" => '12345678',
+                                                "indicator_1" => '123',
+                                                "type_2" => 'folder',
+                                                "indicator_2" => 'ind2',
+                                                "type_3" => 'reel',
+                                                "indicator_3" => 'ind3'
+                                              })
+
+    accession = create_accession({"instances" => [instance]})
+
+    subcontainer = Accession.to_jsonmodel(accession.id)['instances'].first['sub_container']
+
+    subcontainer['type_2'].should eq('folder')
+    subcontainer['type_3'].should eq('reel')
+
+    subcontainer['indicator_2'].should eq('ind2')
+    subcontainer['indicator_3'].should eq('ind3')
+  end
 
 
 end
