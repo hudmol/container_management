@@ -16,7 +16,7 @@ class AspaceJsonToYaleContainerMapper
 
       top_container = get_or_create_top_container(instance)
 
-      ensure_harmonious_values(top_container, instance['container'])
+      ensure_harmonious_values(TopContainer.to_jsonmodel(top_container), instance['container'])
 
       instance['sub_container'] = {
         'top_container' => {'ref' => top_container.uri},
@@ -141,10 +141,10 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
-  # FIXME: check locations
   def ensure_harmonious_values(top_container, aspace_container)
-    {:indicator => 'indicator_1',
-     :barcode => 'barcode_1'}.each do |top_container_property, aspace_property|
+    properties = {:indicator => 'indicator_1', :barcode => 'barcode_1'}
+
+    properties.each do |top_container_property, aspace_property|
       if aspace_container[aspace_property] && top_container[top_container_property] != aspace_container[aspace_property]
         raise ValidationException.new(:errors => ["Mismatch when mapping between #{top_container_property} and #{aspace_property}"],
                                       :object_context => {
@@ -153,6 +153,21 @@ class AspaceJsonToYaleContainerMapper
                                       })
       end
     end
+
+
+    aspace_locations = Array(aspace_container['container_locations']).map {|container_location| container_location['ref']}
+    top_container_locations = Array(top_container['container_locations']).map {|container_location| container_location['ref']}
+
+    if (top_container_locations - aspace_locations).empty? && (aspace_locations - top_container_locations).empty?
+      # All OK!
+    else
+      raise ValidationException.new(:errors => ["Locations in ArchivesSpace container don't match locations in existing top container"],
+                                    :object_context => {
+                                      :top_container => top_container,
+                                      :aspace_container => aspace_container
+                                    })
+    end
+
   end
 
 end
