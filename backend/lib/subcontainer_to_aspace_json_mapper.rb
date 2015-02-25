@@ -2,6 +2,8 @@
 # ArchivesSpace container records.
 class SubContainerToAspaceJsonMapper
 
+  include JSONModel
+
   def initialize(instance_json, instance_obj)
     @instance_json = instance_json
     @instance_obj = instance_obj
@@ -9,7 +11,10 @@ class SubContainerToAspaceJsonMapper
 
 
   def to_hash
-    Hash[JSONModel(:container).schema['properties'].map {|property, _| [property, self.send(property.intern)]}]
+    result = Hash[JSONModel(:container).schema['properties'].map {|property, _| [property, self.send(property.intern)]}]
+    result['container_locations'] ||= []
+
+    result
   end
 
 

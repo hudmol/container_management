@@ -212,10 +212,24 @@ class TopContainer < Sequel::Model(:top_container)
                       :is_array => true)
 
 
+
   # When deleting a top_container, delete all related instances and their subcontainers
   def delete
     related_records(:top_container_link).map {|sub| Instance[sub.instance_id].delete }
     super
+  end
+
+  def update_from_json(json, opts = {}, apply_nested_records = true)
+    result = super
+    reindex_linked_records
+    result
+  end
+
+
+  def reindex_linked_records
+    linked_archival_records.group_by(&:class).each do |clz, records|
+      clz.update_mtime_for_ids(records.map(&:id))
+    end
   end
 
 

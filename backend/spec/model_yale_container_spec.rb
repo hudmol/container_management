@@ -527,4 +527,24 @@ describe 'Yale Container model' do
 
   end
 
+
+    it "reindexes linked records when a top container is updated" do
+      box = create(:json_top_container)
+
+      accessions = []
+      accessions << create_accession({"instances" => [build_instance(box)]})
+      accessions << create_accession({"instances" => [build_instance(box)]})
+      accessions << create_accession({"instances" => [build_instance(box)]})
+
+      mtimes = accessions.map {|accession| accession.system_mtime}
+
+      # Refresh our lock version
+      box = TopContainer.to_jsonmodel(box.id)
+
+      TopContainer[box.id].update_from_json(box)
+
+      mtimes.should_not eq(accessions.map {|accession| accession.refresh.system_mtime})
+    end
+
+
 end

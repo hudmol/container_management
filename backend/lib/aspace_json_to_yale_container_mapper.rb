@@ -1,5 +1,7 @@
 class AspaceJsonToYaleContainerMapper
 
+  include JSONModel
+
   def initialize(json)
     @json = json
   end
