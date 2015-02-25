@@ -110,6 +110,19 @@ class ArchivesSpaceService < Sinatra::Base
   end
 
 
+  Endpoint.post('/repositories/:repo_id/top_containers/batch/location')
+    .description("Update location for a batch of yale containers")
+    .params(["ids", [Integer]],
+            ["location_uri", String, "The uri of the location"],
+            ["repo_id", :repo_id])
+    .permissions([:manage_container])
+    .returns([200, :updated]) \
+  do
+    result = TopContainer.bulk_update_location(params[:ids], params[:location_uri])
+    json_response(result)
+  end
+
+
   Endpoint.post('/repositories/:repo_id/top_containers/bulk/barcodes')
   .description("Bulk update barcodes")
   .params(["barcode_data", String, "JSON string containing barcode data {uri=>barcode}", :body => true],

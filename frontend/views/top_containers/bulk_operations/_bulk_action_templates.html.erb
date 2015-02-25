@@ -71,6 +71,39 @@
   <% end %>
 --></div>
 
+<div id="bulk_action_update_location"><!--
+  <%= form_tag({:controller => :top_containers, :action => :bulk_operation_update}, {:class => "form-horizontal", :id => "bulk_update_form" }) do |f| %>
+    <div class="modal-body">
+        <div class="alert alert-info" id="alertBucket"><%= I18n.t("top_container._frontend.bulk_operations.update_locations_help") %></div>
+
+        <div class="selected-record-list well">
+            <ul>
+                {for container in selection}
+                <li>${container.display_string}</li>
+                {/for}
+            </ul>
+        </div>
+
+        {for container in selection}
+          <input type="hidden" name="update_uris[]" value="${container.uri}">
+        {/for}
+        <input type="hidden" name="location_uri" value="">
+        <div class="span8">
+          <div class="control-group">
+            <label class="control-label" for="location"><%= I18n.t("location._singular") %></label>
+            <div class="controls">
+              <%= render_aspace_partial :partial => "top_containers/bulk_operations/location_linker" %>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary"><%= I18n.t("top_container._frontend.bulk_operations.update_n_records", {:n => "${selection.length}"}) %></button>
+        <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
+    </div>
+  <% end %>
+--></div>
+
 <div id="bulk_action_delete"><!--
   <%= form_tag({:controller => :top_containers, :action => :batch_delete}, {:class => "form-horizontal", :id => "batch_delete_form" }) do |f| %>
     <div class="modal-body">
