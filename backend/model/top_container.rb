@@ -326,7 +326,7 @@ class TopContainer < Sequel::Model(:top_container)
     relationship = TopContainer.find_relationship(:top_container_housed_at)
 
     begin
-      relationship.handle_delete(relationship.find_by_participant_ids(TopContainer, ids).keep_if{|v| v.status == 'current'}.map(&:id))
+      relationship.handle_delete(relationship.find_by_participant_ids(TopContainer, ids).select{|v| v.status == 'current'}.map(&:id))
 
       location = Location[JSONModel(:location).id_for(location_uri)]
 
