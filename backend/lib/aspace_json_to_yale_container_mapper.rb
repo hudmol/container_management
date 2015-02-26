@@ -99,7 +99,7 @@ class AspaceJsonToYaleContainerMapper
          end
 
     if ao
-      find_top_container_for_indicator(ao.series, indicator)
+      find_top_container_for_indicator(ao.topmost_archival_object, indicator)
     else
       nil
     end
