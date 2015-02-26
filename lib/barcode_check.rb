@@ -10,8 +10,7 @@ class BarcodeCheck
 
     cfg = AppConfig[:yale_containers_barcode_length]
 
-    repo_key = "repository_#{repo_code}".intern
-    [:system_default, repo_key].each do |key|
+    [:system_default, repo_code].each do |key|
       if cfg.has_key?(key)
         @min = cfg[key][:min].to_i if cfg[key].has_key?(:min)
         @max = cfg[key][:max].to_i if cfg[key].has_key?(:max)
