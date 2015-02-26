@@ -2,7 +2,7 @@ module ReindexTopContainers
 
   def reindex_top_containers
     # Find any relationships between a top container and any instance within the current tree.
-    root_record = self.root_record_id ? self.class.root_model[self.root_record_id] : self.series
+    root_record = self.root_record_id ? self.class.root_model[self.root_record_id] : self.topmost_archival_object
 
     tree_object_graph = root_record.object_graph
     top_container_link_rlshp = SubContainer.find_relationship(:top_container_link)

@@ -182,15 +182,6 @@ class TopContainersController < ApplicationController
   def search_filter_for(uri)
     return {} if uri.blank?
 
-    parsed = JSONModel.parse_reference(uri)
-
-    if parsed[:type] == "archival_object"
-      series_uri = JSONModel(:archival_object).find(parsed[:id]).series['ref']
-      return {
-        "filter_term[]" => [{"series_uri_u_sstr" => series_uri}.to_json]
-      }
-    end
-
     return {
       "filter_term[]" => [{"collection_uri_u_sstr" => uri}.to_json]
     }

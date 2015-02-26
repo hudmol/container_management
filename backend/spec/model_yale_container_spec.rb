@@ -185,6 +185,7 @@ describe 'Yale Container model' do
         series.id.should eq(grandparent.id)
       end
 
+
       it "includes the series in its JSON output" do
         (resource, grandparent, parent, child) = create_tree(box,
                                                              :grandparent_properties => {
@@ -222,7 +223,7 @@ describe 'Yale Container model' do
       top_container.display_string.should eq("Container 1: Series 3 [123]")
     end
 
-    it "shows a display string for a linked other-level AO" do
+    it "doesn't show a display string for a non-series other-level AO" do
       (resource, grandparent, parent, child) = create_tree(box,
                                                            :grandparent_properties => {
                                                              'component_id' => "9",
@@ -230,7 +231,30 @@ describe 'Yale Container model' do
                                                              'other_level' => 'Handbag'
                                                            })
 
-      top_container.display_string.should eq("Container 1: Handbag 9 [123]")
+      top_container.display_string.should eq("Container 1: [123]")
+    end
+
+
+    it "doesn't show a display string for a topmost archival object without a component_id" do
+      (resource, grandparent, parent, child) = create_tree(box,
+                                                           :grandparent_properties => {
+                                                             'component_id' => nil,
+                                                             'level' => 'series'
+                                                           })
+
+      top_container.display_string.should eq("Container 1: [123]")
+    end
+
+
+    it "shows a display string for a valid series other-level AO" do
+      (resource, grandparent, parent, child) = create_tree(box,
+                                                           :grandparent_properties => {
+                                                             'component_id' => "9",
+                                                             'level' => 'otherlevel',
+                                                             'other_level' => 'Accession'
+                                                           })
+
+      top_container.display_string.should eq("Container 1: Accession 9 [123]")
     end
 
     it "shows a display string for a linked accession" do

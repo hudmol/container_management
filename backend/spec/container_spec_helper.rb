@@ -1,6 +1,6 @@
 def create_tree(top_container_json, opts = {})
   resource = create_resource
-  grandparent = create(:json_archival_object, {:resource => {"ref" => resource.uri}}.merge(opts.fetch(:grandparent_properties, {})))
+  grandparent = create(:json_archival_object, {:resource => {"ref" => resource.uri}, :level => "series", :component_id => SecureRandom.hex}.merge(opts.fetch(:grandparent_properties, {})))
   parent = create(:json_archival_object, "resource" => {"ref" => resource.uri}, "parent" => {"ref" => grandparent.uri})
   child = create(:json_archival_object,
                  "resource" => {"ref" => resource.uri},
