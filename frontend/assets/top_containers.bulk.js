@@ -269,6 +269,71 @@ BulkActionContainerProfileUpdate.prototype.show = function() {
     selection: this.bulkContainerSearch.get_selection()
   });
 
+  var $modal = AS.openCustomModal("bulkUpdateModal", this.$menuItem[0].text, dialog_content, 'full');
+
+  this.setup_update_form($modal);
+};
+
+
+/***************************************************************************
+ * BulkActionLocationUpdate - Location bulk action
+ *
+ */
+function BulkActionLocationUpdate(bulkContainerSearch) {
+  this.bulkContainerSearch = bulkContainerSearch;
+  this.MENU_ID = "bulkActionUpdateLocation";
+
+  this.setup_menu_item();
+};
+
+
+BulkActionLocationUpdate.prototype.setup_update_form = function($modal) {
+  var self = this;
+
+  var $form = $modal.find("form");
+
+  $(document).trigger("loadedrecordform.aspace", [$form]);
+
+  $form.on("submit", function(event) {
+    event.preventDefault();
+    self.perform_update($form, $modal);
+  });
+};
+
+
+BulkActionLocationUpdate.prototype.perform_update = function($form, $modal) {
+  var self = this;
+
+  $.ajax({
+    url:"/plugins/top_containers/bulk_operations/update",
+    data: $form.serializeArray(),
+    type: "post",
+    success: function(html) {
+      $form.replaceWith(html);
+      $modal.trigger("resize");
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      var error = AS.renderTemplate("template_bulk_operation_error_message", {message: jqXHR.responseText});
+      $('#alertBucket').replaceWith(error);
+    }
+  });
+};
+
+BulkActionLocationUpdate.prototype.setup_menu_item = function() {
+  var self = this;
+
+  self.$menuItem = $("#" + self.MENU_ID, self.bulkContainerSearch.$toolbar);
+
+  self.$menuItem.on("click", function(event) {
+    self.show();
+  });
+};
+
+
+BulkActionLocationUpdate.prototype.show = function() {
+  var dialog_content = AS.renderTemplate("bulk_action_update_location", {
+    selection: this.bulkContainerSearch.get_selection()
+  });
 
   var $modal = AS.openCustomModal("bulkUpdateModal", this.$menuItem[0].text, dialog_content, 'full');
 
@@ -399,5 +464,6 @@ $(function() {
   new BulkActionBarcodeRapidEntry(bulkContainerSearch);
   new BulkActionIlsHoldingUpdate(bulkContainerSearch);
   new BulkActionContainerProfileUpdate(bulkContainerSearch);
+  new BulkActionLocationUpdate(bulkContainerSearch);
   new BulkActionDelete(bulkContainerSearch);
 });

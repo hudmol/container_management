@@ -128,6 +128,9 @@ class TopContainersController < ApplicationController
     elsif params['container_profile_uri']
       post_params['container_profile_uri'] = params['container_profile'] ? params['container_profile']['ref'] : ""
       post_uri += 'container_profile'
+    elsif params['location_uri']
+      post_params['location_uri'] = params['location'] ? params['location']['ref'] : ""
+      post_uri += 'location'
     else
       render :text => "You must provide a field to update.", :status => 500
     end

@@ -24,6 +24,16 @@ def stub_barcode_length(min, max)
 end
 
 
+def build_container_location(location_uri, status = 'current')
+    hash = {
+      'status' => status,
+      'start_date' => '2000-01-01',
+      'ref' => location_uri
+    }
+    hash['end_date'] = '2010-01-01' if status == 'previous'
+    JSONModel(:container_location).from_hash(hash)
+end
+
 
 describe 'Yale Container model' do
 
@@ -428,125 +438,211 @@ describe 'Yale Container model' do
     end
   end
 
+
   describe "bulk action" do
-    it "can set multiple valid barcodes" do
-      container1_json = create(:json_top_container)
-      container2_json = create(:json_top_container)
 
-      barcode_data = {}
-      barcode_data[container1_json.uri] = "987654321"
-      barcode_data[container2_json.uri] = "876543210"
+    describe "barcodes" do
 
-      results = TopContainer.bulk_update_barcodes(barcode_data)
-      results.should include(container1_json.id, container2_json.id)
+      it "can set multiple valid barcodes" do
+        container1_json = create(:json_top_container)
+        container2_json = create(:json_top_container)
 
-      TopContainer[container1_json.id].barcode.should eq("987654321")
-      TopContainer[container2_json.id].barcode.should eq("876543210")
-    end
+        barcode_data = {}
+        barcode_data[container1_json.uri] = "987654321"
+        barcode_data[container2_json.uri] = "876543210"
 
-    it "throws exception when attempt to update to an invalid barcode" do
+        results = TopContainer.bulk_update_barcodes(barcode_data)
+        results.should include(container1_json.id, container2_json.id)
 
-      stub_barcode_length(4, 6)
+        TopContainer[container1_json.id].barcode.should eq("987654321")
+        TopContainer[container2_json.id].barcode.should eq("876543210")
+      end
 
-      container1_json = create(:json_top_container)
-      container2_json = create(:json_top_container)
+      it "throws exception when attempt to update to an invalid barcode" do
 
-      original_barcode_1 = TopContainer[container1_json.id].barcode
-      original_barcode_2 = TopContainer[container2_json.id].barcode
+        stub_barcode_length(4, 6)
 
-      barcode_data = {}
-      barcode_data[container1_json.uri] = "7777777"
-      barcode_data[container2_json.uri] = "333"
+        container1_json = create(:json_top_container)
+        container2_json = create(:json_top_container)
 
-      expect {
-        TopContainer.bulk_update_barcodes(barcode_data)
-      }.to raise_error(Sequel::ValidationFailed)
+        original_barcode_1 = TopContainer[container1_json.id].barcode
+        original_barcode_2 = TopContainer[container2_json.id].barcode
 
-    end
+        barcode_data = {}
+        barcode_data[container1_json.uri] = "7777777"
+        barcode_data[container2_json.uri] = "333"
 
-    it "throws exception when attempt to set duplicate barcode" do
-      container1_json = create(:json_top_container)
-      container2_json = create(:json_top_container)
+        expect {
+          TopContainer.bulk_update_barcodes(barcode_data)
+        }.to raise_error(Sequel::ValidationFailed)
 
-      barcode_data = {}
-      barcode_data[container1_json.uri] = "7777777"
-      barcode_data[container2_json.uri] = "7777777"
+      end
 
-      expect {
-        TopContainer.bulk_update_barcodes(barcode_data)
-      }.to raise_error(Sequel::ValidationFailed)
+      it "throws exception when attempt to set duplicate barcode" do
+        container1_json = create(:json_top_container)
+        container2_json = create(:json_top_container)
 
-    end
+        barcode_data = {}
+        barcode_data[container1_json.uri] = "7777777"
+        barcode_data[container2_json.uri] = "7777777"
 
-    it "avoids a duplicate barcode exception when switching barcodes" do
-      container1_json = create(:json_top_container, {:barcode => "11111111"})
-      container2_json = create(:json_top_container, {:barcode => "22222222"})
+        expect {
+          TopContainer.bulk_update_barcodes(barcode_data)
+        }.to raise_error(Sequel::ValidationFailed)
 
-      barcode_data = {}
-      barcode_data[container1_json.uri] = "22222222"
-      barcode_data[container2_json.uri] = "11111111"
+      end
 
-      expect {
-        TopContainer.bulk_update_barcodes(barcode_data)
-      }.to_not raise_error(Sequel::DatabaseError)
+      it "avoids a duplicate barcode exception when switching barcodes" do
+        container1_json = create(:json_top_container, {:barcode => "11111111"})
+        container2_json = create(:json_top_container, {:barcode => "22222222"})
 
-      TopContainer[container1_json.id].barcode.should eq("22222222")
-      TopContainer[container2_json.id].barcode.should eq("11111111")
-    end
+        barcode_data = {}
+        barcode_data[container1_json.uri] = "22222222"
+        barcode_data[container2_json.uri] = "11111111"
 
+        expect {
+          TopContainer.bulk_update_barcodes(barcode_data)
+        }.to_not raise_error(Sequel::DatabaseError)
 
-    it "can bulk update container profile" do
-      container_profile1 = create(:json_container_profile)
-      container_profile2 = create(:json_container_profile)
+        TopContainer[container1_json.id].barcode.should eq("22222222")
+        TopContainer[container2_json.id].barcode.should eq("11111111")
+      end
 
-      container1 = create(:json_top_container,
-                          'container_profile' => {'ref' => container_profile1.uri})
-      container2 = create(:json_top_container,
-                          'container_profile' => {'ref' => container_profile1.uri})
-      container3 = create(:json_top_container,
-                          'container_profile' => {'ref' => container_profile2.uri})
-      container4 = create(:json_top_container,
-                          'container_profile' => nil)
-
-      results = TopContainer.bulk_update_container_profile([container1.id, container2.id, container3.id, container4.id],
-                                                           container_profile2.uri)
-
-      results[:records_updated].should eq(4)
-
-      json = JSONModel(:top_container).find(container1.id)
-      json['container_profile']['ref'].should eq(container_profile2.uri)
     end
 
 
-    it "objects if you try to bulk update to an non-existent container profile" do
-      container_profile1 = create(:json_container_profile)
+    describe "container profile" do
 
-      container1 = create(:json_top_container,
-                          'container_profile' => {'ref' => container_profile1.uri})
-      container2 = create(:json_top_container,
-                          'container_profile' => {'ref' => container_profile1.uri})
+      it "can bulk update container profile" do
+        container_profile1 = create(:json_container_profile)
+        container_profile2 = create(:json_container_profile)
 
-      results = TopContainer.bulk_update_container_profile([container1.id, container2.id],
-                                                           "/container_profiles/99")
+        container1 = create(:json_top_container,
+                            'container_profile' => {'ref' => container_profile1.uri})
+        container2 = create(:json_top_container,
+                            'container_profile' => {'ref' => container_profile1.uri})
+        container3 = create(:json_top_container,
+                            'container_profile' => {'ref' => container_profile2.uri})
+        container4 = create(:json_top_container,
+                            'container_profile' => nil)
 
-      results[:error].should_not be_nil
+        results = TopContainer.bulk_update_container_profile([container1.id, container2.id, container3.id, container4.id],
+                                                             container_profile2.uri)
+
+        results[:records_updated].should eq(4)
+
+        json = JSONModel(:top_container).find(container1.id)
+        json['container_profile']['ref'].should eq(container_profile2.uri)
+      end
+
+
+      it "objects if you try to bulk update to an non-existent container profile" do
+        container_profile1 = create(:json_container_profile)
+
+        container1 = create(:json_top_container,
+                            'container_profile' => {'ref' => container_profile1.uri})
+        container2 = create(:json_top_container,
+                            'container_profile' => {'ref' => container_profile1.uri})
+
+        results = TopContainer.bulk_update_container_profile([container1.id, container2.id],
+                                                             "/container_profiles/99")
+
+        results[:error].should_not be_nil
+      end
+
+
+      it "will happily remove container profiles via bulk update" do
+        container_profile1 = create(:json_container_profile)
+
+        container1 = create(:json_top_container,
+                            'container_profile' => {'ref' => container_profile1.uri})
+        container2 = create(:json_top_container,
+                            'container_profile' => {'ref' => container_profile1.uri})
+
+        results = TopContainer.bulk_update_container_profile([container1.id, container2.id], "")
+
+        results[:records_updated].should eq(2)
+
+        json = JSONModel(:top_container).find(container1.id)
+        json['container_profile'].should be_nil
+      end
+
     end
 
+    describe 'location' do
 
-    it "will happily remove container profiles via bulk update" do
-      container_profile1 = create(:json_container_profile)
+      it "can bulk update location" do
+        location1 = create(:json_location, :temporary => nil)
+        location2 = create(:json_location, :temporary => nil)
 
-      container1 = create(:json_top_container,
-                          'container_profile' => {'ref' => container_profile1.uri})
-      container2 = create(:json_top_container,
-                          'container_profile' => {'ref' => container_profile1.uri})
+        container_location1 = build_container_location(location1.uri)
+        container_location2 = build_container_location(location2.uri)
 
-      results = TopContainer.bulk_update_container_profile([container1.id, container2.id], "")
+        container1 = create(:json_top_container, 'container_locations' => [container_location1])
+        container2 = create(:json_top_container, 'container_locations' => [container_location1])
+        container3 = create(:json_top_container, 'container_locations' => [container_location2])
+        container4 = create(:json_top_container, 'container_locations' => nil)
 
-      results[:records_updated].should eq(2)
+        results = TopContainer.bulk_update_location([container1.id, container2.id, container3.id, container4.id],
+                                                    location2.uri)
 
-      json = JSONModel(:top_container).find(container1.id)
-      json['container_profile'].should be_nil
+        results[:records_updated].should eq(4)
+
+        json = JSONModel(:top_container).find(container1.id)
+        json['container_locations'].length.should eq(1)
+        json['container_locations'][0]['ref'].should eq(location2.uri)
+
+        json = JSONModel(:top_container).find(container4.id)
+        json['container_locations'].length.should eq(1)
+        json['container_locations'][0]['ref'].should eq(location2.uri)
+      end
+
+
+      it "doesn't mess with previous locations" do
+        location1 = create(:json_location, :temporary => nil)
+        location2 = create(:json_location, :temporary => nil)
+        temp_location = create(:json_location, :temporary => 'loan')
+
+        container_location1 = build_container_location(location1.uri)
+        container_location2 = build_container_location(location2.uri)
+        prev_container_location = build_container_location(temp_location.uri, 'previous')
+
+        container1 = create(:json_top_container, 'container_locations' => [container_location1, prev_container_location])
+
+        results = TopContainer.bulk_update_location([container1.id], location2.uri)
+
+        json = JSONModel(:top_container).find(container1.id)
+        json['container_locations'].length.should eq(2)
+        json['container_locations'].map{|v| v['ref']}.include?(location2.uri).should eq(true)
+        json['container_locations'].map{|v| v['ref']}.include?(temp_location.uri).should eq(true)
+      end
+
+
+      it "replaces all current locations with the new one" do
+        location1 = create(:json_location, :temporary => nil)
+        location2 = create(:json_location, :temporary => nil)
+        location3 = create(:json_location, :temporary => nil)
+
+        container_location1 = build_container_location(location1.uri)
+        container_location2 = build_container_location(location2.uri)
+        container_location3 = build_container_location(location3.uri)
+
+        container1 = create(:json_top_container, 'container_locations' => [container_location1, container_location2])
+
+        results = TopContainer.bulk_update_location([container1.id], location3.uri)
+
+        json = JSONModel(:top_container).find(container1.id)
+        json['container_locations'].length.should eq(1)
+        json['container_locations'][0]['ref'].should eq(location3.uri)
+      end
+
+
+      it "complains if the new location doesn't exist" do
+        container1 = create(:json_top_container, 'container_locations' => [])
+        results = TopContainer.bulk_update_location([container1.id], '/locations/duff')
+        results[:error].should_not be_nil
+      end
+
     end
 
   end
