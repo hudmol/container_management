@@ -47,9 +47,10 @@ class AspaceJsonToYaleContainerMapper
     if result
       result
     else
-      p "UNHANDLED MAPPING - generating new container"
-      p ({:instance => instance, :record => @json})
-      TopContainer.create_from_json(JSONModel(:top_container).from_hash('barcode' => SecureRandom.hex, 'indicator' => (rand() * 10000).to_i.to_s))
+      rec = {:instance => instance, :record => @json}
+      Log.warn("Hit unhandled mapping for top container: #{rec.inspect}")
+
+      TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => get_default_indicator))
     end
 
   end
@@ -69,7 +70,7 @@ class AspaceJsonToYaleContainerMapper
     barcode = container['barcode_1']
 
     if barcode
-      if (top_container = TopContainer[:barcode => barcode])
+      if (top_container = TopContainer.for_barcode(barcode))
         top_container
       else
         indicator = container['indicator_1'] || get_default_indicator

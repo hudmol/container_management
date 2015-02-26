@@ -19,19 +19,22 @@ describe 'Yale Container compatibility' do
 
   describe "mapping yale containers to archivesspace containers" do
 
-    before(:each) do
-      MapToAspaceContainer.mapper_to_aspace_json = SubContainerToAspaceJsonMapper
-    end
-
-
     it "maps a subcontainer/topcontainer/container profile to an ArchivesSpace instance record" do
+      location = create(:json_location)
+
       test_container_profile = create(:json_container_profile,
                                       'name' => 'Flat Grey 16x20x3')
 
       container_with_profile = create(:json_top_container,
                                       'container_profile' => {'ref' => test_container_profile.uri},
                                       'barcode' => '9999',
-                                      'indicator' => '1000')
+                                      'indicator' => '1000',
+                                      'container_locations' => [
+                                        JSONModel(:container_location).from_hash('status' => 'current',
+                                                                                 'start_date' => '2000-01-01',
+                                                                                 'ref' => location.uri)
+                                      ]
+                                     )
 
       instance = build_instance(TopContainer.to_jsonmodel(container_with_profile.id),
                                 'type_2' => 'folder',
@@ -43,8 +46,7 @@ describe 'Yale Container compatibility' do
 
       generated_container = Accession.to_jsonmodel(accession.id)['instances'].first['container']
 
-      # FIXME: not sure if type_1 will actually get mapped this way.  Might just be "Box".
-      generated_container['type_1'].should eq('carton')
+      generated_container['type_1'].should eq('box')
       generated_container['indicator_1'].should eq('1000')
       generated_container['barcode_1'].should eq('9999')
 
@@ -52,6 +54,8 @@ describe 'Yale Container compatibility' do
       generated_container['indicator_2'].should eq('222')
       generated_container['type_3'].should eq('reel')
       generated_container['indicator_3'].should eq('333')
+
+      generated_container['container_locations'][0]['ref'].should eq(location.uri)
     end
 
 

@@ -12,30 +12,29 @@ class SubContainerToAspaceJsonMapper
 
   def to_hash
     result = Hash[JSONModel(:container).schema['properties'].map {|property, _| [property, self.send(property.intern)]}]
-    result['container_locations'] ||= []
 
     result
   end
 
 
   def type_1
-    if container_profile && container_profile.name =~ /Flat Grey/
-      'carton'
-    else
-      'box'
-    end
+    'box'
   end
 
 
   def indicator_1
-    top_container.indicator
+    top_container_jsonmodel['indicator']
   end
 
 
   def barcode_1
-    top_container.barcode
+    top_container_jsonmodel['barcode']
   end
 
+
+  def container_locations
+    top_container_jsonmodel['container_locations']
+  end
 
   def method_missing(method, *args)
     nil
@@ -50,6 +49,10 @@ class SubContainerToAspaceJsonMapper
 
   def top_container
     @top_container ||= sub_container.related_records(:top_container_link)
+  end
+
+  def top_container_jsonmodel
+    @top_container_jsonmodel ||= TopContainer.to_jsonmodel(top_container)
   end
 
   def sub_container

@@ -23,12 +23,6 @@ module MapToAspaceContainer
   end
 
 
-
-  def self.mapper_to_aspace_json=(clz)
-    @mapper = clz
-  end
-
-
   def update_from_json(json, extra_values = {}, apply_nested_records = true)
     self.class.map_aspace_json_to_yale_containers(json)
 

@@ -339,4 +339,11 @@ class TopContainer < Sequel::Model(:top_container)
 
     updated
   end
+
+
+  def self.for_barcode(barcode)
+    TopContainer[:barcode => barcode, :repo_id => self.active_repository]
+  end
+
+
 end
