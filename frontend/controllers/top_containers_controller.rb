@@ -178,7 +178,7 @@ class TopContainersController < ApplicationController
   helper_method :barcode_length_range
   def barcode_length_range
     check = BarcodeCheck.new(current_repo[:repo_code])
-    "#{check.min}-#{check.max}"
+    check.min == check.max ? check.min.to_s : "#{check.min}-#{check.max}"
   end
 
 
