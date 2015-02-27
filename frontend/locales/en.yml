@@ -31,6 +31,10 @@ en:
     restricted: Restricted?
     override_restricted: Override Restricted?
     rights_restricted_contents: Rights Restricted Contents
+    legacy_restricted: Legacy Restricted?
+    legacy_restricted_none: None
+    legacy_restricted_fear: Fear
+    legacy_restricted_loathing: Loathing
     parent: Parent Container
 
     yale_container_2_type: Child Container Type
