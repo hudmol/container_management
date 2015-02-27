@@ -115,7 +115,7 @@ class TopContainer < Sequel::Model(:top_container)
 
 
   def display_string
-    ["Container", "#{indicator}:", series_label, format_barcode].compact.join(" ")
+    ["Container", "#{indicator}:", series_label, format_barcode].compact.join(" ").gsub(/:\Z/,'')
   end
 
 
