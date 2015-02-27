@@ -10,7 +10,7 @@ class AspaceJsonToYaleContainerMapper
   def call
     @json['instances'].each do |instance|
 
-      if instance['sub_container']
+      if instance['sub_container'] || instance['digital_object']
         # Just need to make sure there are no conflicting ArchivesSpace containers
         instance.delete('container')
         next
