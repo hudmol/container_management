@@ -20,7 +20,7 @@
       "ils_item_id" => {"type" => "string", "maxLength" => 255, "required" => false},
       "exported_to_ils" => {"type" => "string", "required" => false},
 
-      "legacy_restricted" => {"type" => "string", "enum" => ["none", "fear", "loathing"], "ifmissing" => "error"},
+      "legacy_restricted" => {"type" => "boolean", "default" => false},
       "restricted" => {"type" => "boolean", "default" => false},
       "override_restricted" => {"type" => "boolean", "default" => false},
 
