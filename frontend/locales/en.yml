@@ -31,6 +31,7 @@ en:
     restricted: Restricted?
     override_restricted: Override Restricted?
     rights_restricted_contents: Rights Restricted Contents
+    legacy_restricted: Legacy Restricted?
     parent: Parent Container
 
     yale_container_2_type: Child Container Type

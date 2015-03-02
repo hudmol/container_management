@@ -160,18 +160,19 @@ class TopContainer < Sequel::Model(:top_container)
         json['exported_to_ils'] = json['exported_to_ils'].getlocal.iso8601
       end
 
-      obj.rights_restricted_contents.each do |contents|
-        json['rights_restricted_contents'] ||= []
-        json['rights_restricted_contents'] << {
-          'ref' => contents.uri,
-          'type' => contents.class.my_jsonmodel.record_type,
-          'display_string' => find_title_for(contents)
-        }
-      end
-
-      if obj.override_restricted == 0
-        json['restricted'] = !json['rights_restricted_contents'].empty?
-      end
+### leaving this here as it may be useful when this is reimplemented
+#      obj.rights_restricted_contents.each do |contents|
+#        json['rights_restricted_contents'] ||= []
+#        json['rights_restricted_contents'] << {
+#          'ref' => contents.uri,
+#          'type' => contents.class.my_jsonmodel.record_type,
+#          'display_string' => find_title_for(contents)
+#        }
+#      end
+#
+#      if obj.override_restricted == 0
+#        json['restricted'] = !json['rights_restricted_contents'].empty?
+#      end
     end
 
     jsons
