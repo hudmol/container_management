@@ -54,6 +54,14 @@ class CommonIndexer
         doc['exported_u_sbool'] = record['record'].has_key?('exported_to_ils')
       end
     }
+
+
+    indexer.add_document_prepare_hook {|doc, record|
+      # we no longer want the contents of containers to be indexed at the container's location
+      if ['resource', 'archival_object', 'accession'].include?(doc['primary_type'])
+        doc.delete('location_uris')
+      end
+    }
   end
 
   @@record_types << :container_profile
