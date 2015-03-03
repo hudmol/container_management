@@ -22,7 +22,6 @@ ASModel.all_models.each do |model|
   end
 end
 
-
 if AppConfig.has_key?(:migrate_to_container_management) && AppConfig[:migrate_to_container_management]
 
   Log.info("Migrating existing containers to the new container model...")
