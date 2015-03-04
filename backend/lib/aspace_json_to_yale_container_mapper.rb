@@ -2,8 +2,9 @@ class AspaceJsonToYaleContainerMapper
 
   include JSONModel
 
-  def initialize(json)
+  def initialize(json, new_record)
     @json = json
+    @new_record = new_record
   end
 
 
@@ -35,6 +36,11 @@ class AspaceJsonToYaleContainerMapper
 
 
   private
+
+
+  def new_record?
+    @new_record
+  end
 
 
   def get_or_create_top_container(instance)
@@ -90,10 +96,10 @@ class AspaceJsonToYaleContainerMapper
 
     return nil if !indicator || !@json.is_a?(JSONModel(:archival_object))
 
-    ao = if @json['uri']
-           ArchivalObject[JSONModel(:archival_object).id_for(@json['uri'])]
-         elsif @json['parent']
+    ao = if new_record? && @json['parent']
            ArchivalObject[JSONModel(:archival_object).id_for(@json['parent']['ref'])]
+         elsif !new_record?
+           ArchivalObject[JSONModel(:archival_object).id_for(@json['uri'])]
          else
            nil
          end
