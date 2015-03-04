@@ -6,6 +6,7 @@ class ExtentCalculator
     @calculated_extent = nil
     @units = nil
     @container_count = 0
+    @container_without_profile_count = 0
     @containers = {}
     @calculated = false
 
@@ -78,13 +79,17 @@ class ExtentCalculator
         filter(:id => rel_ids).
         select(:top_container_id).
         distinct().map{|hash| hash[:top_container_id]}.each do |tc_id|
-        rec = TopContainer[tc_id].related_records(:top_container_profile)
         @container_count += 1
-        @containers[rec.name] ||= {:count => 0, :extent => 0}
-        @containers[rec.name][:count] += 1
-        ext = convert(rec.send(rec.extent_dimension.intern).to_f, rec.dimension_units.intern)
-        @containers[rec.name][:extent] += ext
-        extent += ext
+        if (rec = TopContainer[tc_id].related_records(:top_container_profile))
+          @containers[rec.name] ||= {:count => 0, :extent => 0}
+          @containers[rec.name][:count] += 1
+          ext = convert(rec.send(rec.extent_dimension.intern).to_f, rec.dimension_units.intern)
+          @containers[rec.name][:extent] += ext
+          extent += ext
+        else
+          # top container does not have a container profile
+          @container_without_profile_count += 1
+        end
       end
     end
 
@@ -99,6 +104,7 @@ class ExtentCalculator
       :object => {:uri => @root_object.uri, :title => @root_object.title || @root_object.display_string},
       :total_extent => published_extent,
       :container_count => @container_count,
+      :container_without_profile_count => @container_without_profile_count,
       :units => @units,
       :containers => containers
     }
