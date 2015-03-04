@@ -257,6 +257,31 @@ describe 'Yale Container compatibility' do
   end
 
 
+  it "lets it slide if the incoming ArchivesSpace container has no locations" do
+    location = create(:json_location)
+
+    container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234',
+                                                                                  'barcode' => '12345678',
+                                                                                  "container_locations" => [
+                                                                                    JSONModel(:container_location).from_hash('status' => 'current',
+                                                                                                                             'start_date' => '2000-01-01',
+                                                                                                                             'ref' => location.uri)
+                                                                                  ]))
+
+    # Using a different location!
+    instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                              "container" => {
+                                                "barcode_1" => '12345678',
+                                                "container_locations" => []
+                                              })
+
+    expect {
+      accession = create_accession({"instances" => [instance]})
+    }.to_not raise_error(ValidationException)
+  end
+
+
+
   it "creates a subcontainer with type_{2,3}/indicator_{2,3}" do
     instance = JSONModel(:instance).from_hash("instance_type" => "text",
                                               "container" => {

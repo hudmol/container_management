@@ -161,7 +161,7 @@ class AspaceJsonToYaleContainerMapper
     aspace_locations = Array(aspace_container['container_locations']).map {|container_location| container_location['ref']}
     top_container_locations = Array(top_container['container_locations']).map {|container_location| container_location['ref']}
 
-    if (top_container_locations - aspace_locations).empty? && (aspace_locations - top_container_locations).empty?
+    if aspace_locations.empty? || ((top_container_locations - aspace_locations).empty? && (aspace_locations - top_container_locations).empty?)
       # All OK!
     else
       raise ValidationException.new(:errors => ["Locations in ArchivesSpace container don't match locations in existing top container"],
