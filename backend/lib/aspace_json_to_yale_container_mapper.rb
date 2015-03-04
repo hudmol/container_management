@@ -101,7 +101,7 @@ class AspaceJsonToYaleContainerMapper
          end
 
     if ao
-      find_top_container_for_indicator(ao.topmost_archival_object, indicator)
+      find_top_container_within_subtree(ao.topmost_archival_object, indicator)
     else
       nil
     end
@@ -124,7 +124,15 @@ class AspaceJsonToYaleContainerMapper
                  end
 
     if top_record
-      find_top_container_for_indicator(top_record, indicator)
+      object_graph = top_record.object_graph
+
+      top_container_link_rlshp = SubContainer.find_relationship(:top_container_link)
+      relationship_ids = object_graph.ids_for(top_container_link_rlshp)
+
+      DB.open do |db|
+        top_container_ids = db[:top_container_link_rlshp].filter(:id => relationship_ids).select(:top_container_id)
+        TopContainer[:indicator => indicator, :id => top_container_ids]
+      end
     else
       nil
     end
@@ -132,17 +140,31 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
-  def find_top_container_for_indicator(top_record, indicator)
-    object_graph = top_record.object_graph
+  def find_top_container_within_subtree(top_record, indicator)
+    ao_ids = [top_record.id]
 
-    top_container_link_rlshp = SubContainer.find_relationship(:top_container_link)
-    relationship_ids = object_graph.ids_for(top_container_link_rlshp)
+    # Find the IDs of all records under this point
+    while true
+      new_ao_ids = (ArchivalObject.filter(:parent_id => ao_ids).select(:id).map(&:id) - ao_ids)
 
-    DB.open do |db|
-      top_container_ids = db[:top_container_link_rlshp].filter(:id => relationship_ids).select(:top_container_id)
-      TopContainer[:indicator => indicator, :id => top_container_ids]
+      if new_ao_ids.empty?
+        break
+      else
+        ao_ids += new_ao_ids
+      end
     end
 
+    # Find all linked instances
+    instance_ds = Instance.filter(:archival_object_id => ao_ids).select(:id)
+
+    # Then all subcontainers linked to those
+    subcontainer_ds = SubContainer.filter(:instance_id => instance_ds)
+
+    # Then top containers linked to those subcontainers!
+    relationships = SubContainer.find_relationship(:top_container_link).find_by_participant_ids(SubContainer, subcontainer_ds.select(:id).map(&:id))
+
+    # Finally, find a matching top container (if there is one)
+    TopContainer[:indicator => indicator, :id => relationships.map(&:top_container_id)]
   end
 
 
