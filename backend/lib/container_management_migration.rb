@@ -21,7 +21,7 @@ class ContainerManagementMigration
           ids.each do |id|
             record = clz[id]
             json = clz.to_jsonmodel(record)
-            record.update_from_json(json)
+            record.update_from_json(json, {:skip_reindex_top_containers => true})
 
             Log.info("Updated #{clz} #{record.id}")
           end
