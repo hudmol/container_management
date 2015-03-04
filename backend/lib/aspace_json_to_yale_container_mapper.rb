@@ -19,7 +19,7 @@ class AspaceJsonToYaleContainerMapper
 
       top_container = get_or_create_top_container(instance)
 
-      ensure_harmonious_values(TopContainer.to_jsonmodel(top_container), instance['container'])
+      ensure_harmonious_values(top_container, instance['container'])
 
       instance['sub_container'] = {
         'top_container' => {'ref' => top_container.uri},
@@ -162,7 +162,7 @@ class AspaceJsonToYaleContainerMapper
 
 
     aspace_locations = Array(aspace_container['container_locations']).map {|container_location| container_location['ref']}
-    top_container_locations = Array(top_container['container_locations']).map {|container_location| container_location['ref']}
+    top_container_locations = top_container.related_records(:top_container_housed_at).map(&:uri)
 
     if aspace_locations.empty? || ((top_container_locations - aspace_locations).empty? && (aspace_locations - top_container_locations).empty?)
       # All OK!
