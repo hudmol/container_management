@@ -31,7 +31,7 @@ module ReindexTopContainers
   def update_from_json(json, opts = {}, apply_nested_records = true)
     result = super
 
-    reindex_top_containers
+    reindex_top_containers unless opts[:skip_reindex_top_containers]
 
     result
   end
