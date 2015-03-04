@@ -23,4 +23,12 @@ ASModel.all_models.each do |model|
 end
 
 
+if AppConfig.has_key?(:migrate_to_container_management) && AppConfig[:migrate_to_container_management]
 
+  Log.info("Migrating existing containers to the new container model...")
+
+  ContainerManagementMigration.new.run
+
+  Log.info("Completed: existing containers have been migrated to the new container model.")
+
+end

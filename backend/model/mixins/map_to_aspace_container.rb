@@ -24,7 +24,7 @@ module MapToAspaceContainer
 
 
   def update_from_json(json, extra_values = {}, apply_nested_records = true)
-    self.class.map_aspace_json_to_yale_containers(json)
+    self.class.map_aspace_json_to_yale_containers(json, new_record = false)
 
     super
   end
@@ -34,7 +34,7 @@ module MapToAspaceContainer
   module ClassMethods
 
     def create_from_json(json, extra_values = {})
-      map_aspace_json_to_yale_containers(json)
+      map_aspace_json_to_yale_containers(json, new_record = true)
 
       super
     end
@@ -60,8 +60,8 @@ module MapToAspaceContainer
       mapper.to_hash
     end
 
-    def map_aspace_json_to_yale_containers(aspace_instance)
-      MapToAspaceContainer.mapper_to_yale_container.new(aspace_instance).call
+    def map_aspace_json_to_yale_containers(aspace_instance, new_record = true)
+      MapToAspaceContainer.mapper_to_yale_container.new(aspace_instance, new_record).call
     end
 
   end

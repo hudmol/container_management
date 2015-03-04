@@ -2,8 +2,9 @@ class AspaceJsonToYaleContainerMapper
 
   include JSONModel
 
-  def initialize(json)
+  def initialize(json, new_record)
     @json = json
+    @new_record = new_record
   end
 
 
@@ -37,6 +38,11 @@ class AspaceJsonToYaleContainerMapper
   private
 
 
+  def new_record?
+    @new_record
+  end
+
+
   def get_or_create_top_container(instance)
     container = instance['container']
 
@@ -50,18 +56,14 @@ class AspaceJsonToYaleContainerMapper
       rec = {:instance => instance, :record => @json}
       Log.warn("Hit unhandled mapping for top container: #{rec.inspect}")
 
-      TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => get_default_indicator))
+      TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator)))
     end
 
   end
 
 
   def get_default_indicator
-    if AppConfig.has_key?(:yale_containers_default_indicator)
-      AppConfig[:yale_containers_default_indicator]
-    else
-      '1'
-    end
+    "system_indicator_#{SecureRandom.hex}"
   end
 
 
@@ -90,10 +92,10 @@ class AspaceJsonToYaleContainerMapper
 
     return nil if !indicator || !@json.is_a?(JSONModel(:archival_object))
 
-    ao = if @json['uri']
-           ArchivalObject[JSONModel(:archival_object).id_for(@json['uri'])]
-         elsif @json['parent']
+    ao = if new_record? && @json['parent']
            ArchivalObject[JSONModel(:archival_object).id_for(@json['parent']['ref'])]
+         elsif !new_record?
+           ArchivalObject[JSONModel(:archival_object).id_for(@json['uri'])]
          else
            nil
          end
@@ -149,7 +151,8 @@ class AspaceJsonToYaleContainerMapper
 
     properties.each do |top_container_property, aspace_property|
       if aspace_container[aspace_property] && top_container[top_container_property] != aspace_container[aspace_property]
-        raise ValidationException.new(:errors => ["Mismatch when mapping between #{top_container_property} and #{aspace_property}"],
+
+        raise ValidationException.new(:errors => {aspace_property => ["Mismatch when mapping between #{top_container_property} and #{aspace_property}"]},
                                       :object_context => {
                                         :top_container => top_container,
                                         :aspace_container => aspace_container
@@ -164,7 +167,7 @@ class AspaceJsonToYaleContainerMapper
     if aspace_locations.empty? || ((top_container_locations - aspace_locations).empty? && (aspace_locations - top_container_locations).empty?)
       # All OK!
     else
-      raise ValidationException.new(:errors => ["Locations in ArchivesSpace container don't match locations in existing top container"],
+      raise ValidationException.new(:errors => {'container_locations' => ["Locations in ArchivesSpace container don't match locations in existing top container"]},
                                     :object_context => {
                                       :top_container => top_container,
                                       :aspace_container => aspace_container
