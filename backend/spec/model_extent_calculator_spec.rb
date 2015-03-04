@@ -153,7 +153,7 @@ describe 'Extent Calculator model' do
   end
 
 
-  it "objects if told to be strict and it finds a container without container profiles" do
+  it "objects if told to be strict and it finds a container without a container profile" do
     (resource, grandparent, parent, child) = create_tree(a_box_without_a_profile)
     expect {
       ext_cal = ExtentCalculator.new(ArchivalObject[child.id], true)
