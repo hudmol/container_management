@@ -120,7 +120,7 @@ describe 'Yale Container compatibility' do
       accession = create_accession({"instances" => [instance]})
 
       created = TopContainer[:barcode => '12345678']
-      created.indicator.should eq(DEFAULT_INDICATOR)
+      created.indicator.should match(/system_indicator/)
     end
 
 
