@@ -397,7 +397,7 @@ describe 'Yale Container model' do
     end
 
 
-    it "can calculate a value for restricted based on rights statements in records that link to it" do
+    xit "can calculate a value for restricted based on rights statements in records that link to it" do
       # we livin' in tha past
       Time.stub!(:now).and_return(Time.at(0))
 
