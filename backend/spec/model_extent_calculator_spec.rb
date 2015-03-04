@@ -36,6 +36,7 @@ describe 'Extent Calculator model' do
   end
 
   let (:inch_to_cm) { 2.54 }
+  let (:inch_to_feet) { 1.0/12.0 }
   let (:bigbox_extent) { 15 }
   let (:bigbox_profile) { create_container_profile("big box", "18", "12", bigbox_extent.to_s, "inches", "width") }
   let (:a_bigbox) { create(:json_top_container, 'container_profile' => {'ref' => bigbox_profile.uri}) }
@@ -60,6 +61,8 @@ describe 'Extent Calculator model' do
     ext_cal = ExtentCalculator.new(resource)
     ext_cal.units(:centimeters)
     ext_cal.total_extent.should eq(bigbox_extent*inch_to_cm)
+    ext_cal.units(:feet)
+    ext_cal.total_extent.should eq(bigbox_extent*inch_to_feet)
   end
 
 

@@ -14,7 +14,7 @@ class ExtentCalculator
     @unit_conversions = {
       :inches => {
         :centimeters => 2.54,
-        :feet => 1/12,
+        :feet => 1.0/12.0,
         :meters => 0.0254
       },
       :centimeters => {
@@ -23,14 +23,14 @@ class ExtentCalculator
         :meters => 0.01
       },
       :feet => {
-        :inches => 12,
-        :centimeters => 2.54*12,
+        :inches => 12.0,
+        :centimeters => 2.54*12.0,
         :meters => 0.3048
       },
       :meters => {
         :inches => 39.3701,
         :feet => 3.28084,
-        :centimeters => 100
+        :centimeters => 100.0
       }
     }
     total_extent if calculate
