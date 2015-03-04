@@ -155,7 +155,8 @@ class AspaceJsonToYaleContainerMapper
 
     properties.each do |top_container_property, aspace_property|
       if aspace_container[aspace_property] && top_container[top_container_property] != aspace_container[aspace_property]
-        raise ValidationException.new(:errors => ["Mismatch when mapping between #{top_container_property} and #{aspace_property}"],
+
+        raise ValidationException.new(:errors => {aspace_property => ["Mismatch when mapping between #{top_container_property} and #{aspace_property}"]},
                                       :object_context => {
                                         :top_container => top_container,
                                         :aspace_container => aspace_container
@@ -170,7 +171,7 @@ class AspaceJsonToYaleContainerMapper
     if aspace_locations.empty? || ((top_container_locations - aspace_locations).empty? && (aspace_locations - top_container_locations).empty?)
       # All OK!
     else
-      raise ValidationException.new(:errors => ["Locations in ArchivesSpace container don't match locations in existing top container"],
+      raise ValidationException.new(:errors => {'container_locations' => ["Locations in ArchivesSpace container don't match locations in existing top container"]},
                                     :object_context => {
                                       :top_container => top_container,
                                       :aspace_container => aspace_container
