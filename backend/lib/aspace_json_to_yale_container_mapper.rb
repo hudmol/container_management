@@ -56,18 +56,14 @@ class AspaceJsonToYaleContainerMapper
       rec = {:instance => instance, :record => @json}
       Log.warn("Hit unhandled mapping for top container: #{rec.inspect}")
 
-      TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => get_default_indicator))
+      TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator)))
     end
 
   end
 
 
   def get_default_indicator
-    if AppConfig.has_key?(:yale_containers_default_indicator)
-      AppConfig[:yale_containers_default_indicator]
-    else
-      '1'
-    end
+    "system_indicator_#{SecureRandom.hex}"
   end
 
 
