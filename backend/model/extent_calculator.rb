@@ -1,6 +1,6 @@
 class ExtentCalculator
 
-  def initialize(obj, calculate = true)
+  def initialize(obj, strict = false, calculate = true)
     @root_object = obj
     @resource = obj.respond_to?(:root_record_id) ? obj.class.root_model[obj.root_record_id] : nil
     @calculated_extent = nil
@@ -9,6 +9,7 @@ class ExtentCalculator
     @container_without_profile_count = 0
     @containers = {}
     @calculated = false
+    @strict = strict
 
     @unit_conversions = {
       :inches => {
@@ -88,7 +89,11 @@ class ExtentCalculator
           extent += ext
         else
           # top container does not have a container profile
-          @container_without_profile_count += 1
+          if @strict
+            raise "Container without Profile found"
+          else
+            @container_without_profile_count += 1
+          end
         end
       end
     end

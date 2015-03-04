@@ -39,6 +39,7 @@ describe 'Extent Calculator model' do
   let (:bigbox_extent) { 15 }
   let (:bigbox_profile) { create_container_profile("big box", "18", "12", bigbox_extent.to_s, "inches", "width") }
   let (:a_bigbox) { create(:json_top_container, 'container_profile' => {'ref' => bigbox_profile.uri}) }
+  let (:a_box_without_a_profile) { create(:json_top_container, 'container_profile' => nil) }
 
   it "can calculate the total extent for a resource" do
     (resource, grandparent, parent, child) = create_tree(a_bigbox)
@@ -132,11 +133,27 @@ describe 'Extent Calculator model' do
     ec_hash[:container_count].should eq(32)
   end
 
+
   it "objects if you try to set a unit it doesn't recognize" do
     (resource, grandparent, parent, child) = create_tree(a_bigbox)
     ext_cal = ExtentCalculator.new(resource)
     expect {
       ext_cal.units(:cubits)
+    }.to raise_error
+  end
+
+
+  it "warns if it finds one or more containers that don't have container profiles" do
+    (resource, grandparent, parent, child) = create_tree(a_box_without_a_profile)
+    ext_cal = ExtentCalculator.new(ArchivalObject[child.id])
+    ext_cal.to_hash[:container_without_profile_count].should eq(1)    
+  end
+
+
+  it "objects if told to be strict and it finds a container without container profiles" do
+    (resource, grandparent, parent, child) = create_tree(a_box_without_a_profile)
+    expect {
+      ext_cal = ExtentCalculator.new(ArchivalObject[child.id], true)
     }.to raise_error
   end
 
