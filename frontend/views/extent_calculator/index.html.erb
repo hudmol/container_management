@@ -22,9 +22,16 @@
             <tr>
               <td><%= k %></td>
               <td><%= v['count'] %></td>
-              <td><%= v['extent'] %> <%= @results['units'] %></td>
+              <td><%= v['extent'] %></td>
             </tr>
           <% end %>
+        <% end %>
+        <% if @results['container_without_profile_count'] > 0 %>
+          <tr>
+            <td>NO PROFILE</td>
+            <td><%= @results['container_without_profile_count'] %></td>
+            <td>--</td>
+          </tr>
         <% end %>
           <tr>
             <td>All containers</td>
