@@ -59,9 +59,9 @@ describe 'Extent Calculator model' do
   it "allows you to change the dimension units" do
     (resource, grandparent, parent, child) = create_tree(a_bigbox)
     ext_cal = ExtentCalculator.new(resource)
-    ext_cal.units(:centimeters)
+    ext_cal.units = :centimeters
     ext_cal.total_extent.should eq(bigbox_extent*inch_to_cm)
-    ext_cal.units(:feet)
+    ext_cal.units = :feet
     ext_cal.total_extent.should eq(bigbox_extent*inch_to_feet)
   end
 
@@ -91,7 +91,7 @@ describe 'Extent Calculator model' do
     create_ao_with_instances(resource, baby, tiny_boxes)
     
     ext_cal = ExtentCalculator.new(resource)
-    ext_cal.units(:centimeters)
+    ext_cal.units = :centimeters
     ext_cal.total_extent.should eq(bigbox_extent*11*inch_to_cm+21*1.5)
     ext_cal.containers("big box")[:count].should eq(11)
     ext_cal.containers("big box")[:extent].should eq(bigbox_extent*11*inch_to_cm)
@@ -130,7 +130,7 @@ describe 'Extent Calculator model' do
     create_ao_with_instances(resource, baby, tiny_boxes)
     
     ext_cal = ExtentCalculator.new(ArchivalObject[parent.id])
-    ext_cal.units(:centimeters)
+    ext_cal.units = :centimeters
 
     ec_hash = ext_cal.to_hash
     ec_hash[:container_count].should eq(32)
@@ -141,7 +141,7 @@ describe 'Extent Calculator model' do
     (resource, grandparent, parent, child) = create_tree(a_bigbox)
     ext_cal = ExtentCalculator.new(resource)
     expect {
-      ext_cal.units(:cubits)
+      ext_cal.units = :cubits
     }.to raise_error
   end
 
