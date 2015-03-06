@@ -14,8 +14,11 @@ module ResourceTrees
         top_container = sub_container.related_records(:top_container_link)
 
         if (top_container)
-          properties["type_1"] = "Container #{top_container.indicator}"
-          properties["indicator_1"] = "[#{top_container.barcode}]"
+          properties["type_1"] = "Container"
+          properties["indicator_1"] = top_container.indicator
+          if top_container.barcode
+            properties["indicator_1"] += " [#{top_container.barcode}]"
+          end
         end
 
         properties["type_2"] = BackendEnumSource.value_for_id("container_type",

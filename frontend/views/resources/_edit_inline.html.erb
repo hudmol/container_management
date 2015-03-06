@@ -33,8 +33,11 @@
                if top_container["json"]
                  top_container = ASUtils.json_parse(top_container["json"])
                end
-               properties["type_1"] = "Container #{top_container["indicator"]}"
-               properties["indicator_1"] = "[#{top_container["barcode"]}]"
+               properties["type_1"] = "Container"
+               properties["indicator_1"] = top_container["indicator"]
+               if top_container["barcode"]
+                 properties["indicator_1"] += " [#{top_container["barcode"]}]"
+               end
              end
              properties["type_2"] = I18n.t("enumerations.container_type.#{sub_container["type_2"]}", :default => sub_container["type_2"])
              properties["indicator_2"] =sub_container["indicator_2"]
