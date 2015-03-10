@@ -204,6 +204,9 @@ class TopContainersController < ApplicationController
     unless params['exported'].blank?
       filters.push({'exported_u_sbool' => (params['exported'] == "yes" ? true : false)}.to_json)
     end
+    unless params['empty'].blank?
+      filters.push({'empty_u_sbool' => (params['empty'] == "yes" ? true : false)}.to_json)
+    end
 
     if filters.empty? && params['q'].blank?
       raise MissingFilterException.new
