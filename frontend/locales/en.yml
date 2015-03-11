@@ -73,6 +73,9 @@ en:
         keyword_criteria: Keyword
         exported_to_ils_true: "Yes"
         exported_to_ils_false: "No"
+        empty: Empty
+        empty_true: "Yes"
+        empty_false: "No"
         search: Search
         update_ils_holding_ids: Update ILS Holding IDs
         update_ils_holding_ids_help: Enter a value for ILS Holding ID for all selected containers.
