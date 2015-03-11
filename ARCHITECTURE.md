@@ -162,25 +162,25 @@ We'll work through these aspects in the following sections.
 The backend changes are divided up as follows:
 
      ├── controllers
-     │   ├── container_profile.rb
-     │   └── container.rb
+     │   ├── container_profile.rb
+     │   └── container.rb
      ├── lib
-     │   ├── aspace_json_to_yale_container_mapper.rb
-     │   └── subcontainer_to_aspace_json_mapper.rb
+     │   ├── aspace_json_to_yale_container_mapper.rb
+     │   └── subcontainer_to_aspace_json_mapper.rb
      ├── model
-     │   ├── accession_ext.rb
-     │   ├── archival_object_ext.rb
-     │   ├── container_profile.rb
-     │   ├── instance_ext.rb
-     │   ├── resource_ext.rb
-     │   ├── sub_container.rb
-     │   └── top_container.rb
-     │   ├── mixins
-     │   │   ├── archival_object_series.rb
-     │   │   ├── map_to_aspace_container.rb
-     │   │   ├── reindex_top_containers.rb
-     │   │   ├── rights_statement_restrictions.rb
-     │   │   └── sub_containers.rb
+     │   ├── accession_ext.rb
+     │   ├── archival_object_ext.rb
+     │   ├── container_profile.rb
+     │   ├── instance_ext.rb
+     │   ├── resource_ext.rb
+     │   ├── sub_container.rb
+     │   └── top_container.rb
+     │   ├── mixins
+     │   │   ├── archival_object_series.rb
+     │   │   ├── map_to_aspace_container.rb
+     │   │   ├── reindex_top_containers.rb
+     │   │   ├── rights_statement_restrictions.rb
+     │   │   └── sub_containers.rb
      ├── plugin_init.rb
 
 
@@ -259,9 +259,133 @@ The backend changes are divided up as follows:
     compatibility mapping for the record types that need it.
 
 
-### Frontend changes
+### Staff interface changes
+
+The changes we have seen so far deal with modifying the ArchivesSpace
+data model to support the new container structure.  Within the staff
+interface (sometimes called the "frontend"), there are new template,
+CSS and JavaScript files that provide the user interfaces for creating
+and managing the new types of records.  There are also a handful of
+places where the standard ArchivesSpace templates have been
+overridden--these places are noted below.
+
+Modifications to the staff interface are contained in the `frontend`
+directory, whose structure is as follows:
+
+
+     ├── assets
+     │   ├── box.png
+     │   ├── container_profile.png
+     │   ├── jquery.tablesorter.min.js
+     │   ├── top_containers.bulk.css
+     │   ├── top_containers.bulk.js
+     │   ├── top_containers.crud.js
+     │   ├── yale_container_loading.gif
+     │   ├── yale_containers.css
+     │   └── yale_containers.index.js
+     ├── controllers
+     │   ├── container_profiles_controller.rb
+     │   └── top_containers_controller.rb
+     ├── locales
+     │   ├── enums
+     │   │   └── en.yml
+     │   └── en.yml
+     ├── plugin_init.rb
+     ├── routes.rb
+     └── views
+         ├── container_profiles
+         │   ├── edit.html.erb
+         │   ├── _form.html.erb
+         │   ├── index.html.erb
+         │   ├── _linker.html.erb
+         │   ├── _listing.html.erb
+         │   ├── _new.html.erb
+         │   ├── new.html.erb
+         │   ├── show.html.erb
+         │   ├── _sidebar.html.erb
+         │   └── _toolbar.html.erb
+         ├── instances
+         │   ├── _show.html.erb
+         │   ├── _subrecord_form_action.html.erb
+         │   └── _template.html.erb
+         ├── layout_head.html.erb
+         ├── sub_containers
+         │   ├── _show.html.erb
+         │   └── _template.html.erb
+         └── top_containers
+             ├── bulk_operations
+             │   ├── _browse.html.erb
+             │   ├── _bulk_action_success.html.erb
+             │   ├── _bulk_action_templates.html.erb
+             │   ├── _collection_linker.html.erb
+             │   ├── _container_profile_linker.html.erb
+             │   ├── _error_messages.html.erb
+             │   ├── _location_linker.html.erb
+             │   ├── _results.html.erb
+             │   ├── _search_criteria.html.erb
+             │   ├── _series_linker.html.erb
+             │   └── _toolbar.html.erb
+             ├── edit.html.erb
+             ├── _form.html.erb
+             ├── index.html.erb
+             ├── _linker.html.erb
+             ├── _new.html.erb
+             ├── new.html.erb
+             ├── show.html.erb
+             ├── _sidebar.html.erb
+             └── _toolbar.html.erb
+
+
+  * The `assets` directory contains CSS, JavaScript and other static
+    content.
+
+  * The `controllers` directory contains the custom controllers that
+    have been added to the frontend Rails application.  These handle
+    CRUD-style requests for the new record types, plus requests for
+    things like full-text searches searches, type-ahead search and
+    bulk update operations.
+
+  * The `locales` directory contains I18n strings used by the
+    application (in YAML format).  There is one file that translates
+    enumerations, and one that translates everything else.
+
+  * The `plugin_init.rb` file gets loaded when the application first
+    starts up.  This deals with overriding some of the search defaults
+    inherited from the standard ArchivesSpace configuration and
+    eagerly loads some of the JSONModel schemas we make use of.
+
+  * The `routes.rb` file adds the extra Rails URL routes that direct
+    requests to our custom controllers.
+
+  * The `views` directory contains one set of templates for each of
+    the new record types.  This includes the standard ArchivesSpace
+    templates for:
+
+      - the read-only record view
+      - record edit forms
+      - the record sidebar
+      - toolbar actions
+      - record browse listings
+
+    Note here that any template that shares a name with a standard
+    ArchivesSpace template will override it.  In particular, the files
+    under the `instances` directory override their ArchivesSpace
+    counterparts.
 
 
 ### Indexer changes
 
+To allow the new record types to be made searchable, several
+additional indexing rules have been defined.  You can find these
+definitions under `indexer/indexer.rb`.
 
+The code in this file gets invoked whenever a document is about to be
+added to the index, and we use this to add additional fields where
+required.  The field names make use of Solr's "dynamic fields"
+functionality: by giving them predictable suffixes, we save the need
+to modify the ArchivesSpace Solr schema.  You can see the list of
+available suffixes by inspecting the ArchivesSpace Solr schema:
+
+  https://github.com/archivesspace/archivesspace/blob/master/solr/schema.xml
+
+and searching for "dynamicField" (around line 181 at time of writing).
