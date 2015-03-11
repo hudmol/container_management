@@ -21,13 +21,30 @@ class AspaceJsonToYaleContainerMapper
 
       ensure_harmonious_values(top_container, instance['container'])
 
-      instance['sub_container'] = {
+      subcontainer = {
         'top_container' => {'ref' => top_container.uri},
-        'type_2' => instance['container']['type_2'],
-        'indicator_2' => instance['container']['indicator_2'],
-        'type_3' => instance['container']['type_3'],
-        'indicator_3' => instance['container']['indicator_3'],
       }
+
+      [2, 3].each do |level|
+        # ArchivesSpace containers allow type_2/3 to be set without
+        # indicator_2/3.  Provide a default if it's missing.
+        if instance['container']["type_#{level}"]
+          subcontainer["type_#{level}"] = instance['container']["type_#{level}"]
+          subcontainer["indicator_#{level}"] = instance['container']["indicator_#{level}"] || get_default_indicator
+        end
+      end
+
+      if instance['container']["type_3"] && !instance['container']["type_2"]
+        # Promote type_3 to type_2 to stop validation blowing up
+        subcontainer["type_2"] = instance['container']["type_3"]
+        subcontainer["indicator_2"] = instance['container']["indicator_3"] || get_default_indicator
+
+        subcontainer["type_3"] = nil
+        subcontainer["indicator_3"] = nil
+      end
+
+
+      instance['sub_container'] = subcontainer
 
       # No need for the original value now.
       instance.delete('container')
@@ -35,37 +52,7 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
-  private
-
-
-  def new_record?
-    @new_record
-  end
-
-
-  def get_or_create_top_container(instance)
-    container = instance['container']
-
-    result = (try_matching_barcode(container) ||
-              try_matching_indicator_within_series(container) ||
-              try_matching_indicator_within_resource(container))
-
-    if result
-      result
-    else
-      rec = {:instance => instance, :record => @json}
-      Log.warn("Hit unhandled mapping for top container: #{rec.inspect}")
-
-      TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator)))
-    end
-
-  end
-
-
-  def get_default_indicator
-    "system_indicator_#{SecureRandom.hex}"
-  end
-
+  protected
 
   def try_matching_barcode(container)
     # If we have a barcode, attempt to locate an existing top container but create one if needed
@@ -91,6 +78,7 @@ class AspaceJsonToYaleContainerMapper
     indicator = container['indicator_1']
 
     return nil if !indicator || !@json.is_a?(JSONModel(:archival_object))
+    return nil if !TopContainer[:indicator => indicator]
 
     ao = if new_record? && @json['parent']
            ArchivalObject[JSONModel(:archival_object).id_for(@json['parent']['ref'])]
@@ -112,6 +100,7 @@ class AspaceJsonToYaleContainerMapper
     indicator = container['indicator_1']
 
     return nil if !indicator
+    return nil if !TopContainer[:indicator => indicator]
 
     top_record = if @json.is_a?(JSONModel(:archival_object)) && @json['resource']
                    Resource[JSONModel(:resource).id_for(@json['resource']['ref'])]
@@ -124,47 +113,24 @@ class AspaceJsonToYaleContainerMapper
                  end
 
     if top_record
-      object_graph = top_record.object_graph
 
-      top_container_link_rlshp = SubContainer.find_relationship(:top_container_link)
-      relationship_ids = object_graph.ids_for(top_container_link_rlshp)
+      if top_record.is_a?(Accession)
+        find_top_container_by_instances(Instance.filter(:accession_id => top_record.id).select(:id), indicator)
+      else
+        ArchivalObject.filter(:parent_id => nil, :root_record_id => top_record.id).each do |ao_root|
+          top_container = find_top_container_within_subtree(ao_root, indicator)
 
-      DB.open do |db|
-        top_container_ids = db[:top_container_link_rlshp].filter(:id => relationship_ids).select(:top_container_id)
-        TopContainer[:indicator => indicator, :id => top_container_ids]
+          if top_container
+            return top_container
+          end
+        end
+
+        nil
       end
     else
       nil
     end
 
-  end
-
-
-  def find_top_container_within_subtree(top_record, indicator)
-    ao_ids = [top_record.id]
-
-    # Find the IDs of all records under this point
-    while true
-      new_ao_ids = (ArchivalObject.filter(:parent_id => ao_ids).select(:id).map(&:id) - ao_ids)
-
-      if new_ao_ids.empty?
-        break
-      else
-        ao_ids += new_ao_ids
-      end
-    end
-
-    # Find all linked instances
-    instance_ds = Instance.filter(:archival_object_id => ao_ids).select(:id)
-
-    # Then all subcontainers linked to those
-    subcontainer_ds = SubContainer.filter(:instance_id => instance_ds)
-
-    # Then top containers linked to those subcontainers!
-    relationships = SubContainer.find_relationship(:top_container_link).find_by_participant_ids(SubContainer, subcontainer_ds.select(:id).map(&:id))
-
-    # Finally, find a matching top container (if there is one)
-    TopContainer[:indicator => indicator, :id => relationships.map(&:top_container_id)]
   end
 
 
@@ -187,15 +153,97 @@ class AspaceJsonToYaleContainerMapper
     top_container_locations = top_container.related_records(:top_container_housed_at).map(&:uri)
 
     if aspace_locations.empty? || ((top_container_locations - aspace_locations).empty? && (aspace_locations - top_container_locations).empty?)
-      # All OK!
+    # All OK!
+    elsif top_container_locations.empty?
+      # We'll just take the incoming location if we don't have any better ideas
+      top_container.refresh
+      json = TopContainer.to_jsonmodel(top_container)
+      json['container_locations'] = aspace_container['container_locations']
+      top_container.update_from_json(json)
+      top_container.refresh
     else
       raise ValidationException.new(:errors => {'container_locations' => ["Locations in ArchivesSpace container don't match locations in existing top container"]},
                                     :object_context => {
                                       :top_container => top_container,
-                                      :aspace_container => aspace_container
+                                      :aspace_container => aspace_container,
+                                      :top_container_locations => top_container_locations,
+                                      :aspace_locations => aspace_locations,
                                     })
     end
 
+  end
+
+
+
+  private
+
+
+  def new_record?
+    @new_record
+  end
+
+
+  def get_or_create_top_container(instance)
+    container = instance['container']
+
+    if container['barcode_1'] && container['barcode_1'].strip == ""
+      # Seriously?  Yeesh.  Bad barcode!  No biscuit!
+      container['barcode_1'] = nil
+    end
+
+    result = (try_matching_barcode(container) ||
+              try_matching_indicator_within_series(container) ||
+              try_matching_indicator_within_resource(container))
+
+    if result
+      result
+    else
+      Log.info("Creating a new Top Container for a container with no barcode")
+
+      TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator),
+                                                                        'container_locations' => container['container_locations'],
+                                                                       ))
+    end
+
+  end
+
+
+  def get_default_indicator
+    "system_indicator_#{SecureRandom.hex}"
+  end
+
+
+  def find_top_container_within_subtree(top_record, indicator)
+    ao_ids = [top_record.id]
+
+    # Find the IDs of all records under this point
+    new_ao_ids = [top_record.id]
+    while true
+      new_ao_ids = ArchivalObject.filter(:parent_id => new_ao_ids).select(:id).map(&:id)
+
+      if new_ao_ids.empty?
+        break
+      else
+        ao_ids += new_ao_ids
+      end
+    end
+
+    # Find all linked instances
+    instance_ds = Instance.filter(:archival_object_id => ao_ids).select(:id)
+
+    find_top_container_by_instances(instance_ds, indicator)
+  end
+
+
+  def find_top_container_by_instances(instance_ds, indicator)
+    # All subcontainers linked to our instances
+    subcontainer_ds = SubContainer.filter(:instance_id => instance_ds)
+
+    # Then top containers linked to those subcontainers!
+    relationships = SubContainer.find_relationship(:top_container_link).find_by_participant_ids(SubContainer, subcontainer_ds.select(:id).map(&:id))
+
+    # Finally, find a matching top container (if there is one)
+    TopContainer[:indicator => indicator, :id => relationships.map(&:top_container_id)]
   end
 
 end
