@@ -28,6 +28,38 @@ Rails.application.config.after_initialize do
   end
 
 
+  NotesHelper.class_eval do
+
+    alias_method :note_types_for_pre_yale_container, :note_types_for
+    def note_types_for(jsonmodel_type)
+      result = note_types_for_pre_yale_container(jsonmodel_type)
+
+      if jsonmodel_type =~ /resource/ or jsonmodel_type =~ /archival_object/
+        # add the note_rights_restriction
+        result.merge!(rights_condition_notes)
+      end
+
+      result
+    end
+
+    def rights_condition_notes
+      note_types = {}
+
+      JSONModel.enum_values(JSONModel(:note_rights_condition).schema['properties']['type']['dynamic_enum']).each do |type|
+        note_types[type] = {
+          :target => :note_rights_condition,
+          :enum => JSONModel(:note_rights_condition).schema['properties']['type']['dynamic_enum'],
+          :value => type,
+          :i18n => I18n.t("enumerations.#{JSONModel(:note_rights_condition).schema['properties']['type']['dynamic_enum']}.#{type}", :default => type)
+        }
+      end
+
+      note_types
+    end
+
+  end
+
+
   # force load our JSONModels so the are registered rather than lazy initialised
   # we need this for parse_reference to work
   JSONModel(:top_container)
