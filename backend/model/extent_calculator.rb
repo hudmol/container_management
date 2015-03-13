@@ -108,7 +108,8 @@ class ExtentCalculator
 
   def to_hash
     {
-      :object => {:uri => @root_object.uri, :title => @root_object.title || @root_object.display_string},
+      :object => {:uri => @root_object.uri, :jsonmodel_type => @root_object.class.my_jsonmodel.record_type,
+        :title => @root_object.title || @root_object.display_string},
       :resource => @resource ? {:uri => @resource.uri, :title => @resource.title} : nil,
       :total_extent => published_extent,
       :container_count => @container_count,
