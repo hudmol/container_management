@@ -35,6 +35,7 @@ class ExtentCalculator
     @container_without_profile_count = 0
     @containers = {}
     @calculated = false
+    @timestamp = nil
 
     total_extent if calculate
   end
@@ -102,6 +103,7 @@ class ExtentCalculator
 
     @calculated = true
     @calculated_extent = extent
+    @timestamp = Time.now
     published_extent
   end
 
@@ -115,7 +117,8 @@ class ExtentCalculator
       :container_count => @container_count,
       :container_without_profile_count => @container_without_profile_count,
       :units => @units,
-      :containers => containers
+      :containers => containers,
+      :timestamp => @timestamp.iso8601
     }
   end
 
