@@ -33,6 +33,8 @@ describe 'Extent Calculator model' do
 
   before(:each) do
     stub_barcode_length(0, 255)
+
+    AppConfig.stub(:has_key?).with(:container_management_extent_calculator).and_return(false)
   end
 
   let (:inch_to_cm) { 2.54 }
@@ -158,6 +160,48 @@ describe 'Extent Calculator model' do
     expect {
       ext_cal = ExtentCalculator.new(ArchivalObject[child.id], true)
     }.to raise_error
+  end
+
+
+  it "supports a config option to set the unit" do
+    AppConfig.stub(:has_key?).with(:container_management_extent_calculator).and_return(true)
+    AppConfig.stub(:[]).with(:container_management_extent_calculator).and_return({:unit => :centimeters})
+
+    (resource, grandparent, parent, child) = create_tree(a_bigbox)
+    ext_cal = ExtentCalculator.new(resource)
+    ext_cal.units.should eq(:centimeters)
+    ext_cal.total_extent.should eq(bigbox_extent*inch_to_cm)
+  end
+
+
+  it "supports a config option to set the number of decimal places to show in the report" do
+    AppConfig.stub(:has_key?).with(:container_management_extent_calculator).and_return(true)
+    AppConfig.stub(:[]).with(:container_management_extent_calculator).and_return({:decimal_places => 4})
+
+    (resource, grandparent, parent, child) = create_tree(a_bigbox)
+    ext_cal = ExtentCalculator.new(resource)
+    ext_cal.units = :meters
+    ext_cal.total_extent.should eq((bigbox_extent*inch_to_cm/100).round(4))
+  end
+
+
+  it "can calculate extent as a volume if so configured" do
+    AppConfig.stub(:has_key?).with(:container_management_extent_calculator).and_return(true)
+    AppConfig.stub(:[]).with(:container_management_extent_calculator).and_return({:report_volume => true,
+                                                                                   :unit => :meters,
+                                                                                   :decimal_places => 3})
+
+    metric_box_profile = create_container_profile("metric box", "120", "120", "90", "centimeters", "depth")
+    metric_box = create(:json_top_container, 'container_profile' => {'ref' => metric_box_profile.uri})
+    (resource, grandparent, parent, child) = create_tree(metric_box)
+
+    metric_box_volume_in_cubic_meters = metric_box_profile.width.to_f *
+                                        metric_box_profile.height.to_f *
+                                        metric_box_profile.depth.to_f / 1000000
+
+    ext_cal = ExtentCalculator.new(resource)
+
+    ext_cal.total_extent.should eq(metric_box_volume_in_cubic_meters.round(3))
   end
 
 end

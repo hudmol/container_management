@@ -30,12 +30,21 @@ class ExtentCalculator
     @resource = obj.respond_to?(:root_record_id) ? obj.class.root_model[obj.root_record_id] : nil
     @strict = strict
     @calculated_extent = nil
+    @volume = false
     @units = nil
+    @decimal_places_in_published_extent = 2
     @container_count = 0
     @container_without_profile_count = 0
     @containers = {}
     @calculated = false
     @timestamp = nil
+
+    if AppConfig.has_key?(:container_management_extent_calculator)
+      cfg = AppConfig[:container_management_extent_calculator]
+      @volume = cfg.has_key?(:report_volume) && cfg[:report_volume]
+      @decimal_places_in_published_extent = cfg[:decimal_places] if cfg.has_key?(:decimal_places)
+      self.units = cfg[:unit] if cfg.has_key?(:unit)
+    end
 
     total_extent if calculate
   end
@@ -87,7 +96,13 @@ class ExtentCalculator
         if (rec = TopContainer[tc_id].related_records(:top_container_profile))
           @containers[rec.name] ||= {:count => 0, :extent => 0.0}
           @containers[rec.name][:count] += 1
-          ext = convert(rec.send(rec.extent_dimension.intern).to_f, rec.dimension_units.intern)
+          ext = if @volume
+                  vol = 1.0
+                  [:width, :height, :depth].each {|dim| vol = rec.send(dim).to_f * vol }
+                  convert(vol, rec.dimension_units.intern)
+                else
+                  convert(rec.send(rec.extent_dimension.intern).to_f, rec.dimension_units.intern)
+                end
           @containers[rec.name][:extent] += ext
           extent += ext
         else
@@ -117,6 +132,7 @@ class ExtentCalculator
       :container_count => @container_count,
       :container_without_profile_count => @container_without_profile_count,
       :units => @units,
+      :volume => @volume,
       :containers => containers,
       :timestamp => @timestamp.iso8601
     }
@@ -128,12 +144,15 @@ class ExtentCalculator
   def convert(val, unit)
     @units ||= unit
     return val if unit == @units
-    val * Unit_conversions[unit][@units]    
+    conv = Unit_conversions[unit][@units]
+    conv = conv**3 if @volume
+    val * conv
   end
 
 
   def published_extent(extent = nil)
-    extent ? extent.round(2) : @calculated_extent.round(2)
+    extent ? extent.round(@decimal_places_in_published_extent) :
+      @calculated_extent.round(@decimal_places_in_published_extent)
   end
 
 end
