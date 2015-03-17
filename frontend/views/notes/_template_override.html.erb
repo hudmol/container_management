@@ -17,7 +17,21 @@
                                 :field_opts => {:class => "note-type"}) %>
       <%= form.label_and_boolean("publish", {}, user_prefs["publish"]) %>
 
-      <p>BOOOOOOOOOO!!!!!</p>
+      <section id="notes_restriction" style="display: none">
+        <% form.push("rights_restriction", form.obj["rights_restriction"] || {}) do %>
+          <%= form.label_and_date("restriction_begin") %>
+          <%= form.label_and_date("restriction_end") %>
+          <div class="control-group">
+            <%= form.label("local_access_restriction_type") %>
+            <div class="controls">
+                <%= select_tag(form.path("local_access_restriction_type[]"),
+                               options_for_select(["RestrictedSpecColl", "RestrictedCurApprSpecColl", "RestrictedFragileSpecColl", "InProcessSpecColl", "ColdStorageBrbl"], form.obj["local_access_restriction_type"]),
+                               {:id => form.id_for("local_access_restriction_type"), :multiple => "multiple"})
+                 %>
+            </div>
+          </div>
+        <% end %>
+      </section>
 
       <section class="subrecord-form" id="<%= form.id_for('subnotes')%>">
         <h5 class="subrecord-form-heading">
