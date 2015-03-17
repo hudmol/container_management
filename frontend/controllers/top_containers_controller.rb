@@ -2,8 +2,8 @@ require 'uri'
 
 class TopContainersController < ApplicationController
 
-  set_access_control  "view_repository" => [:index, :show, :typeahead, :bulk_operations_browse],
-                      "manage_container" => [:new, :create, :edit, :update, :delete, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update, :update_barcodes]
+  set_access_control  "view_repository" => [:show, :typeahead, :bulk_operations_browse],
+                      "manage_container" => [:new, :index, :create, :edit, :update, :delete, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update, :update_barcodes]
 
 
   def index
