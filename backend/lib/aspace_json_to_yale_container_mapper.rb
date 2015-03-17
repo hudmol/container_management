@@ -190,12 +190,8 @@ class AspaceJsonToYaleContainerMapper
       # trying to find a more specific match in the series.
       within_resource = try_matching_indicator_within_resource(container)
 
-      if within_resource
-        if (within_series = try_matching_indicator_within_series(container))
-          return within_series
-        else
-          return within_resource
-        end
+      if within_resource && (within_series = try_matching_indicator_within_series(container))
+        return within_series
       end
     end
 
