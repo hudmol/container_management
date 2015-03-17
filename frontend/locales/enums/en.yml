@@ -8,5 +8,13 @@ en:
       centimeters: Centimeters
       meters: Meters
 
+    restriction_type:
+      RestrictedSpecColl: Donor/university imposed access restriction (1)
+      RestrictedCurApprSpecColl: Repository imposed access restriction (2)
+      RestrictedFragileSpecColl: Restricted fragile (3)
+      InProcessSpecColl: Restricted in-process (4)
+      ColdStorageBrbl: Other (5)
+
   enumeration_names:
     dimension_units: Dimension Units
+

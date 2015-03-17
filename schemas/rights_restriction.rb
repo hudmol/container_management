@@ -15,10 +15,10 @@
         "ifmissing" => "error",
       },
 
-      # FIXME: This should ultimately be an enumeration
       "local_access_restriction_type" => {
         "type" => "array",
-        "items" => {"type" => "string"},
+        "items" => {"type" => "string",
+                    "dynamic_enum" => "restriction_type"},
       },
     }
   }

@@ -31,6 +31,13 @@ module RightsRestrictionNotes
       obj
     end
 
+    def handle_delete(ids)
+      join_column = self.association_reflection(:rights_restriction)[:key]
+      RightsRestriction.filter(join_column => ids).delete
+
+      super
+    end
+
   end
 
 

@@ -1,3 +1,18 @@
+<% define_template "rights_restriction", jsonmodel_definition(:rights_restriction) do |form| %>
+  <%= form.label_and_date("begin") %>
+  <%= form.label_and_date("end") %>
+  <div class="control-group">
+    <%= form.label("local_access_restriction_type") %>
+    <div class="controls">
+        <%= select_tag(form.path("local_access_restriction_type[]"),
+                       options_for_select(JSONModel.enum_values("restriction_type"), form.obj['local_access_restriction_type']),
+                       {:id => form.id_for("local_access_restriction_type"), :multiple => "multiple"})
+        %>
+    </div>
+  </div>
+<% end %>
+
+
 <% define_template "note_multipart", jsonmodel_definition(:note_multipart) do |form| %>
   <div class="subrecord-form-fields" data-type="note_multipart">
     <h4 class="subrecord-form-heading">
@@ -19,17 +34,7 @@
 
       <section id="notes_restriction" style="display: none">
         <% form.push("rights_restriction", form.obj["rights_restriction"] || {}) do |form| %>
-          <%= form.label_and_date("begin") %>
-          <%= form.label_and_date("end") %>
-          <div class="control-group">
-            <%= form.label("local_access_restriction_type") %>
-            <div class="controls">
-                <%= select_tag(form.path("local_access_restriction_type[]"),
-                               options_for_select(["RestrictedSpecColl", "RestrictedCurApprSpecColl", "RestrictedFragileSpecColl", "InProcessSpecColl", "ColdStorageBrbl"], form.obj["local_access_restriction_type"]),
-                               {:id => form.id_for("local_access_restriction_type"), :multiple => "multiple"})
-                 %>
-            </div>
-          </div>
+          <% form.emit_template("rights_restriction") %>
         <% end %>
       </section>
 

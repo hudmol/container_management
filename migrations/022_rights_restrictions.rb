@@ -4,6 +4,12 @@ Sequel.migration do
 
   up do
 
+    create_editable_enum("restriction_type",
+                         ["RestrictedSpecColl", "RestrictedCurApprSpecColl",
+                          "RestrictedFragileSpecColl", "InProcessSpecColl",
+                          "ColdStorageBrbl"])
+
+
     create_table(:rights_restriction) do
       primary_key :id
 
@@ -26,7 +32,7 @@ Sequel.migration do
       primary_key :id
 
       Integer :rights_restriction_id, :null => false
-      String :restriction_type, :null => false
+      DynamicEnum :restriction_type_id, :null => false
     end
 
     alter_table(:rights_restriction_type) do
