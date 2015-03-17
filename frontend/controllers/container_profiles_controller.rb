@@ -1,6 +1,6 @@
 class ContainerProfilesController < ApplicationController
 
-  set_access_control  "manage_container_profile_record" => [:new, :index, :edit, :create, :update, :show, :delete]
+  set_access_control  "update_container_profile_record" => [:new, :index, :edit, :create, :update, :show, :delete]
 
   FACETS = ["container_profile_width_u_sstr", "container_profile_height_u_sstr", "container_profile_depth_u_sstr", "container_profile_dimension_units_u_sstr"]
 

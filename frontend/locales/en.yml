@@ -132,3 +132,8 @@ en:
       container_profile_dimension_units_u_sstr: Dimension Units
     help:
       row_selection: Click a row to select it for bulk operations. Hold alt while clicking a checkbox to select, or unselect, multple previous rows.
+
+  group:
+    permission_types:
+      manage_container: create/update/delete/bulk update top container records
+      manage_container_profile_record: create/update/delete container profile records
