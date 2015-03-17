@@ -113,19 +113,11 @@ class AspaceJsonToYaleContainerMapper
                  end
 
     if top_record
-
       if top_record.is_a?(Accession)
         find_top_container_by_instances(Instance.filter(:accession_id => top_record.id).select(:id), indicator)
       else
-        ArchivalObject.filter(:parent_id => nil, :root_record_id => top_record.id).each do |ao_root|
-          top_container = find_top_container_within_subtree(ao_root, indicator)
-
-          if top_container
-            return top_container
-          end
-        end
-
-        nil
+        resource_id = top_record.id
+        find_top_container_by_instances(Instance.filter(:archival_object_id => ArchivalObject.filter(:root_record_id => resource_id).select(:id)).select(:id), indicator)
       end
     else
       nil
@@ -191,20 +183,27 @@ class AspaceJsonToYaleContainerMapper
       container['barcode_1'] = nil
     end
 
-    result = (try_matching_barcode(container) ||
-              try_matching_indicator_within_series(container) ||
-              try_matching_indicator_within_resource(container))
-
-    if result
-      result
+    if (result = try_matching_barcode(container))
+      return result
     else
-      Log.info("Creating a new Top Container for a container with no barcode")
+      # We do this first because it's cheaper and tells us whether it's worth
+      # trying to find a more specific match in the series.
+      within_resource = try_matching_indicator_within_resource(container)
 
-      TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator),
-                                                                        'container_locations' => container['container_locations'],
-                                                                       ))
+      if within_resource
+        if (within_series = try_matching_indicator_within_series(container))
+          return within_series
+        else
+          return within_resource
+        end
+      end
     end
 
+    Log.info("Creating a new Top Container for a container with no barcode")
+
+    TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator),
+                                                                      'container_locations' => container['container_locations'],
+                                                                     ))
   end
 
 
@@ -218,6 +217,7 @@ class AspaceJsonToYaleContainerMapper
 
     # Find the IDs of all records under this point
     new_ao_ids = [top_record.id]
+
     while true
       new_ao_ids = ArchivalObject.filter(:parent_id => new_ao_ids).select(:id).map(&:id)
 
@@ -227,6 +227,7 @@ class AspaceJsonToYaleContainerMapper
         ao_ids += new_ao_ids
       end
     end
+
 
     # Find all linked instances
     instance_ds = Instance.filter(:archival_object_id => ao_ids).select(:id)
@@ -239,11 +240,11 @@ class AspaceJsonToYaleContainerMapper
     # All subcontainers linked to our instances
     subcontainer_ds = SubContainer.filter(:instance_id => instance_ds)
 
-    # Then top containers linked to those subcontainers!
-    relationships = SubContainer.find_relationship(:top_container_link).find_by_participant_ids(SubContainer, subcontainer_ds.select(:id).map(&:id))
+    relationship_model = SubContainer.find_relationship(:top_container_link)
+    top_containers_for_subcontainers = relationship_model.filter(:sub_container_id => subcontainer_ds.select(:id)).select(:top_container_id)
 
-    # Finally, find a matching top container (if there is one)
-    TopContainer[:indicator => indicator, :id => relationships.map(&:top_container_id)]
+    TopContainer[:indicator => indicator,
+                 :id => top_containers_for_subcontainers]
   end
 
 end
