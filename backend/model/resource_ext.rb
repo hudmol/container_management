@@ -1,1 +1,1 @@
-Resource.include(RightsStatementRestrictions)
+Resource.include(RightsRestrictionNotes)

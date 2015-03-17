@@ -139,6 +139,6 @@ en:
       manage_container_profile_record: create/update/delete container profile records
 
   note_multipart:
-    restriction_begin: Restriction Begin
-    restriction_end: Restriction End
+    begin: Restriction Begin
+    end: Restriction End
     local_access_restriction_type: Local Access Restriction Type
