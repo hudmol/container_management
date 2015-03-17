@@ -4,7 +4,7 @@ class ArchivesSpaceService < Sinatra::Base
     .description("Update a Container Profile")
     .params(["id", :id],
             ["container_profile", JSONModel(:container_profile), "The updated record", :body => true])
-    .permissions([:manage_container_profile_record])
+    .permissions([:update_container_profile_record])
     .returns([200, :updated]) \
   do
     handle_update(ContainerProfile, params[:id], params[:container_profile])
@@ -14,7 +14,7 @@ class ArchivesSpaceService < Sinatra::Base
   Endpoint.post('/container_profiles')
     .description("Create a Container_Profile")
     .params(["container_profile", JSONModel(:container_profile), "The record to create", :body => true])
-    .permissions([:manage_container_profile_record])
+    .permissions([:update_container_profile_record])
     .returns([200, :created]) \
   do
     handle_create(ContainerProfile, params[:container_profile])
@@ -48,7 +48,7 @@ class ArchivesSpaceService < Sinatra::Base
   Endpoint.delete('/container_profiles/:id')
     .description("Delete an Container Profile")
     .params(["id", :id])
-    .permissions([:manage_container_profile_record])
+    .permissions([:update_container_profile_record])
     .returns([200, :deleted]) \
   do
     handle_delete(ContainerProfile, params[:id])
