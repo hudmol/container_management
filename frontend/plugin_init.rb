@@ -28,6 +28,19 @@ Rails.application.config.after_initialize do
   end
 
 
+  ApplicationHelper.class_eval do
+    alias_method :render_aspace_partial_pre_container_management, :render_aspace_partial
+    def render_aspace_partial(args)
+      result = render_aspace_partial_pre_container_management(args);
+
+      if args[:partial] == "notes/template"
+        render args.merge(:partial => "notes/template_override")
+      end
+
+      result
+    end
+  end
+
   # force load our JSONModels so the are registered rather than lazy initialised
   # we need this for parse_reference to work
   JSONModel(:top_container)
