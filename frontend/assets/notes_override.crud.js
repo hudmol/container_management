@@ -32,6 +32,12 @@ $(document).ready(function() {
     }
   });
 
+  $(document).bind("loadedrecordform.aspace", function(event, $container) {
+    $container.find("section.notes-form.subrecord-form .subrecord-form-fields").each(function() {
+      setupRightsRestrictionNoteFields($(this));
+    });
+  });
+
 
   $("section.notes-form.subrecord-form .subrecord-form-fields").each(function() {
     setupRightsRestrictionNoteFields($(this));
