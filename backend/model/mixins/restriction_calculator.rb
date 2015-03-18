@@ -52,10 +52,12 @@ module RestrictionCalculator
     def sequel_to_jsonmodel(objs, opts = {})
       jsons = super
 
-      jsons.zip(objs).each do |json, obj|
-        json['active_restrictions'] = obj.active_restrictions.map {|restriction|
-          RightsRestriction.to_jsonmodel(restriction)
-        }
+      unless opts[:skip_restrictions]
+        jsons.zip(objs).each do |json, obj|
+          json['active_restrictions'] = obj.active_restrictions.map {|restriction|
+            RightsRestriction.to_jsonmodel(restriction)
+          }
+        end
       end
 
       jsons
