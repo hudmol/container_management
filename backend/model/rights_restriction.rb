@@ -44,7 +44,7 @@ class RightsRestriction < Sequel::Model(:rights_restriction)
     jsons = super
 
     jsons.zip(objs).each do |json, obj|
-      json['local_access_restriction_type'] = obj.rights_restriction_type.sort_by(&:restriction_type_id).map {|obj| obj.values[:restriction_type]}
+      json['local_access_restriction_type'] = obj.rights_restriction_type.map {|obj| obj.values[:restriction_type]}
       json['linked_records'] = {'ref' => obj.linked_record_uri}
     end
 

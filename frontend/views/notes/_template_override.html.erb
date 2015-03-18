@@ -1,3 +1,11 @@
+<%
+  def local_access_restriction_types_for_options
+    JSONModel.enum_values("restriction_type").map {|type|
+      [I18n.t("enumerations.restriction_type.#{type}", type), type]
+    }.sort_by(&:first)
+  end
+%>
+
 <% define_template "rights_restriction", jsonmodel_definition(:rights_restriction) do |form| %>
   <%= form.label_and_date("begin") %>
   <%= form.label_and_date("end") %>
@@ -5,8 +13,12 @@
     <%= form.label("local_access_restriction_type") %>
     <div class="controls">
         <%= select_tag(form.path("local_access_restriction_type[]"),
-                       options_for_select(JSONModel.enum_values("restriction_type"), form.obj['local_access_restriction_type']),
-                       {:id => form.id_for("local_access_restriction_type"), :multiple => "multiple"})
+                       options_for_select(local_access_restriction_types_for_options, form.obj['local_access_restriction_type']),
+                       {
+                         :id => form.id_for("local_access_restriction_type"),
+                         :multiple => "multiple",
+                         :class => "span12"
+                       })
         %>
     </div>
   </div>
