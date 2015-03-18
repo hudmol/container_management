@@ -5,19 +5,15 @@ $(function () {
 		    event.stopImmediatePropagation();
 		    event.preventDefault();
 
-		    var dialog_content = AS.renderTemplate("extent_calculator_show_calculation_template", {
-			    results: "moo"
-			});
+		    var dialog_content = AS.renderTemplate("extent_calculator_show_calculation_template");
 
 		    var $modal = AS.openCustomModal("extentCalculationModal", "Extent Calculation", dialog_content, 'full');
 
-		    var $form = $modal.find("form");
-
 		    $.ajax({
 			    url:"/plugins/extent_calculator/",
-				data: {record_uri: $("#extent_calculator_show_calculation_template").attr("record_uri")},
-				type: "get",
-				success: function(html) {
+			    data: {record_uri: $("#extent_calculator_show_calculation_template").attr("record_uri")},
+			    type: "get",
+			    success: function(html) {
 				$("#show_calculation_results").html(html);
 			    },
 				error: function(jqXHR, textStatus, errorThrown) {
