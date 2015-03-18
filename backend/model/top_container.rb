@@ -10,6 +10,9 @@ class TopContainer < Sequel::Model(:top_container)
 
   set_model_scope :repository
 
+  include RestrictionCalculator
+
+
 
   def validate
     validates_unique([:repo_id, :barcode],
