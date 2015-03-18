@@ -61,7 +61,7 @@
                       <td><%= restriction["end"] %></td>
                       <td>
                         <ul>
-                          <% restriction["local_access_restriction_type"].
+                          <% Array.wrap(restriction["local_access_restriction_type"]).
                               map{|type| I18n.t("enumerations.restriction_type.#{type}",type)}.
                               sort.each do |type| %>
                             <li><%= type %></li>
