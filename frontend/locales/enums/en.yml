@@ -9,11 +9,11 @@ en:
       meters: Meters
 
     restriction_type:
-      RestrictedSpecColl: Donor/university imposed access restriction (1)
-      RestrictedCurApprSpecColl: Repository imposed access restriction (2)
-      RestrictedFragileSpecColl: Restricted fragile (3)
-      InProcessSpecColl: Restricted in-process (4)
-      ColdStorageBrbl: Other (5)
+      RestrictedSpecColl: 1 - Donor/university imposed access restriction
+      RestrictedCurApprSpecColl: 2 - Repository imposed access restriction
+      RestrictedFragileSpecColl: 3 - Restricted fragile
+      InProcessSpecColl: 4 - Restricted in-process
+      ColdStorageBrbl: 5 - Other
 
   enumeration_names:
     dimension_units: Dimension Units
