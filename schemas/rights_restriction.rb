@@ -20,6 +20,19 @@
         "items" => {"type" => "string",
                     "dynamic_enum" => "restriction_type"},
       },
+
+      "linked_records" => {
+        "type" => "object",
+        "subtype" => "ref",
+        "properties" => {
+          "ref" => {"type" => [{"type" => "JSONModel(:archival_object) uri"},
+                               {"type" => "JSONModel(:resource) uri"}]},
+          "_resolved" => {
+            "type" => "object",
+            "readonly" => "true"
+          }
+        }
+      }
     }
   }
 }

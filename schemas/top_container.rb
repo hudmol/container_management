@@ -20,6 +20,13 @@
       "ils_item_id" => {"type" => "string", "maxLength" => 255, "required" => false},
       "exported_to_ils" => {"type" => "string", "required" => false},
 
+
+      "active_restrictions" => {
+        "type" => "array",
+        "readonly" => "true",
+        "items" => {"type" => "JSONModel(:rights_restriction) object"},
+      },
+
       "legacy_restricted" => {"type" => "boolean", "default" => false},
       "restricted" => {"type" => "boolean", "default" => false},
       "override_restricted" => {"type" => "boolean", "default" => false},
