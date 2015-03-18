@@ -50,6 +50,8 @@ en:
     _plural: Top Containers
 
     _frontend:
+      section:
+        active_restrictions: Active Restrictions
       action:
         add: Add Top Container
         create: Create a Top Container
@@ -64,6 +66,7 @@ en:
         bulk_selection_sort_help: Click a column to set the sort ordering.  Hold shift to sort by multiple columns.
         bulk_action_success: Top Containers successfully updated
         bulk_action_success_info: Please be aware it may take a moment before changes are reflected in the search results.
+        no_active_restrictions: No Active Restrictions
       bulk_operations:
         title: Bulk Operations
         collection_singular: Resource/Accession
@@ -142,3 +145,4 @@ en:
     begin: Restriction Begin
     end: Restriction End
     local_access_restriction_type: Local Access Restriction Type
+    linked_records: Linked Record
