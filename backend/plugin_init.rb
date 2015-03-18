@@ -36,3 +36,19 @@ if AppConfig.has_key?(:migrate_to_container_management) && AppConfig[:migrate_to
   Log.info("Completed: existing containers have been migrated to the new container model.")
 
 end
+
+
+Solr.add_search_hook do |query|
+
+  # If we're doing a typeahead, replace our search fields to only match display
+  # strings.
+  query.instance_eval do
+    if Hash[@solr_params][:sort] =~ /typeahead_sort_key_u_sort/
+      @solr_params = @solr_params.reject {|k, v| k == :qf}
+      @solr_params << [:qf, "display_string"]
+    end
+  end
+
+  query
+
+end
