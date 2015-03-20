@@ -21,7 +21,7 @@ class ExtentCalculatorController < ApplicationController
 
       render_aspace_partial :partial => "extent_calculator/show_calculation", :locals => {:results => results, :extent => extent}
     else
-      results = "no object"
+      render_aspace_partial :partial => "extent_calculator/no_object"
     end
 
   end
