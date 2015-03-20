@@ -1,5 +1,3 @@
-require 'uri'
-
 class ExtentCalculatorController < ApplicationController
 
   set_access_control  "view_repository" => [:index]
