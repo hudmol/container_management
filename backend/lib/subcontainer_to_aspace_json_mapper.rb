@@ -23,18 +23,28 @@ class SubContainerToAspaceJsonMapper
 
 
   def indicator_1
-    top_container_jsonmodel['indicator']
+    top_container.indicator
   end
 
 
   def barcode_1
-    top_container_jsonmodel['barcode']
+    top_container.barcode
   end
 
 
   def container_locations
-    top_container_jsonmodel['container_locations']
+    relationship = TopContainer.find_relationship(:top_container_housed_at)
+
+    relationship.find_by_participant(top_container).map {|container_location|
+      properties = container_location.values.merge('ref' => Location.uri_for(:location, container_location[:location_id]))
+
+      properties[:start_date] = properties[:start_date].strftime('%Y-%m-%d') if properties[:start_date]
+      properties[:end_date] = properties[:start_date].strftime('%Y-%m-%d') if properties[:end_date]
+
+      JSONModel(:container_location).from_hash(properties, true, true).to_hash(:trusted)
+    }
   end
+
 
   def method_missing(method, *args)
     nil
@@ -49,10 +59,6 @@ class SubContainerToAspaceJsonMapper
 
   def top_container
     @top_container ||= sub_container.related_records(:top_container_link)
-  end
-
-  def top_container_jsonmodel
-    @top_container_jsonmodel ||= TopContainer.to_jsonmodel(top_container)
   end
 
   def sub_container
