@@ -78,7 +78,7 @@ class AspaceJsonToYaleContainerMapper
     indicator = container['indicator_1']
 
     return nil if !indicator || !@json.is_a?(JSONModel(:archival_object))
-    return nil if !TopContainer[:indicator => indicator]
+    return nil if !TopContainer.for_indicator(indicator)
 
     ao = if new_record? && @json['parent']
            ArchivalObject[JSONModel(:archival_object).id_for(@json['parent']['ref'])]
@@ -100,7 +100,7 @@ class AspaceJsonToYaleContainerMapper
     indicator = container['indicator_1']
 
     return nil if !indicator
-    return nil if !TopContainer[:indicator => indicator]
+    return nil if !TopContainer.for_indicator(indicator)
 
     top_record = if @json.is_a?(JSONModel(:archival_object)) && @json['resource']
                    Resource[JSONModel(:resource).id_for(@json['resource']['ref'])]

@@ -385,5 +385,9 @@ class TopContainer < Sequel::Model(:top_container)
     TopContainer[:barcode => barcode, :repo_id => self.active_repository]
   end
 
+  def self.for_indicator(indicator)
+    TopContainer[:indicator => indicator, :repo_id => self.active_repository]
+  end
+
 
 end
