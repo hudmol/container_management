@@ -21,7 +21,7 @@ Rails.application.config.after_initialize do
     alias_method :can_edit_search_result_pre_yale_container?, :can_edit_search_result?
 
     def can_edit_search_result?(record)
-      return user_can?('manage_container', record['id']) if record['primary_type'] === "top_container"
+      return user_can?('update_container_record', record['id']) if record['primary_type'] === "top_container"
       can_edit_search_result_pre_yale_container?(record)
     end
 

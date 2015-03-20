@@ -1,5 +1,9 @@
-Permission.define("manage_container",
-                  "The ability to manage container records",
+Permission.define("update_container_record",
+                  "The ability to create and update container records",
+                  :level => "repository")
+
+Permission.define("manage_container_record",
+                  "The ability to delete and bulk update container records",
                   :level => "repository")
 
 Permission.define("manage_container_profile_record",

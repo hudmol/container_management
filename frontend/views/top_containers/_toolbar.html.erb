@@ -1,18 +1,20 @@
-<% if user_can?('manage_container') %>
+<% if user_can?('update_container_record') || user_can?('manage_container_record') %>
   <div class="row-fluid">
     <div class="span12">
       <div class="record-toolbar">
         <% if !['edit', 'update', 'new'].include?(controller.action_name) %>
-          <div class="btn-group pull-left">
-            <%= link_to I18n.t("actions.edit"), {:controller => :top_containers, :action => :edit, :id => @top_container.id}, :class => "btn btn-small btn-primary" %>
-          </div>
+          <% if user_can?('update_container_record') %>
+            <div class="btn-group pull-left">
+              <%= link_to I18n.t("actions.edit"), {:controller => :top_containers, :action => :edit, :id => @top_container.id}, :class => "btn btn-small btn-primary" %>
+            </div>
+          <% end %>
         <% end %>
         <% if ['new', 'create', 'edit', 'update'].include?(controller.action_name) %>
           <div class="pull-left save-changes">
             <button type="submit" class="btn btn-primary btn-small"><%= I18n.t("actions.save_prefix") %></button>
           </div>
         <% end %>
-        <% if !['new'].include?(controller.action_name) %>
+        <% if !['new'].include?(controller.action_name) && user_can?('manage_container_record') %>
         <div class="btn-toolbar pull-right">
           <div class="btn-group">
             <div class="btn btn-inline-form">
