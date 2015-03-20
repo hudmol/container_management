@@ -1,32 +1,47 @@
 $(function () {
 
-	var init = function () {
-	    $('.extent-calculator-btn').on('click', function (event) {
-		    event.stopImmediatePropagation();
-		    event.preventDefault();
+  function ExtentCalculatorForm() {}
 
-		    var dialog_content = AS.renderTemplate("extent_calculator_show_calculation_template");
+  ExtentCalculatorForm.prototype.init_form = function() {
+    $('.create-extent-btn').on('click', function (event) {
+      $('[id$=_extents_]').find(".btn")[1].click();
 
-		    var $modal = AS.openCustomModal("extentCalculationModal", "Extent Calculation", dialog_content, 'full');
+      var extent_form = $('[id$=_extents_]').find(".subrecord-form-fields").last();
 
-		    $.ajax({
-			    url:"/plugins/extent_calculator/",
-			    data: {record_uri: $("#extent_calculator_show_calculation_template").attr("record_uri")},
-			    type: "get",
-			    success: function(html) {
-				$("#show_calculation_results").html(html);
-			    },
-				error: function(jqXHR, textStatus, errorThrown) {
-				alert("boo");
-			    }
-			});
-		});
+      extent_form.find("[id$=__portion_]").val($('#extent_portion_').val());
+      extent_form.find("[id$=__number_]").val($('#extent_number_').val());
+      extent_form.find("[id$=__extent_type_]").val($('#extent_extent_type_').val());
+      extent_form.find("[id$=__container_summary_]").val($('#extent_container_summary_').val());
+      extent_form.find("[id$=__physical_details_]").val($('#extent_physical_details_').val());
+      extent_form.find("[id$=__dimensions_]").val($('#extent_dimensions_').val());
 
-	}
-	if ($('.extent-calculator-btn').length > 0) {
-	    init();
-	} else {
-	    $(document).bind("loadedrecordform.aspace", init);
-	}
-
+      $modal.modal("hide");
     });
+  }
+
+  var init = function () {
+    $('.extent-calculator-btn').on('click', function (event) {
+      var dialog_content = AS.renderTemplate("extent_calculator_show_calculation_template");
+
+      $modal = AS.openCustomModal("extentCalculationModal", "Extent Calculation", dialog_content, 'full');
+
+      $.ajax({
+        url:"/plugins/extent_calculator/",
+        data: {record_uri: $("#extent_calculator_show_calculation_template").attr("record_uri")},
+        type: "get",
+        success: function(html) {
+          $("#show_calculation_results").html(html);
+          var extentCalculatorForm = new ExtentCalculatorForm();
+          extentCalculatorForm.init_form();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+          alert("boo");
+        }
+      });
+    });
+
+  }
+
+  init();
+
+});
