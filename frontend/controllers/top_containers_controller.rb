@@ -198,7 +198,6 @@ class TopContainersController < ApplicationController
                                                     })
 
     filters = []
-    filters.push({'series_uri_u_sstr' => params['series']['ref']}.to_json) if params['series']
     filters.push({'collection_uri_u_sstr' => params['collection']['ref']}.to_json) if params['collection']
     filters.push({'container_profile_uri_u_sstr' => params['container_profile']['ref']}.to_json) if params['container_profile']
     filters.push({'location_uri_u_sstr' => params['location']['ref']}.to_json) if params['location']
