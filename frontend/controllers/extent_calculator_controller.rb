@@ -8,7 +8,7 @@ class ExtentCalculatorController < ApplicationController
     if params['record_uri']
       results = JSONModel::HTTP::get_json("/extent_calculator", {'record_uri' => params['record_uri']})
 
-      extent = if params['referrer'] && params['referrer'].end_with?("/edit")
+      extent = if params['referrer'] && params['referrer'].match('/edit(\#.*)?\Z')
                  extent = JSONModel(:extent).new
                  extent.number = results['total_extent']
                  units = results['volume'] ? 'cubic_' : 'linear_'
