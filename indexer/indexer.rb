@@ -53,9 +53,16 @@ class CommonIndexer
 
 
     indexer.add_document_prepare_hook {|doc, record|
-      # we no longer want the contents of containers to be indexed at the container's location
       if ['resource', 'archival_object', 'accession'].include?(doc['primary_type'])
+        # we no longer want the contents of containers to be indexed at the container's location
         doc.delete('location_uris')
+
+        # index the top_container's linked via a sub_container
+        ASUtils.wrap(record['record']['instances']).each{|instance|
+          if instance['sub_container'] && instance['sub_container']['top_container']
+            doc['top_container_uri_u_sstr'] = instance['sub_container']['top_container']['ref']
+          end
+        }
       end
     }
   end
