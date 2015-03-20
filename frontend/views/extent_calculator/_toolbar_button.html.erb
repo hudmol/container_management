@@ -1,4 +1,4 @@
 <%= render_aspace_partial :partial => "extent_calculator/show_calculation_template", :locals => {:record => record} %>
-<a href="javascript:void(0);" class="btn btn-small extent-calculator-btn">Calculate Extent</a>
+<a href="javascript:void(0);" class="btn btn-small extent-calculator-btn"><%= I18n.t("extent_calculator.calculate_extent") %></a>
 
 <script src="<%= "#{AppConfig[:frontend_prefix]}assets/extent_calculator.js" %>"></script>

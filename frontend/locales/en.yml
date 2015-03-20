@@ -148,3 +148,18 @@ en:
     end: Restriction End
     local_access_restriction_type: Local Access Restriction Type
     linked_records: Linked Record
+
+  extent_calculator:
+    no_object_message: Please specify an object to run the extent calculator on.
+    report_title: Calculated Extent Report
+    container_profile_header: Container Profile
+    count_header: Count
+    extent_header: Extent
+    no_profile: NO PROFILE
+    all_containers_label: All Containers
+    timestamp_label: Report generated at
+    extent_record_header: Extent Record
+    create_extent: Create Extent
+    calculate_extent: Calculate Extent
+    create_extent_record_message: Run the Extent Calculator in edit mode to have the option of creating an extent record based on the report.
+    waiting_for_report_message: Calculating extent ...
