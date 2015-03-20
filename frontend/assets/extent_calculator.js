@@ -27,7 +27,8 @@ $(function () {
 
       $.ajax({
         url:"/plugins/extent_calculator/",
-        data: {record_uri: $("#extent_calculator_show_calculation_template").attr("record_uri")},
+        data: {record_uri: $("#extent_calculator_show_calculation_template").attr("record_uri"),
+	       referrer: document.location.href},
         type: "get",
         success: function(html) {
           $("#show_calculation_results").html(html);

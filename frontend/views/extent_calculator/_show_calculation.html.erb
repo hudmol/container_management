@@ -47,6 +47,8 @@
         <small>Calculated at <strong><%= results['timestamp'] %></strong></small>
       </div>
     </div>
+
+  <% if extent %>
     <div>
       <h3>
         Extent Record
@@ -57,7 +59,7 @@
       <div class="row-fluid">
         <div class="span3">
           <a href="javascript:void(0);" class="btn btn-primary create-extent-btn">Create Extent</a>
-          <button class="btn btn-cancel" data-dismiss="modal"><%= I18n.t("actions.cancel") %></button>
+          <button class="btn btn-cancel" data-dismiss="modal">Close</button>
         </div>
 
         <div class="span9">
@@ -73,5 +75,13 @@
         </div>
       <% end %>
     </div>
+  <% else %>
+      <div class="row-fluid">
+        <div class="span3">
+          <button class="btn btn-cancel" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+  <% end %>
+
   </div>
 </div>
