@@ -36,7 +36,8 @@ $(function () {
           extentCalculatorForm.init_form();
         },
         error: function(jqXHR, textStatus, errorThrown) {
-          alert("boo");
+	  var html = AS.renderTemplate("template_extent_calculator_error_message", {message: jqXHR.responseText})
+          $("#show_calculation_results").html(html);
         }
       });
     });
