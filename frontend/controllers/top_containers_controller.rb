@@ -3,7 +3,8 @@ require 'uri'
 class TopContainersController < ApplicationController
 
   set_access_control  "view_repository" => [:show, :typeahead, :bulk_operations_browse],
-                      "manage_container" => [:new, :index, :create, :edit, :update, :delete, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update, :update_barcodes]
+                      "update_container_record" => [:new, :create, :edit, :update],
+                      "manage_container_record" => [:index, :delete, :batch_delete, :bulk_operations, :bulk_operation_search, :bulk_operation_update, :update_barcodes]
 
 
   def index
@@ -169,7 +170,7 @@ class TopContainersController < ApplicationController
 
   helper_method :can_edit_search_result?
   def can_edit_search_result?(record)
-    return user_can?('manage_container') if record['primary_type'] === "top_container"
+    return user_can?('update_container_record') if record['primary_type'] === "top_container"
     SearchHelper.can_edit_search_result?(record)
   end
 

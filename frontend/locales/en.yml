@@ -138,7 +138,8 @@ en:
 
   group:
     permission_types:
-      manage_container: create/update/delete/bulk update top container records
+      update_container_record: create/update top container records
+      manage_container_record: delete/bulk update top container records
       manage_container_profile_record: create/update/delete container profile records
 
   rights_restriction:

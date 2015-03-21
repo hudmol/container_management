@@ -30,7 +30,7 @@ class ArchivesSpaceService < Sinatra::Base
     .params(["id", :id],
             ["top_container", JSONModel(:top_container), "The updated record", :body => true],
             ["repo_id", :repo_id])
-    .permissions([:manage_container])
+    .permissions([:update_container_record])
     .returns([200, :updated]) \
   do
     handle_update(TopContainer, params[:id], params[:top_container])
@@ -41,7 +41,7 @@ class ArchivesSpaceService < Sinatra::Base
     .description("Create a yale container")
     .params(["top_container", JSONModel(:top_container), "The record to create", :body => true],
             ["repo_id", :repo_id])
-    .permissions([:manage_container])
+    .permissions([:update_container_record])
     .returns([200, :created]) \
   do
     handle_create(TopContainer, params[:top_container])
@@ -77,7 +77,7 @@ class ArchivesSpaceService < Sinatra::Base
     .description("Delete a yale container")
     .params(["id", :id],
             ["repo_id", :repo_id])
-    .permissions([:manage_container])
+    .permissions([:manage_container_record])
     .returns([200, :deleted]) \
   do
     handle_delete(TopContainer, params[:id])
@@ -89,7 +89,7 @@ class ArchivesSpaceService < Sinatra::Base
     .params(["ids", [Integer]],
             ["ils_holding_id", String, "Value to set for ils_holding_id"],
             ["repo_id", :repo_id])
-    .permissions([:manage_container])
+    .permissions([:manage_container_record])
     .returns([200, :updated]) \
   do
     result = TopContainer.batch_update(params[:ids], :ils_holding_id => params[:ils_holding_id])
@@ -102,7 +102,7 @@ class ArchivesSpaceService < Sinatra::Base
     .params(["ids", [Integer]],
             ["container_profile_uri", String, "The uri of the container profile"],
             ["repo_id", :repo_id])
-    .permissions([:manage_container])
+    .permissions([:manage_container_record])
     .returns([200, :updated]) \
   do
     result = TopContainer.bulk_update_container_profile(params[:ids], params[:container_profile_uri])
@@ -115,7 +115,7 @@ class ArchivesSpaceService < Sinatra::Base
     .params(["ids", [Integer]],
             ["location_uri", String, "The uri of the location"],
             ["repo_id", :repo_id])
-    .permissions([:manage_container])
+    .permissions([:manage_container_record])
     .returns([200, :updated]) \
   do
     result = TopContainer.bulk_update_location(params[:ids], params[:location_uri])
@@ -127,7 +127,7 @@ class ArchivesSpaceService < Sinatra::Base
   .description("Bulk update barcodes")
   .params(["barcode_data", String, "JSON string containing barcode data {uri=>barcode}", :body => true],
           ["repo_id", :repo_id])
-  .permissions([:manage_container])
+  .permissions([:manage_container_record])
   .returns([200, :updated]) \
   do
     begin
