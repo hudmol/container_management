@@ -163,3 +163,6 @@ en:
     calculate_extent: Calculate Extent
     create_extent_record_message: Run the Extent Calculator in edit mode to have the option of creating an extent record based on the report.
     waiting_for_report_message: Calculating extent ...
+    container_summary_type:
+      _singular: box
+      _plural: boxes
