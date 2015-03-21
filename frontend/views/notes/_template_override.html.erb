@@ -1,0 +1,85 @@
+<%
+  def local_access_restriction_types_for_options
+    JSONModel.enum_values("restriction_type").map {|type|
+      [I18n.t("enumerations.restriction_type.#{type}", type), type]
+    }.sort_by(&:first)
+  end
+%>
+
+<% define_template "rights_restriction", jsonmodel_definition(:rights_restriction) do |form| %>
+  <%= form.label_and_date("begin") %>
+  <%= form.label_and_date("end") %>
+  <div class="control-group">
+    <%= form.label("local_access_restriction_type") %>
+    <div class="controls">
+      <% if form.readonly? %>
+        <ul>
+          <% Array.wrap(form.obj['local_access_restriction_type']).
+                   map{|type| I18n.t("enumerations.restriction_type.#{type}",type)}.
+                   sort.each do |type| %>
+            <li><%= type %></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <%= select_tag(form.path("local_access_restriction_type[]"),
+                       options_for_select(local_access_restriction_types_for_options, form.obj['local_access_restriction_type']),
+                       {
+                         :id => form.id_for("local_access_restriction_type"),
+                         :multiple => "multiple",
+                         :class => "span12"
+                       })
+        %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+
+<% define_template "note_multipart", jsonmodel_definition(:note_multipart) do |form| %>
+  <div class="subrecord-form-fields" data-type="note_multipart">
+    <h4 class="subrecord-form-heading">
+      <% if form.readonly? %>
+        <%= I18n.t("enumerations.note_multipart_type.#{form.obj["type"]}", :default => form.obj["type"]) %>
+      <% else %>
+        <%= I18n.t("note.note_multipart") %>
+      <% end %>
+    </h4>
+    <div class="subrecord-form-container">
+      <%= form.hidden_input(:jsonmodel_type, "note_multipart") %>
+      <%= form.hidden_input("ingest_problem") %>
+      <%= form.label_and_textfield("persistent_id") %>
+      <%= form.label_and_textfield("label") %>
+      <%= form.label_and_select("type",
+                                multipart_notes.map {|value, hash| [hash[:i18n], value]},
+                                :field_opts => {:class => "note-type"}) %>
+      <%= form.label_and_boolean("publish", {}, user_prefs["publish"]) %>
+
+      <% if form.readonly? && ["accessrestrict", "userestrict"].include?(form.obj["type"]) %>
+        <section id="notes_restriction">
+      <% else %>
+        <section id="notes_restriction" style="display: none">
+      <% end %>
+        <% form.push("rights_restriction", form.obj["rights_restriction"] || {}) do |form| %>
+          <% form.emit_template("rights_restriction") %>
+        <% end %>
+      </section>
+
+      <section class="subrecord-form" id="<%= form.id_for('subnotes')%>">
+        <h5 class="subrecord-form-heading">
+          <%= I18n.t("note_multipart.sub_notes") %>
+          <% if not form.readonly? %>
+            <button class="btn btn-small add-sub-note-btn pull-right"><%= I18n.t("note._frontend.action.add_sub_note") %></button>
+          <% end %>
+        </h5>
+        <div class="subrecord-form-container">
+          <% form.obj["subnotes"] = [JSONModel(:note_text).new.to_hash(:raw)] if form["subnotes"].blank? %>
+
+
+          <%= form.list_for(form["subnotes"], "subnotes[]") do |subnote| %>
+            <% form.emit_template(subnote["jsonmodel_type"]) %>
+          <% end %>
+        </div>
+      </section>
+    </div>
+  </div>
+<% end %>

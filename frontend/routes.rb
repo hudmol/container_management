@@ -8,6 +8,7 @@ ArchivesSpace::Application.routes.draw do
   match('/plugins/top_containers/:id' => 'top_containers#update', :via => [:post])
   match('/plugins/top_containers/:id/delete' => 'top_containers#delete', :via => [:post])
 
+  match('/plugins/container_profiles/search/typeahead' => 'container_profiles#typeahead', :via => [:get])
   match('/plugins/container_profiles/bulk_operations/update_barcodes' => 'top_containers#update_barcodes', :via => [:post])
 
   match('/plugins/container_profiles/:id' => 'container_profiles#update', :via => [:post])

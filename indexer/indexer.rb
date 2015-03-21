@@ -67,12 +67,15 @@ class CommonIndexer
       if doc['primary_type'] == 'container_profile'
         doc['json'] = record['record'].to_json
         doc['title'] = record['record']['display_string']
+        doc['display_string'] = record['record']['display_string']
 
         ['width', 'height', 'depth'].each do |property|
           doc["container_profile_#{property}_u_sstr"] = record['record'][property]
         end
 
         doc["container_profile_dimension_units_u_sstr"] = record['record']['dimension_units']
+
+        doc['typeahead_sort_key_u_sort'] = record['record']['display_string']
       end
     }
   end

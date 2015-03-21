@@ -1,6 +1,7 @@
 class ContainerProfilesController < ApplicationController
 
-  set_access_control  "update_container_profile_record" => [:new, :index, :edit, :create, :update, :show, :delete]
+  set_access_control  "view_repository" => [:show, :typeahead],
+                      "update_container_profile_record" => [:new, :index, :edit, :create, :update, :delete]
 
   FACETS = ["container_profile_width_u_sstr", "container_profile_height_u_sstr", "container_profile_depth_u_sstr", "container_profile_dimension_units_u_sstr"]
 
@@ -71,5 +72,15 @@ class ContainerProfilesController < ApplicationController
 
     redirect_to(:controller => :container_profiles, :action => :index, :deleted_uri => container_profile.uri)
   end
+
+
+  def typeahead
+    search_params = params_for_backend_search
+
+    search_params = search_params.merge("sort" => "typeahead_sort_key_u_sort asc")
+
+    render :json => Search.all(session[:repo_id], search_params)
+  end
+
 
 end

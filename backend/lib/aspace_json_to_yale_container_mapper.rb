@@ -149,7 +149,7 @@ class AspaceJsonToYaleContainerMapper
     elsif top_container_locations.empty?
       # We'll just take the incoming location if we don't have any better ideas
       top_container.refresh
-      json = TopContainer.to_jsonmodel(top_container)
+      json = TopContainer.to_jsonmodel(top_container, :skip_restrictions => true)
       json['container_locations'] = aspace_container['container_locations']
       top_container.update_from_json(json)
       top_container.refresh
