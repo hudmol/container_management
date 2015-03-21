@@ -155,7 +155,7 @@ en:
     container_profile_header: Container Profile
     count_header: Count
     extent_header: Extent
-    no_profile: NO PROFILE
+    no_profile: <span class="text-error">NO PROFILE</span>
     all_containers_label: All Containers
     timestamp_label: Report generated at
     extent_record_header: Extent Record
