@@ -26,7 +26,7 @@ $(function () {
       $modal = AS.openCustomModal("extentCalculationModal", "Extent Calculation", dialog_content, 'container');
 
       $.ajax({
-        url:"/plugins/extent_calculator/",
+        url:"/plugins/extent_calculator",
         data: {record_uri: $("#extent_calculator_show_calculation_template").attr("record_uri"),
 	       referrer: document.location.href},
         type: "get",
