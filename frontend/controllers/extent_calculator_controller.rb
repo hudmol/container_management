@@ -9,9 +9,11 @@ class ExtentCalculatorController < ApplicationController
       extent = if params['referrer'] && params['referrer'].match('/edit(\#.*)?\Z')
                  extent = JSONModel(:extent).new
                  extent.number = results['total_extent']
-                 units = results['volume'] ? 'cubic_' : 'linear_'
-                 units += results['units']
-                 extent.extent_type = units
+                 if results['units']
+                   units = results['volume'] ? 'cubic_' : 'linear_'
+                   units += results['units']
+                   extent.extent_type = units
+                 end
                  container_cardinality = results['container_count'] == 1 ? 'container' : 'containers'
                  extent.container_summary = "(#{results['container_count']} #{container_cardinality})"
                  extent

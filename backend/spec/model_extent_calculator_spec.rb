@@ -204,4 +204,11 @@ describe 'Extent Calculator model' do
     ext_cal.total_extent.should eq(metric_box_volume_in_cubic_meters.round(3))
   end
 
+
+  it "behaves nicely if there are no containers to count" do
+    accession = create_accession()
+    ext_cal = ExtentCalculator.new(accession)
+    ext_cal.total_extent.should eq(0)
+  end
+
 end
