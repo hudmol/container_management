@@ -15,15 +15,6 @@ def create_archival_object_with_rights(top_container_json, dates = [])
 end
 
 
-def stub_barcode_length(min, max)
-  AppConfig.stub(:[]).and_call_original
-  AppConfig.stub(:has_key?).and_call_original
-
-  AppConfig.stub(:has_key?).with(:yale_containers_barcode_length).and_return(true)
-  AppConfig.stub(:[]).with(:yale_containers_barcode_length).and_return({:system_default => {:min => min, :max => max}})
-end
-
-
 def build_container_location(location_uri, status = 'current')
     hash = {
       'status' => status,

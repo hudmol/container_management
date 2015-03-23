@@ -11,8 +11,6 @@ def create_tree(top_container_json, opts = {})
 end
 
 
-
-
 def build_instance(top_container_json, subcontainer_opts = {})
   build(:json_instance, {
           "instance_type" => "text",
@@ -23,4 +21,13 @@ def build_instance(top_container_json, subcontainer_opts = {})
                                    }.merge(subcontainer_opts)),
           "container" => nil
         })
+end
+
+
+def stub_barcode_length(min, max)
+  AppConfig.stub(:[]).and_call_original
+  AppConfig.stub(:has_key?).and_call_original
+
+  AppConfig.stub(:has_key?).with(:yale_containers_barcode_length).and_return(true)
+  AppConfig.stub(:[]).with(:yale_containers_barcode_length).and_return({:system_default => {:min => min, :max => max}})
 end
