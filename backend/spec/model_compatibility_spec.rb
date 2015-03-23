@@ -169,6 +169,22 @@ describe 'Yale Container compatibility' do
       # created a top container
       TopContainer.all.count.should be > (old_count)
     end
+    it "links top containers by indicator within a single accession" do
+      instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                                "container" => {
+                                                  "type_1" => 'box',
+                                                  "indicator_1" => '9999'
+                                                })
+
+      accession = create_accession({"instances" => [instance, instance]})
+
+      # All the same
+      Accession.to_jsonmodel(accession.id)['instances'].map {|instance|
+        instance['sub_container']['top_container']['ref']
+      }.inject {|a, b| a == b}.should be_true
+    end
+
+
 
 
     it "updates and links the top container even if we're updating the series AO" do

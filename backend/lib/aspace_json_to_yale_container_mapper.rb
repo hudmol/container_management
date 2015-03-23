@@ -5,6 +5,7 @@ class AspaceJsonToYaleContainerMapper
   def initialize(json, new_record)
     @json = json
     @new_record = new_record
+    @new_top_containers = []
   end
 
 
@@ -96,7 +97,7 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
-  def try_matching_indicator_within_resource(container)
+  def try_matching_indicator_within_collection(container)
     indicator = container['indicator_1']
 
     return nil if !indicator
@@ -186,20 +187,33 @@ class AspaceJsonToYaleContainerMapper
     if (result = try_matching_barcode(container))
       return result
     else
+      # If we've created a matching top container for this record already, use that.
+      @new_top_containers.each do |top_container|
+        if top_container.indicator == container['indicator_1']
+          return top_container
+        end
+      end
+
       # We do this first because it's cheaper and tells us whether it's worth
       # trying to find a more specific match in the series.
-      within_resource = try_matching_indicator_within_resource(container)
+      within_collection = try_matching_indicator_within_collection(container)
 
-      if within_resource && (within_series = try_matching_indicator_within_series(container))
+      if @json.is_a?(JSONModel(:accession))
+        if within_collection
+          return within_collection
+        end
+      elsif within_collection && (within_series = try_matching_indicator_within_series(container))
         return within_series
       end
     end
 
     Log.info("Creating a new Top Container for a container with no barcode")
 
-    TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator),
-                                                                      'container_locations' => container['container_locations'],
-                                                                     ))
+    created = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator),
+                                                                                'container_locations' => container['container_locations'],
+                                                                               ))
+    @new_top_containers << created
+    created
   end
 
 
