@@ -11,17 +11,11 @@ module RestrictionCalculator
     models_supporting_rights_restrictions.map {|model|
       instance_link_column = model.association_reflection(:instance)[:key]
 
-      db = self.class.db
-
-      id_set = db[:instance].
-               join(:sub_container, :instance_id => :instance__id).
-               join(:top_container_link_rlshp, :sub_container_id => :sub_container__id).
-               join(:top_container, :id => :top_container_link_rlshp__top_container_id).
+      id_set = TopContainer.linked_instance_ds.
                filter(:top_container__id => self.id).
                where { Sequel.~(instance_link_column => nil) }.
                select(instance_link_column).
                map {|row| row[instance_link_column]}
-
 
       model_to_record_ids = Implementation.expand_to_tree(model, id_set)
 

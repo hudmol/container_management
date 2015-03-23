@@ -54,6 +54,14 @@ class TopContainer < Sequel::Model(:top_container)
   end
 
 
+  def self.linked_instance_ds
+    db[:instance].
+      join(:sub_container, :instance_id => :instance__id).
+      join(:top_container_link_rlshp, :sub_container_id => :sub_container__id).
+      join(:top_container, :id => :top_container_link_rlshp__top_container_id)
+  end
+
+
   def linked_archival_record_for(subcontainer)
     # Find its linked instance
     instance = Instance[subcontainer.instance_id]

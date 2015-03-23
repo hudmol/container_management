@@ -161,3 +161,40 @@ increase the amount of memory used per-request, but not by an amount
 that would matter), but it can be safely removed once the above pull
 request has been merged and released in a future ArchivesSpace
 version.
+
+
+## Migrating user defined fields from the Archivist's Toolkit
+
+This plugin comes with a migrator that can read information from
+certain user defined fields attached to instances within the
+Archivist's Toolkit.  To run this migration:
+
+  * Shut down your ArchivesSpace instance
+
+  * Set the `at_db_url` configuration property to point to your
+    Archivist's Toolkit database.  For example:
+
+         AppConfig[:at_db_url] = 'jdbc:mysql://localhost:3306/archivists_toolkit?useUnicode=true&characterEncoding=UTF-8&user=at&password=at123'
+
+  * Set the following configuration properties to trigger the
+    migration process to run on startup:
+
+         # Run the migration process
+         AppConfig[:user_defined_field_migrate] = true
+
+         # If set to 'true', this will log updates without updating
+         # your ArchivesSpace database.
+         #
+         # When you are ready to run a real migration, set this to
+         # 'false'
+         #
+         AppConfig[:user_defined_field_migrate_dry_run] = true
+
+  * Start your ArchivesSpace instance.  Once the migration is underway
+    you will see log messages like:
+
+         [java] I, [2015-03-30T11:27:24.601000 #5538]  INFO -- : Thread-3400: Processing top container 19000 of 125544
+
+  * Once the process completes, ArchivesSpace will start as normal.
+    At this point, remove the above configuration properties to avoid
+    the migration running again when ArchivesSpace next starts up.

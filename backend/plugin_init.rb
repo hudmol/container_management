@@ -56,3 +56,8 @@ Solr.add_search_hook do |query|
   query
 
 end
+
+
+if AppConfig.has_key?(:user_defined_field_migrate) && AppConfig[:user_defined_field_migrate]
+  UserDefinedFieldMigrator.new.migrate
+end
