@@ -201,7 +201,7 @@ describe 'Yale Container compatibility' do
       # All the same
       Accession.to_jsonmodel(accession.id)['instances'].map {|instance|
         instance['sub_container']['top_container']['ref']
-      }.inject {|a, b| a == b}.should be_true
+      }.uniq.length == 1
     end
 
 
