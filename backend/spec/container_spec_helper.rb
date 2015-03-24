@@ -28,6 +28,6 @@ def stub_barcode_length(min, max)
   AppConfig.stub(:[]).and_call_original
   AppConfig.stub(:has_key?).and_call_original
 
-  AppConfig.stub(:has_key?).with(:yale_containers_barcode_length).and_return(true)
-  AppConfig.stub(:[]).with(:yale_containers_barcode_length).and_return({:system_default => {:min => min, :max => max}})
+  AppConfig.stub(:has_key?).with(:container_management_barcode_length).and_return(true)
+  AppConfig.stub(:[]).with(:container_management_barcode_length).and_return({:system_default => {:min => min, :max => max}})
 end
