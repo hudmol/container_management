@@ -91,7 +91,7 @@ describe 'Yale container restrictions' do
   end
 
 
-  it "treats a restriction as current when open ended (no end date)" do
+  it "deems a restriction active when restriction types is empty but has start date in the past" do
     (resource, grandparent, parent, child) = create_tree(box_json)
 
     resource_json = Resource.to_jsonmodel(resource.id)
@@ -101,14 +101,14 @@ describe 'Yale container restrictions' do
     add_restriction_to_record(Resource.to_jsonmodel(resource.id),
                               '2000-01-01',
                               nil,
-                              ["RestrictedSpecColl"])
+                              nil)
 
     box_record.restrictions.count.should eq(1)
     box_record.active_restrictions(stub(:today => Date.parse('2010-01-01'))).count.should eq(1)
   end
 
 
-  it "treats a restriction as current when open starting (no begin date)" do
+  it "deems a restriction active when restriction types is empty but has a future end date" do
     (resource, grandparent, parent, child) = create_tree(box_json)
 
     resource_json = Resource.to_jsonmodel(resource.id)
@@ -118,14 +118,14 @@ describe 'Yale container restrictions' do
     add_restriction_to_record(Resource.to_jsonmodel(resource.id),
                               nil,
                               '2020-01-01',
-                              ["RestrictedSpecColl"])
+                              nil)
 
     box_record.restrictions.count.should eq(1)
     box_record.active_restrictions(stub(:today => Date.parse('2010-01-01'))).count.should eq(1)
   end
 
 
-  it "treats a restriction as current when no date range present" do
+  it "deems a restriction active when no date range present but has restriction types" do
     (resource, grandparent, parent, child) = create_tree(box_json)
 
     add_restriction_to_record(Resource.to_jsonmodel(resource.id),
@@ -138,15 +138,28 @@ describe 'Yale container restrictions' do
   end
 
 
-  it "saves but doesn't treat a restriction when restriction types is empty as current" do
+  it "doesn't deem a restriction active when restriction types is empty and date range has expired" do
     (resource, grandparent, parent, child) = create_tree(box_json)
 
     add_restriction_to_record(Resource.to_jsonmodel(resource.id),
                               '2000-01-01',
-                              nil,
+                              '2010-01-01',
                               nil)
 
     box_record.restrictions.count.should eq(1)
-    box_record.active_restrictions(stub(:today => Date.parse('2010-01-01'))).should be_empty
+    box_record.active_restrictions(stub(:today => Date.parse('2020-01-01'))).should be_empty
+  end
+
+
+  it "doesn't deem a restriction active when restriction types has values but date range has expired" do
+    (resource, grandparent, parent, child) = create_tree(box_json)
+
+    add_restriction_to_record(Resource.to_jsonmodel(resource.id),
+                              '2000-01-01',
+                              '2010-01-01',
+                              ["RestrictedSpecColl"])
+
+    box_record.restrictions.count.should eq(1)
+    box_record.active_restrictions(stub(:today => Date.parse('2020-01-01'))).should be_empty
   end
 end

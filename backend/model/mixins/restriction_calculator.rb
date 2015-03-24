@@ -34,11 +34,11 @@ module RestrictionCalculator
     now = clock.today
 
     restrictions.select {|restriction|
-      if restriction.rights_restriction_type.empty?
-        false
-      elsif restriction.begin && now < restriction.begin
+      if restriction.begin && now < restriction.begin
         false
       elsif restriction.end && now > restriction.end
+        false
+      elsif restriction.rights_restriction_type.empty? && restriction.begin.nil? && restriction.end.nil?
         false
       else
         true
