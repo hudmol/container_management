@@ -37,6 +37,14 @@
 
           <%= readonly.label_and_boolean "legacy_restricted" %>
 
+
+          <% if @top_container["container_locations"].length > 0 %>
+            <hr>
+            <section>
+              <%= render_aspace_partial :partial => "container_locations/show", :locals => { :container_locations => @top_container["container_locations"] } %>
+            </section>
+          <% end %>
+
           <section id="rights_restrictions">
             <h3 class="subrecord-form-heading"><%= I18n.t("top_container._frontend.section.active_restrictions") %></h3>
             <% if @top_container["active_restrictions"].length > 0 %>
@@ -79,14 +87,6 @@
               <div class="alert alert-info"><%= I18n.t("top_container._frontend.messages.no_active_restrictions") %></div>
             <% end %>
           </section>
-
-
-          <% if @top_container["container_locations"].length > 0 %>
-            <hr>
-            <section>
-              <%= render_aspace_partial :partial => "container_locations/show", :locals => { :container_locations => @top_container["container_locations"] } %>
-            </section>
-          <% end %>
 
           <%= render_aspace_partial :partial => "search/embedded", :locals => {:record => @top_container, :filter_term => {"top_container_uri_u_sstr" => @top_container.uri}.to_json, :heading_text => I18n.t("location._frontend.section.search_embedded")} %>
 
