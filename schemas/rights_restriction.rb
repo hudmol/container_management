@@ -7,12 +7,10 @@
     "properties" => {
       "begin" => {
         "type" => "string",
-        "ifmissing" => "error",
       },
 
       "end" => {
         "type" => "string",
-        "ifmissing" => "error",
       },
 
       "local_access_restriction_type" => {

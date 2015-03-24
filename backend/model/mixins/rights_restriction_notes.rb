@@ -48,10 +48,13 @@ module RightsRestrictionNotes
 
       restrictions = ASUtils.wrap(json['notes']).each do |note|
         next unless note['jsonmodel_type'] == 'note_multipart' && RESTRICTION_NOTE_TYPES.include?(note['type'])
-        next unless note.has_key?('rights_restriction') && (note['rights_restriction']['begin'] || note['rights_restriction']['end'])
+        next unless note.has_key?('rights_restriction')
 
-        restriction = obj.add_rights_restriction(:begin => Date.parse(note['rights_restriction']['begin']),
-                                                 :end => Date.parse(note['rights_restriction']['end']))
+        begin_date = note['rights_restriction']['begin'] ? Date.parse(note['rights_restriction']['begin']) : nil
+        end_date = note['rights_restriction']['end'] ? Date.parse(note['rights_restriction']['end']) : nil
+
+        restriction = obj.add_rights_restriction(:begin => begin_date,
+                                                 :end => end_date)
 
         ASUtils.wrap(note['rights_restriction']['local_access_restriction_type']).each do |restriction_type|
           restriction.add_rights_restriction_type(:restriction_type => restriction_type)
