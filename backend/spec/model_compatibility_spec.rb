@@ -145,7 +145,6 @@ describe 'Yale Container compatibility' do
     end
 
 
-
     it "creates a new top container if it can't find one in the series (even if there's one in the resource!)" do
       container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234'))
 
@@ -163,12 +162,33 @@ describe 'Yale Container compatibility' do
                                                                        "indicator_1" => '1234'
                                                                      })])
 
-      # and it's magically linked up with the right container (from the different series)
       ArchivalObject.to_jsonmodel(new_ao.id)['instances'].first['sub_container']['top_container']['ref'].should_not eq(container.uri)
 
       # created a top container
       TopContainer.all.count.should be > (old_count)
     end
+
+
+    it "links top containers by indicator across two different trees as long as they're not part of a series" do
+      container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234'))
+
+      # not a series!
+      (resource, grandparent, parent, child) = create_tree(container, :grandparent_properties => {:level => 'file'})
+
+      second_subtree = create(:json_archival_object,
+                              "resource" => {"ref" => resource.uri},
+                              "level" => 'file',
+                              "instances" => [JSONModel(:instance).from_hash("instance_type" => "text",
+                                                                             "container" => {
+                                                                               "type_1" => 'box',
+                                                                               "indicator_1" => '1234'
+                                                                             })])
+
+      # This matches because neither tree was a series
+      ArchivalObject.to_jsonmodel(second_subtree.id)['instances'].first['sub_container']['top_container']['ref'].should eq(container.uri)
+    end
+
+
     it "links top containers by indicator within a single accession" do
       instance = JSONModel(:instance).from_hash("instance_type" => "text",
                                                 "container" => {
@@ -183,8 +203,6 @@ describe 'Yale Container compatibility' do
         instance['sub_container']['top_container']['ref']
       }.inject {|a, b| a == b}.should be_true
     end
-
-
 
 
     it "updates and links the top container even if we're updating the series AO" do
