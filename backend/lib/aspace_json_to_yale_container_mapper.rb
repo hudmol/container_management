@@ -5,6 +5,7 @@ class AspaceJsonToYaleContainerMapper
   def initialize(json, new_record)
     @json = json
     @new_record = new_record
+    @new_top_containers = []
   end
 
 
@@ -74,12 +75,7 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
-  def try_matching_indicator_within_series(container)
-    indicator = container['indicator_1']
-
-    return nil if !indicator || !@json.is_a?(JSONModel(:archival_object))
-    return nil if !TopContainer.for_indicator(indicator)
-
+  def series_for_current_record
     ao = if new_record? && @json['parent']
            ArchivalObject[JSONModel(:archival_object).id_for(@json['parent']['ref'])]
          elsif !new_record?
@@ -89,36 +85,87 @@ class AspaceJsonToYaleContainerMapper
          end
 
     if ao
-      find_top_container_within_subtree(ao.topmost_archival_object, indicator)
-    else
-      nil
+      topmost = ao.topmost_archival_object
+
+      if topmost.has_series_specific_fields?
+        topmost
+      else
+        nil
+      end
     end
   end
 
-
-  def try_matching_indicator_within_resource(container)
+  def try_matching_indicator_within_series(series, container)
     indicator = container['indicator_1']
 
-    return nil if !indicator
-    return nil if !TopContainer.for_indicator(indicator)
+    find_top_container_within_subtree(series, indicator)
+  end
 
-    top_record = if @json.is_a?(JSONModel(:archival_object)) && @json['resource']
-                   Resource[JSONModel(:resource).id_for(@json['resource']['ref'])]
-                 elsif @json.is_a?(JSONModel(:resource)) && @json['uri']
-                   Resource[JSONModel(:resource).id_for(@json['uri'])]
-                 elsif @json.is_a?(JSONModel(:accession)) && @json['uri']
-                   Accession[JSONModel(:accession).id_for(@json['uri'])]
-                 else
-                   nil
-                 end
 
-    if top_record
-      if top_record.is_a?(Accession)
-        find_top_container_by_instances(Instance.filter(:accession_id => top_record.id).select(:id), indicator)
-      else
-        resource_id = top_record.id
-        find_top_container_by_instances(Instance.filter(:archival_object_id => ArchivalObject.filter(:root_record_id => resource_id).select(:id)).select(:id), indicator)
+  def try_matching_indicator_outside_of_series(container)
+    indicator = container['indicator_1']
+
+    return nil if !@json['resource']
+
+    resource_id = JSONModel(:resource).id_for(@json['resource']['ref'])
+
+    db = Instance.db
+
+    # Sorry about this.  The general idea is that we join all the way from
+    # Archival Object through to the Top Containers they link to.  Then we limit
+    # to the Archival Objects within the current resource, and the top
+    # containers that have the indicator we're looking for.
+    #
+    # That gives us a (hopefully short) list of possible top containers to link
+    # to.  Then we do one final sweep to find one that isn't part of a series.
+    #
+    candidate_top_containers = db[:archival_object].
+                               join(:instance, :archival_object_id => :archival_object__id).
+                               join(:sub_container, :instance_id => :instance__id).
+                               join(:top_container_link_rlshp, :sub_container_id => :sub_container__id).
+                               join(:top_container, :id => :top_container_link_rlshp__top_container_id).
+                               filter(:archival_object__root_record_id => resource_id).
+                               filter(:top_container__indicator => indicator).
+                               select(Sequel.as(:top_container__id, :top_container_id),
+                                      Sequel.as(:archival_object__id, :archival_object_id))
+
+    candidate_top_containers.each do |row|
+      ao = ArchivalObject[row[:archival_object_id]]
+
+      if !ao.series
+        # Not in a series.  That's a match!
+        return TopContainer[row[:top_container_id]]
       end
+    end
+
+    return nil
+  end
+
+
+  def try_matching_indicator_within_record(container)
+    indicator = container['indicator_1']
+
+    # Record is being created so nothing to search for yet.
+    return nil if !@json['uri']
+
+    model = if @json.is_a?(JSONModel(:archival_object))
+               ArchivalObject
+             elsif @json.is_a?(JSONModel(:resource))
+               Resource
+             elsif @json.is_a?(JSONModel(:accession))
+               Accession
+             else
+               nil
+             end
+
+    return nil if !model
+
+    id = @json.class.id_for(@json['uri'])
+    record = model[id]
+
+    if record
+      join_column = model.association_reflection(:instance)[:key]
+      find_top_container_by_instances(Instance.filter(join_column => top_record.id).select(:id), indicator)
     else
       nil
     end
@@ -186,20 +233,46 @@ class AspaceJsonToYaleContainerMapper
     if (result = try_matching_barcode(container))
       return result
     else
-      # We do this first because it's cheaper and tells us whether it's worth
-      # trying to find a more specific match in the series.
-      within_resource = try_matching_indicator_within_resource(container)
+      indicator = container['indicator_1']
 
-      if within_resource && (within_series = try_matching_indicator_within_series(container))
-        return within_series
+      match = try_matching_indicator(container, indicator)
+
+      if match
+        return match
       end
     end
 
     Log.info("Creating a new Top Container for a container with no barcode")
 
-    TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator),
-                                                                      'container_locations' => container['container_locations'],
-                                                                     ))
+    created = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator),
+                                                                                'container_locations' => container['container_locations'],
+                                                                               ))
+    @new_top_containers << created
+    created
+  end
+
+
+  def try_matching_indicator(container, indicator)
+    return nil if !indicator
+
+    # If we've created a matching top container for this record already, use that.
+    @new_top_containers.each do |top_container|
+      if top_container.indicator == indicator
+        return top_container
+      end
+    end
+
+    if @json.is_a?(JSONModel(:accession)) || @json.is_a?(JSONModel(:resource))
+      return try_matching_indicator_within_record(container)
+    else
+      series = series_for_current_record
+
+      if series
+        return try_matching_indicator_within_series(series, container)
+      else
+        return try_matching_indicator_outside_of_series(container)
+      end
+    end
   end
 
 
