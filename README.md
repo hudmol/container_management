@@ -96,6 +96,46 @@ should see an entry for "Manage container profiles" under the
   * Verify that your container records have been migrated correctly.
 
 
+## Configuring it
+
+This plugin supports the following configuration options:
+
+  * container_management_barcode_length
+  * container_management_extent_calculator
+
+All configuration is optional. Default values will be used if none are specified. Add these entries to your config/config.rb file if you wish to override the defaults.
+
+### container_management_barcode_length
+This configuration option is used to specify allowed length ranges for barcodes by repository. For example:
+
+      AppConfig[:container_management_barcode_length] = {
+        :system_default => {:min => 5, :max => 10},
+        'repo' => {:min => 9, :max => 12},
+        'other_repo' => {:min => 9, :max => 9},
+        'yet_another_repo' => {:min => 6}
+      }
+
+The :system_default entry sets minimum and maximum allowed barcode lengths for the whole system (all repositories). The other entries, keyed by repository code, override the system defaults for specific repositories. Note that it is not necessary to override both :min and :max. In the example above 'yet_another_repository' would inherit :max from :system_default and so would have an allowed range of 6-10. If :min or :max are not provided either in :system_default or in an entry for the current repository then the barcode length is not lower or upper bounded respectively.
+
+### container_management_extent_calculator
+This configuration option is used to customize the behavior of the extent calculator function. For example:
+
+      AppConfig[:container_management_extent_calculator] = {
+        :report_volume => true,
+        :unit => :feet,
+        :decimal_places => 3
+      }
+
+The extent calculator provides a report on the total extent of containers within an accession, resource, or resource component. It calculates the extent by totaling the dimensions of the containers attached to instances belonging to the object in question and all of its children. The dimensions of the containers are specified in container profile records.
+
+The :report_volume option specifies whether the calculator should report a volume (cubic) measure or a length measure. The default is false (ie length). If a length measure is used then the calculator totals values in the field (width, height, depth) specified by extent_dimension of the container profiles it finds. If a volume measure is used the calculator multiples width, height and depth to determine a cubic measure for each container, and totals that value.
+
+
+The :unit option specifies the unit to report. The default is whatever the dimension_units value is in the first container profile it encounters when performing the calculation. Supported values are: :feet, :inches, :meters, :centimeters.
+
+The :decimal_places option specifies the number of decimal places to show for extent values in the report. The default is 2.
+
+
 ## Temporary workaround for "Full head" errors
 
 The top container linker passes a large amount of data to the frontend
