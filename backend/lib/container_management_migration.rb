@@ -91,7 +91,7 @@ class ContainerManagementMigration
 
 
   def is_series?(ao)
-    ao['level'] == 'series' || (ao['level'] == 'other' && ArchivalObject[ao['id']].other_level == 'series')
+    ArchivalObject[ao['id']].has_series_specific_fields?
   end
 
 
@@ -100,7 +100,7 @@ class ContainerManagementMigration
   # expensive SQL queries to search back up the tree.
   class MigrationMapper < AspaceJsonToYaleContainerMapper
 
-    def initialize(json, new_record, series_top_containers, resource_top_containers)
+    def initialize(json, new_record, resource_top_containers, series_top_containers)
       super(json, new_record)
 
       @series_top_containers = series_top_containers
@@ -108,7 +108,7 @@ class ContainerManagementMigration
     end
 
 
-    def try_matching_indicator_within_series(container)
+    def try_matching_indicator_within_series(series, container)
       indicator = container['indicator_1']
       @series_top_containers.values.each do |top_container|
         if top_container.indicator == indicator
@@ -120,10 +120,10 @@ class ContainerManagementMigration
     end
 
 
-    def try_matching_indicator_within_resource(container)
+    def try_matching_indicator_outside_of_series(container)
       indicator = container['indicator_1']
       @resource_top_containers.values.each do |top_container|
-        if top_container.indicator == indicator
+        if top_container.indicator == indicator && !@series_top_containers[top_container.id]
           return top_container
         end
       end
