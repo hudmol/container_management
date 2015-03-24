@@ -17,4 +17,5 @@ en:
 
   enumeration_names:
     dimension_units: Dimension Units
+    restriction_type: Local Access Restriction Type
 
