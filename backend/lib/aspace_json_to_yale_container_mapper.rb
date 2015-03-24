@@ -142,28 +142,6 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
-  def try_matching_indicator_within_collection(container)
-    indicator = container['indicator_1']
-
-    top_record = if @json.is_a?(JSONModel(:archival_object)) && @json['resource']
-                   Resource[JSONModel(:resource).id_for(@json['resource']['ref'])]
-                 elsif @json.is_a?(JSONModel(:resource)) && @json['uri']
-                   Resource[JSONModel(:resource).id_for(@json['uri'])]
-                 else
-                   nil
-                 end
-
-    if top_record
-      resource_id = top_record.id
-      find_top_container_by_instances(Instance.filter(:archival_object_id => ArchivalObject.filter(:root_record_id => resource_id).select(:id)).select(:id),
-                                      indicator)
-    else
-      nil
-    end
-
-  end
-
-
   def try_matching_indicator_within_record(container)
     indicator = container['indicator_1']
 
