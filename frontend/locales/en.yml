@@ -53,6 +53,8 @@ en:
     _frontend:
       section:
         active_restrictions: Active Restrictions
+        linked_records: Linked Records
+        basic_information: Container Information
       action:
         add: Add Top Container
         create: Create a Top Container
