@@ -9,7 +9,7 @@
 %>
 <% if rows < num_found %>
   <div class="alert alert-warning"><%= I18n.t("top_container._frontend.messages.max_results_limit_reached") %></div>
-  <p><%= I18n.t("top_container._frontend.messages.max_results_limit_details", {:visible => [rows, num_found].min, :results => num_found}) %></p>
+  <p><%= I18n.t("top_container._frontend.messages.max_results_limit_details", {:visible => [rows, num_found].min, :num_found => num_found}) %></p>
 <% else %>
   <p><%= I18n.t("top_container._frontend.messages.results_summary", {:num_found => num_found}) %></p>
 <% end %>
