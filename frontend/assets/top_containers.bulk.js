@@ -97,6 +97,10 @@ BulkContainerSearch.prototype.update_button_state = function() {
 };
 
 BulkContainerSearch.prototype.setup_table_sorter = function() {
+  function padValue(value) {
+    return (new Array(255).join("#") + value).slice(-255)
+  };
+
   var tablesorter_opts = {
     // only sort on the second row of header columns
     selectorHeaders: "thead tr.sortable-columns th",
@@ -121,6 +125,13 @@ BulkContainerSearch.prototype.setup_table_sorter = function() {
         } else {
           return "";
         }
+      } else if ($node.hasClass("top-container-indicator")) {
+        var value = $node.text().trim();
+        // check for dash and take the first
+        var first_number = value.split("-")[0];
+
+        // pad the indicator values so they sort correctly with digit and alpha values
+        return padValue(first_number) + padValue(value);
       }
 
       return $node.text().trim();
