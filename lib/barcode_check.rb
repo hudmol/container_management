@@ -6,9 +6,9 @@ class BarcodeCheck
     @min = 0
     @max = 255
 
-    return if !AppConfig.has_key?(:yale_containers_barcode_length)
+    return if !AppConfig.has_key?(:container_management_barcode_length)
 
-    cfg = AppConfig[:yale_containers_barcode_length]
+    cfg = AppConfig[:container_management_barcode_length]
 
     [:system_default, repo_code].each do |key|
       if cfg.has_key?(key)
