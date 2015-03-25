@@ -29,9 +29,6 @@ en:
     ils_item_id: ILS Item ID
     exported_to_ils: Exported to ILS
     not_exported: Not exported
-    restricted: Restricted?
-    override_restricted: Override Restricted?
-    rights_restricted_contents: Rights Restricted Contents
     legacy_restricted: Legacy Restricted?
     parent: Parent Container
 

@@ -39,14 +39,14 @@ describe 'Yale Container model' do
     ils_holding_id = '112358'
     ils_item_id = '853211'
     exported_to_ils = Time.at(1234567890).iso8601
-    restricted = false
+    legacy_restricted = false
 
     yale_box_container = build(:json_top_container,
                                'barcode' => barcode,
                                'ils_holding_id' => ils_holding_id,
                                'ils_item_id' => ils_item_id,
                                'exported_to_ils' => exported_to_ils,
-                               'restricted' => restricted)
+                               'legacy_restricted' => legacy_restricted)
 
     box_id = TopContainer.create_from_json(yale_box_container, :repo_id => $repo_id).id
 
@@ -55,7 +55,7 @@ describe 'Yale Container model' do
     box.ils_holding_id.should eq(ils_holding_id)
     box.ils_item_id.should eq(ils_item_id)
     box.exported_to_ils.should eq(exported_to_ils)
-    box.restricted.should eq(restricted)
+    box.legacy_restricted.should eq(legacy_restricted)
   end
 
 
@@ -385,47 +385,6 @@ describe 'Yale Container model' do
 
       container1.refresh.system_mtime.should be > container1_original_mtime
       container2.refresh.system_mtime.should be > container2_original_mtime
-    end
-
-
-    xit "can calculate a value for restricted based on rights statements in records that link to it" do
-      # we livin' in tha past
-      Time.stub!(:now).and_return(Time.at(0))
-
-      topcon1 = create(:json_top_container, {:restricted => nil})
-      create_archival_object_with_rights(topcon1, [["19720120", "19740809"]])
-      JSONModel(:top_container).find(topcon1.id).restricted.should eq(false)
-
-      create_archival_object_with_rights(topcon1, [["19690120", "19740809"]])
-      JSONModel(:top_container).find(topcon1.id).restricted.should eq(true)
-
-      topcon2 = create(:json_top_container, {:restricted => nil})
-      create_archival_object_with_rights(topcon2, [["", "19690720"]])
-      JSONModel(:top_container).find(topcon2.id).restricted.should eq(false)
-
-      create_archival_object_with_rights(topcon2, [["19631122", "19801208"]])
-      JSONModel(:top_container).find(topcon2.id).restricted.should eq(true)
-
-      # time passes
-      Time.stub!(:now).and_return(Time.new(1980, 12, 8))
-      JSONModel(:top_container).find(topcon2.id).restricted.should eq(true)
-      Time.stub!(:now).and_return(Time.new(1980, 12, 9))
-      JSONModel(:top_container).find(topcon2.id).restricted.should eq(false)
-    end
-
-
-    it "allows the calculated value for restricted to be overridden" do
-      Time.stub!(:now).and_return(Time.at(0))
-
-      topcon1 = create(:json_top_container)
-      create_archival_object_with_rights(topcon1, [["19720120", "19740809"]])
-      JSONModel(:top_container).find(topcon1.id).restricted.should eq(false)
-
-      topcon1 = JSONModel(:top_container).find(topcon1.id)
-      topcon1.override_restricted = true
-      topcon1.restricted = true
-      topcon1.save
-      JSONModel(:top_container).find(topcon1.id).restricted.should eq(true)
     end
   end
 
