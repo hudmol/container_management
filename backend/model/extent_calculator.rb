@@ -94,8 +94,9 @@ class ExtentCalculator
         @container_count += 1
 
         if (rec = TopContainer[tc_id].related_records(:top_container_profile))
-          @containers[rec.name] ||= {:count => 0, :extent => 0.0}
-          @containers[rec.name][:count] += 1
+          key = @volume ? rec.name : rec.display_string
+          @containers[key] ||= {:count => 0, :extent => 0.0}
+          @containers[key][:count] += 1
           ext = if @volume
                   vol = 1.0
                   [:width, :height, :depth].each {|dim| vol = rec.send(dim).to_f * vol }
@@ -103,7 +104,7 @@ class ExtentCalculator
                 else
                   convert(rec.send(rec.extent_dimension.intern).to_f, rec.dimension_units.intern)
                 end
-          @containers[rec.name][:extent] += ext
+          @containers[key][:extent] += ext
           extent += ext
         else
           # top container does not have a container profile
