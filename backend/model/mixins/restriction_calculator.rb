@@ -4,21 +4,24 @@ module RestrictionCalculator
     base.extend(ClassMethods)
   end
 
+
   def restrictions
-    # top container -> instance -> linked record -> restriction
-
-    relationship_model = TopContainer.find_relationship(:top_container_link)
-    subcontainers_for_this_top_container = relationship_model.filter(:top_container_id => self.id).select(:sub_container_id)
-    linked_instances = SubContainer.filter(:id => subcontainers_for_this_top_container).select(:instance_id)
-
     models_supporting_rights_restrictions = RightsRestriction.applicable_models.values
 
     models_supporting_rights_restrictions.map {|model|
       instance_link_column = model.association_reflection(:instance)[:key]
 
-      id_set = Instance.filter(:id => linked_instances).where { Sequel.~(instance_link_column => nil) }.
+      db = self.class.db
+
+      id_set = db[:instance].
+               join(:sub_container, :instance_id => :instance__id).
+               join(:top_container_link_rlshp, :sub_container_id => :sub_container__id).
+               join(:top_container, :id => :top_container_link_rlshp__top_container_id).
+               filter(:top_container__id => self.id).
+               where { Sequel.~(instance_link_column => nil) }.
                select(instance_link_column).
                map {|row| row[instance_link_column]}
+
 
       model_to_record_ids = Implementation.expand_to_tree(model, id_set)
 
