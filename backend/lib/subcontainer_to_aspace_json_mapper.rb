@@ -39,7 +39,7 @@ class SubContainerToAspaceJsonMapper
       properties = container_location.values.merge('ref' => Location.uri_for(:location, container_location[:location_id]))
 
       properties[:start_date] = properties[:start_date].strftime('%Y-%m-%d') if properties[:start_date]
-      properties[:end_date] = properties[:start_date].strftime('%Y-%m-%d') if properties[:end_date]
+      properties[:end_date] = properties[:end_date].strftime('%Y-%m-%d') if properties[:end_date]
 
       JSONModel(:container_location).from_hash(properties, true, true).to_hash(:trusted)
     }
