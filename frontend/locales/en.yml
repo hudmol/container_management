@@ -147,6 +147,7 @@ en:
     begin: Restriction Begin
     end: Restriction End
     local_access_restriction_type: Local Access Restriction Type
+    local_access_restriction_type_inline_help: "Hold down  CTRL (Windows) / Command (Mac) to select multiple options or deselect an option"
     linked_records: Linked Record
     restriction_note_type: Note Type
 
