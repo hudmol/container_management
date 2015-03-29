@@ -54,7 +54,8 @@ module RightsRestrictionNotes
         end_date = note['rights_restriction']['end'] ? Date.parse(note['rights_restriction']['end']) : nil
 
         restriction = obj.add_rights_restriction(:begin => begin_date,
-                                                 :end => end_date)
+                                                 :end => end_date,
+                                                 :restriction_note_type => note['type'])
 
         ASUtils.wrap(note['rights_restriction']['local_access_restriction_type']).each do |restriction_type|
           restriction.add_rights_restriction_type(:restriction_type => restriction_type)

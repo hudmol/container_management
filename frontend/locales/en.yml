@@ -148,6 +148,7 @@ en:
     end: Restriction End
     local_access_restriction_type: Local Access Restriction Type
     linked_records: Linked Record
+    restriction_note_type: Note Type
 
   extent_calculator:
     no_object_message: Please specify an object to run the extent calculator on.

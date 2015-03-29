@@ -52,6 +52,7 @@
                 <thead>
                   <tr>
                     <th><%= I18n.t("rights_restriction.linked_records") %></th>
+                    <th><%= I18n.t("rights_restriction.restriction_note_type") %></th>
                     <th><%= I18n.t("rights_restriction.begin") %></th>
                     <th><%= I18n.t("rights_restriction.end") %></th>
                     <th><%= I18n.t("rights_restriction.local_access_restriction_type") %></th>
@@ -68,6 +69,7 @@
                                         :uri => restriction["linked_records"]["ref"] %>
                         </div>
                       </td>
+                      <td><%= I18n.t("enumerations.note_multipart_type.#{restriction["restriction_note_type"]}", restriction["restriction_note_type"]) %></td>
                       <td><%= restriction["begin"] %></td>
                       <td><%= restriction["end"] %></td>
                       <td>
