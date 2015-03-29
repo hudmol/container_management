@@ -32,7 +32,7 @@
       <th><%= I18n.t("top_container._frontend.bulk_operations.current_location") %></th>
       <th><%= I18n.t("top_container.ils_holding_id") %></th>
       <th><%= I18n.t("top_container.ils_item_id") %></th>
-      <th><%= I18n.t("top_container.legacy_restricted") %></th>
+      <th><%= I18n.t("top_container.restricted") %></th>
       <th><%= I18n.t("top_container.exported_to_ils") %></th>
       <% if show_edit_actions %><th><!-- Actions --></th><% end %>
     </tr>
@@ -72,7 +72,7 @@
         <td><%= Array(doc['location_display_string_u_sstr']).first %></td>
         <td><%= container_json['ils_holding_id'] %></td>
         <td><%= container_json['ils_item_id'] %></td>
-        <td><%= I18n.t("boolean.#{container_json['legacy_restricted']}") %></td>
+        <td><%= I18n.t("boolean.#{container_json['restricted']}") %></td>
         <% if container_json['exported_to_ils'].blank? %>
           <td><%= I18n.t("top_container.not_exported") %></td>
         <% else %>

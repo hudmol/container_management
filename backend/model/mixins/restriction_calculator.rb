@@ -60,6 +60,7 @@ module RestrictionCalculator
           json['active_restrictions'] = obj.active_restrictions.map {|restriction|
             RightsRestriction.to_jsonmodel(restriction)
           }
+          json['restricted'] = !json['active_restrictions'].empty?
         end
       end
 
