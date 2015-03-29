@@ -162,4 +162,16 @@ describe 'Yale container restrictions' do
     box_record.restrictions.count.should eq(1)
     box_record.active_restrictions(stub(:today => Date.parse('2020-01-01'))).should be_empty
   end
+
+
+  it "knows its note type" do
+    (resource, grandparent, parent, child) = create_tree(box_json)
+
+    add_restriction_to_record(Resource.to_jsonmodel(resource.id),
+                              '2000-01-01',
+                              '2010-01-01',
+                              ["RestrictedSpecColl"])
+
+    box_record.restrictions.first.restriction_note_type.should eq("accessrestrict")
+  end
 end

@@ -30,7 +30,12 @@
             "readonly" => "true"
           }
         }
-      }
+      },
+
+      "restriction_note_type" => {
+        "type" => "string",
+        "readonly" => "true"
+      },
     }
   }
 }
