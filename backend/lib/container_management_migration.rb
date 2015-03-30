@@ -138,7 +138,7 @@ class ContainerManagementMigration
         Accession.filter(:repo_id => repo.id).each do |accession|
           Log.info("Working on Accession #{accession.id} (records migrated: #{records_migrated})")
           records_migrated += 1
-          ContainerMigrationModel(:accession).new(accession).create_containers({}, {})
+          ContainerMigrationModel(:accession).new(accession).create_containers({})
         end
 
         # Then resources and containers
