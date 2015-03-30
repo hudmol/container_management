@@ -28,7 +28,7 @@ class ContainerManagementMigration
     end
 
 
-    def create_containers(top_containers_in_this_tree, top_containers_in_this_series)
+    def create_containers(top_containers_in_this_tree)
       # If our incoming instance records already have their subcontainers created, we won't create them again.
       instances_with_subcontainers = self['instance_ids'].zip(self['instances']).map {|instance_id, instance|
         if instance['sub_container']
@@ -36,7 +36,7 @@ class ContainerManagementMigration
         end
       }.compact
 
-      MigrationMapper.new(self, false, top_containers_in_this_tree, top_containers_in_this_series).call
+      MigrationMapper.new(self, false, top_containers_in_this_tree).call
 
       self['instance_ids'].zip(self['instances']).map {|instance_id, instance|
         # Create a new subcontainer that links everything up
@@ -90,45 +90,21 @@ class ContainerManagementMigration
   end
 
 
-  def is_series?(ao)
-    ArchivalObject[ao['id']].has_series_specific_fields?
-  end
-
-
   # An extension of the standard mapper which gets handed hashes of all top
   # containers used in the current resource and series.  Uses those to avoid
   # expensive SQL queries to search back up the tree.
   class MigrationMapper < AspaceJsonToYaleContainerMapper
 
-    def initialize(json, new_record, resource_top_containers, series_top_containers)
+    def initialize(json, new_record, resource_top_containers)
       super(json, new_record)
 
-      @series_top_containers = series_top_containers
       @resource_top_containers = resource_top_containers
     end
 
 
-    def try_matching_indicator_within_series(series, container)
+    def try_matching_indicator_within_collection(container)
       indicator = container['indicator_1']
-      @series_top_containers.values.each do |top_container|
-        if top_container.indicator == indicator
-          return top_container
-        end
-      end
-
-      nil
-    end
-
-
-    def try_matching_indicator_outside_of_series(container)
-      indicator = container['indicator_1']
-      @resource_top_containers.values.each do |top_container|
-        if top_container.indicator == indicator && !@series_top_containers[top_container.id]
-          return top_container
-        end
-      end
-
-      nil
+      @resource_top_containers.values.find {|top_container| top_container.indicator == indicator}
     end
 
 
@@ -165,19 +141,15 @@ class ContainerManagementMigration
         # Then resources and containers
         Resource.filter(:repo_id => repo.id).each do |resource|
           top_containers_in_this_tree = {}
-          top_containers_in_this_series = {}
-          within_series = false
 
           records_migrated += 1
-          ContainerMigrationModel.new(resource).create_containers(top_containers_in_this_tree, top_containers_in_this_series).each do |top_container|
+          ContainerMigrationModel.new(resource).create_containers(top_containers_in_this_tree).each do |top_container|
             top_containers_in_this_tree[top_container.id] = top_container
           end
 
           ao_roots = resource.tree['children']
 
           ao_roots.each do |ao_root|
-            top_containers_in_this_series = {}
-            within_series = is_series?(ao_root)
             work_queue = [ao_root]
 
             while !work_queue.empty?
@@ -200,12 +172,8 @@ class ContainerManagementMigration
 
                   migration_record = ContainerMigrationModel.new(record)
 
-                  migration_record.create_containers(top_containers_in_this_tree, top_containers_in_this_series).each do |top_container|
+                  migration_record.create_containers(top_containers_in_this_tree).each do |top_container|
                     top_containers_in_this_tree[top_container.id] = top_container
-
-                    if within_series
-                      top_containers_in_this_series[top_container.id] = top_container
-                    end
                   end
 
                   records_migrated += 1
