@@ -159,6 +159,25 @@ describe 'Yale Container compatibility' do
     end
 
 
+    it "updates an existing accession to add a new container" do
+      accession = create_accession({"instances" => []})
+
+      json = Accession.to_jsonmodel(accession.id)
+
+      instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                                "container" => {
+                                                  "type_1" => 'box',
+                                                  "indicator_1" => '9999'
+                                                })
+
+      json["instances"] = [instance.to_hash]
+
+      expect {
+        accession.update_from_json(json)
+      }.to_not raise_error
+    end
+
+
     it "updates and links the top container even if we're updating the series AO" do
       container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234'))
 

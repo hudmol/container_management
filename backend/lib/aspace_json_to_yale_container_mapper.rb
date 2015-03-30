@@ -94,15 +94,9 @@ class AspaceJsonToYaleContainerMapper
     return nil if !model
 
     id = @json.class.id_for(@json['uri'])
-    record = model[id]
 
-    if record
-      join_column = model.association_reflection(:instance)[:key]
-      find_top_container_by_instances(Instance.filter(join_column => top_record.id).select(:id), indicator)
-    else
-      nil
-    end
-
+    join_column = model.association_reflection(:instance)[:key]
+    find_top_container_by_instances(Instance.filter(join_column => id).select(:id), indicator)
   end
 
 
