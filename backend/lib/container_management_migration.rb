@@ -8,85 +8,88 @@ class ContainerManagementMigration
   # update their instances.
   #
   # So, this implements just enough of our JSONModels to keep the mapper happy.
-  class ContainerMigrationModel
+  MIGRATION_MODELS = {}
 
-    include JSONModel
+  def ContainerMigrationModel(model_type)
 
-    def initialize(record)
-      @acting_as = record.class
-      @fields = {}
+    MIGRATION_MODELS[model_type] ||= Class.new(JSONModel::JSONModel(model_type)) do
 
-      load_relevant_fields(record)
-    end
+      include JSONModel
 
-    def is_a?(clz)
-      @acting_as.my_jsonmodel == clz
-    end
+      def initialize(record)
+        @acting_as = record.class
+        @fields = {}
 
-    def [](key)
-      @fields.fetch(key.to_s)
-    end
-
-
-    def create_containers(top_containers_in_this_tree)
-      # If our incoming instance records already have their subcontainers created, we won't create them again.
-      instances_with_subcontainers = self['instance_ids'].zip(self['instances']).map {|instance_id, instance|
-        if instance['sub_container']
-          instance_id
-        end
-      }.compact
-
-      MigrationMapper.new(self, false, top_containers_in_this_tree).call
-
-      self['instance_ids'].zip(self['instances']).map {|instance_id, instance|
-        # Create a new subcontainer that links everything up
-        if instance['sub_container']
-
-          # This subcontainer was added by the mapping process.  Create it.
-          if !instances_with_subcontainers.include?(instance_id)
-            SubContainer.create_from_json(JSONModel(:sub_container).from_hash(instance['sub_container']), :instance_id => instance_id)
-          end
-
-          # Extract the top container we linked to and return it if we haven't seen it before
-          top_container_id = JSONModel(:top_container).id_for(instance['sub_container']['top_container']['ref'])
-
-          if !top_containers_in_this_tree.has_key?(top_container_id)
-            TopContainer[top_container_id]
-          else
-            nil
-          end
-        end
-      }.compact
-    end
-
-
-    private
-
-    def load_relevant_fields(record)
-      @fields['uri'] = record.uri
-
-      # Set the fields that are used by the mapper to walk the tree.
-      if record.is_a?(ArchivalObject)
-        if record.parent_id
-          @fields['parent'] = {'ref' => ArchivalObject.uri_for(:archival_object, record.parent_id)}
-        end
-
-        if record.root_record_id
-          @fields['resource'] = {'ref' => Resource.uri_for(:resource, record.root_record_id)}
-        end
+        load_relevant_fields(record)
       end
 
-      # Find the existing instances and their IDs and load them in as well.
-      instance_join_column = record.class.association_reflection(:instance)[:key]
+      def is_a?(clz)
+        @acting_as.my_jsonmodel == clz
+      end
 
-      @fields['instances'] = []
-      @fields['instance_ids'] = []
-      Instance.filter(instance_join_column => record.id).each do |instance|
-        @fields['instances'] << Instance.to_jsonmodel(instance).to_hash(:trusted)
-        @fields['instance_ids'] << instance.id
+      def [](key)
+        @fields.fetch(key.to_s)
+      end
+
+      def create_containers(top_containers_in_this_tree)
+        # If our incoming instance records already have their subcontainers created, we won't create them again.
+        instances_with_subcontainers = self['instance_ids'].zip(self['instances']).map {|instance_id, instance|
+          if instance['sub_container']
+            instance_id
+          end
+        }.compact
+
+        MigrationMapper.new(self, false, top_containers_in_this_tree).call
+
+        self['instance_ids'].zip(self['instances']).map {|instance_id, instance|
+          # Create a new subcontainer that links everything up
+          if instance['sub_container']
+
+            # This subcontainer was added by the mapping process.  Create it.
+            if !instances_with_subcontainers.include?(instance_id)
+              SubContainer.create_from_json(JSONModel(:sub_container).from_hash(instance['sub_container']), :instance_id => instance_id)
+            end
+
+            # Extract the top container we linked to and return it if we haven't seen it before
+            top_container_id = JSONModel(:top_container).id_for(instance['sub_container']['top_container']['ref'])
+
+            if !top_containers_in_this_tree.has_key?(top_container_id)
+              TopContainer[top_container_id]
+            else
+              nil
+            end
+          end
+        }.compact
+      end
+
+
+      private
+
+      def load_relevant_fields(record)
+        @fields['uri'] = record.uri
+
+        # Set the fields that are used by the mapper to walk the tree.
+        if record.is_a?(ArchivalObject)
+          if record.parent_id
+            @fields['parent'] = {'ref' => ArchivalObject.uri_for(:archival_object, record.parent_id)}
+          end
+
+          if record.root_record_id
+            @fields['resource'] = {'ref' => Resource.uri_for(:resource, record.root_record_id)}
+          end
+        end
+
+        # Find the existing instances and their IDs and load them in as well.
+        instance_join_column = record.class.association_reflection(:instance)[:key]
+
+        @fields['instances'] = []
+        @fields['instance_ids'] = []
+        Instance.filter(instance_join_column => record.id).each do |instance|
+          @fields['instances'] << Instance.to_jsonmodel(instance).to_hash(:trusted)
+          @fields['instance_ids'] << instance.id
+        end
       end
     end
-
   end
 
 
@@ -135,7 +138,7 @@ class ContainerManagementMigration
         Accession.filter(:repo_id => repo.id).each do |accession|
           Log.info("Working on Accession #{accession.id} (records migrated: #{records_migrated})")
           records_migrated += 1
-          ContainerMigrationModel.new(accession).create_containers({}, {})
+          ContainerMigrationModel(:accession).new(accession).create_containers({}, {})
         end
 
         # Then resources and containers
@@ -143,7 +146,7 @@ class ContainerManagementMigration
           top_containers_in_this_tree = {}
 
           records_migrated += 1
-          ContainerMigrationModel.new(resource).create_containers(top_containers_in_this_tree).each do |top_container|
+          ContainerMigrationModel(:resource).new(resource).create_containers(top_containers_in_this_tree).each do |top_container|
             top_containers_in_this_tree[top_container.id] = top_container
           end
 
@@ -170,7 +173,7 @@ class ContainerManagementMigration
 
                   Log.info("Working on ArchivalObject #{record.id} (records migrated: #{records_migrated})")
 
-                  migration_record = ContainerMigrationModel.new(record)
+                  migration_record = ContainerMigrationModel(:archival_object).new(record)
 
                   migration_record.create_containers(top_containers_in_this_tree).each do |top_container|
                     top_containers_in_this_tree[top_container.id] = top_container
