@@ -75,73 +75,6 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
-  def series_for_current_record
-    ao = if new_record? && @json['parent']
-           ArchivalObject[JSONModel(:archival_object).id_for(@json['parent']['ref'])]
-         elsif !new_record?
-           ArchivalObject[JSONModel(:archival_object).id_for(@json['uri'])]
-         else
-           nil
-         end
-
-    if ao
-      topmost = ao.topmost_archival_object
-
-      if topmost.has_series_specific_fields?
-        topmost
-      else
-        nil
-      end
-    end
-  end
-
-  def try_matching_indicator_within_series(series, container)
-    indicator = container['indicator_1']
-
-    find_top_container_within_subtree(series, indicator)
-  end
-
-
-  def try_matching_indicator_outside_of_series(container)
-    indicator = container['indicator_1']
-
-    return nil if !@json['resource']
-
-    resource_id = JSONModel(:resource).id_for(@json['resource']['ref'])
-
-    db = Instance.db
-
-    # Sorry about this.  The general idea is that we join all the way from
-    # Archival Object through to the Top Containers they link to.  Then we limit
-    # to the Archival Objects within the current resource, and the top
-    # containers that have the indicator we're looking for.
-    #
-    # That gives us a (hopefully short) list of possible top containers to link
-    # to.  Then we do one final sweep to find one that isn't part of a series.
-    #
-    candidate_top_containers = db[:archival_object].
-                               join(:instance, :archival_object_id => :archival_object__id).
-                               join(:sub_container, :instance_id => :instance__id).
-                               join(:top_container_link_rlshp, :sub_container_id => :sub_container__id).
-                               join(:top_container, :id => :top_container_link_rlshp__top_container_id).
-                               filter(:archival_object__root_record_id => resource_id).
-                               filter(:top_container__indicator => indicator).
-                               select(Sequel.as(:top_container__id, :top_container_id),
-                                      Sequel.as(:archival_object__id, :archival_object_id))
-
-    candidate_top_containers.each do |row|
-      ao = ArchivalObject[row[:archival_object_id]]
-
-      if !ao.series
-        # Not in a series.  That's a match!
-        return TopContainer[row[:top_container_id]]
-      end
-    end
-
-    return nil
-  end
-
-
   def try_matching_indicator_within_record(container)
     indicator = container['indicator_1']
 
@@ -171,6 +104,26 @@ class AspaceJsonToYaleContainerMapper
     end
 
   end
+
+
+  def try_matching_indicator_within_collection(container)
+    indicator = container['indicator_1']
+
+    resource_uri = @json['resource'] && @json['resource']['ref']
+    return nil if !resource_uri
+
+    resource_id = JSONModel(:resource).id_for(resource_uri)
+
+    matching_top_containers = TopContainer.linked_instance_ds.
+                              join(:archival_object, :id => :instance__archival_object_id).
+                              where { Sequel.|({:archival_object__root_record_id => resource_id},
+                                               {:instance__resource_id => resource_id}) }.
+                              filter(:top_container__indicator => indicator).
+                              select(:top_container_id)
+
+    TopContainer[:id => matching_top_containers]
+  end
+
 
 
   def ensure_harmonious_values(top_container, aspace_container)
@@ -263,15 +216,9 @@ class AspaceJsonToYaleContainerMapper
     end
 
     if @json.is_a?(JSONModel(:accession)) || @json.is_a?(JSONModel(:resource))
-      return try_matching_indicator_within_record(container)
+      try_matching_indicator_within_record(container)
     else
-      series = series_for_current_record
-
-      if series
-        return try_matching_indicator_within_series(series, container)
-      else
-        return try_matching_indicator_outside_of_series(container)
-      end
+      try_matching_indicator_within_collection(container)
     end
   end
 
