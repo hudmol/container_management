@@ -127,8 +127,8 @@ BulkContainerSearch.prototype.setup_table_sorter = function() {
         }
       } else if ($node.hasClass("top-container-indicator")) {
         var value = $node.text().trim();
-        // check for dash and take the first
-        var first_number = value.split("-")[0];
+        // check for non-decimal and take the first
+        var first_number = value.split(/[^0-9]/)[0];
 
         // pad the indicator values so they sort correctly with digit and alpha values
         return padValue(first_number) + padValue(value);
