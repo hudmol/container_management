@@ -23,7 +23,7 @@ $(function () {
     $('.extent-calculator-btn').on('click', function (event) {
       var dialog_content = AS.renderTemplate("extent_calculator_show_calculation_template");
 
-      $modal = AS.openCustomModal("extentCalculationModal", "Extent Calculation", dialog_content, 'container');
+      $modal = AS.openCustomModal("extentCalculationModal", "Extent Calculation", dialog_content, 'full');
 
       $.ajax({
         url:"/plugins/extent_calculator",

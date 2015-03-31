@@ -22,10 +22,10 @@
         {for container in selection}
           <input type="hidden" name="update_uris[]" value="${container.uri}">
         {/for}
-        <div class="span4">
-            <div class="control-group">
-                <label class="control-label" for="ils_holding_id"><%= I18n.t("top_container.ils_holding_id") %></label>
-                <div class="controls">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label col-sm-4" for="ils_holding_id"><%= I18n.t("top_container.ils_holding_id") %></label>
+                <div class="controls col-sm-8">
                     <%= text_field_tag "ils_holding_id", params["ils_holding_id"], :style => "width: 80%;" %>
                 </div>
             </div>
@@ -55,10 +55,10 @@
           <input type="hidden" name="update_uris[]" value="${container.uri}">
         {/for}
         <input type="hidden" name="container_profile_uri" value="">
-        <div class="span8">
-          <div class="control-group">
-            <label class="control-label" for="container_profile"><%= I18n.t("container_profile._singular") %></label>
-            <div class="controls">
+        <div class="col-md-8">
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="container_profile"><%= I18n.t("container_profile._singular") %></label>
+            <div class="controls col-sm-8">
               <%= render_aspace_partial :partial => "top_containers/bulk_operations/container_profile_linker" %>
             </div>
           </div>
@@ -88,10 +88,10 @@
           <input type="hidden" name="update_uris[]" value="${container.uri}">
         {/for}
         <input type="hidden" name="location_uri" value="">
-        <div class="span8">
-          <div class="control-group">
-            <label class="control-label" for="location"><%= I18n.t("location._singular") %></label>
-            <div class="controls">
+        <div class="col-md-8">
+          <div class="form-group">
+            <label class="control-label col-sm-4" for="location"><%= I18n.t("location._singular") %></label>
+            <div class="controls col-sm-8">
               <%= render_aspace_partial :partial => "top_containers/bulk_operations/location_linker" %>
             </div>
           </div>

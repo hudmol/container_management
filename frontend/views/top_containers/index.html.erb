@@ -4,8 +4,8 @@
 
 <%= render_aspace_partial :partial => "top_containers/bulk_operations/search_criteria" %>
 <br/>
-<div class="row-fluid" style="display: none">
-  <div class="span12">
+<div class="row" style="display: none">
+  <div class="col-md-12">
     <%= render_aspace_partial :partial => "top_containers/bulk_operations/toolbar" %>
     <div id="bulk_operation_results" class="record-pane"></div>
     <%= render_aspace_partial :partial => "top_containers/bulk_operations/toolbar" %>
@@ -18,7 +18,7 @@
   </center>
 --></div>
 <div id="template_bulk_operation_error_message"><!--
-  <div id="alertBucket" class="alert alert-error">
+  <div id="alertBucket" class="alert alert-danger">
     ${message}
   </div>
 --></div>
