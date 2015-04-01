@@ -100,6 +100,13 @@ class UserDefinedFieldMigrator
 
   def migrate
 
+    raise "No target ArchivesSpace repository was specified.  You will need to set AppConfig[:at_target_aspace_repo]" unless AppConfig.has_key?(:at_target_aspace_repo)
+
+    repo = Repository[:repo_code => AppConfig[:at_target_aspace_repo]]
+
+    raise "No repository found for repo_code '#{AppConfig[:at_target_aspace_repo]}'" if !repo
+
+
     set_up_temp_tables
     begin
       Log.info("Preloading top container mappings")
@@ -109,72 +116,69 @@ class UserDefinedFieldMigrator
       Sequel.connect(AppConfig[:at_db_url]) do |db|
         at = ArchivistsToolkit.new(db)
 
-        Repository.all.each do |repo|
-          RequestContext.open(:repo_id => repo.id,
-                              :is_high_priority => false,
-                              :current_username => "admin") do
+        RequestContext.open(:repo_id => repo.id,
+                            :is_high_priority => false,
+                            :current_username => "admin") do
 
-            total_count = TopContainer.filter(:repo_id => repo.id).count
-            count = 0
-            TopContainer.filter(:repo_id => repo.id).each do |top_container|
-              count += 1
+          total_count = TopContainer.filter(:repo_id => repo.id).count
+          count = 0
+          TopContainer.filter(:repo_id => repo.id).each do |top_container|
+            count += 1
 
-              if (count % 100) == 0
-                Log.info("Processing top container #{count} of #{total_count}")
+            if (count % 100) == 0
+              Log.info("Processing top container #{count} of #{total_count}")
+            end
+
+            DB.open do |db|
+
+              relationship = TopContainer.find_relationship(:top_container_link)
+
+              subcontainers = relationship.filter(:top_container_id => top_container.id).select(:sub_container_id)
+              instances = Instance.filter(:id => SubContainer.filter(:id => subcontainers).select(:instance_id))
+
+              got_a_match = false
+              container_data = nil
+
+              EXTERNAL_ID_MAPPING.each do |mapping|
+
+                at_record_ids = db[:udf_mig_tc_to_extid].
+                                filter(:top_container_id => top_container.id).
+                                select(mapping[:aspace_column]).
+                                map {|row| row[mapping[:aspace_column]]}
+
+                next if at_record_ids.empty?
+
+                at_containers = at.find_matching_containers(mapping[:at_column], at_record_ids, top_container)
+
+                if at_containers.empty?
+                  true # No match, but maybe we'll get it in the next round.
+                elsif (at_containers - [:no_data]).length > 1
+                  Log.error("Ambiguous containers for #{top_container.values.inspect}: #{at_containers.inspect}")
+
+                  # Still counts as getting a match for logging purposes, but it's a lousy match!
+                  got_a_match = true
+                else
+                  # puts "#{top_container.id}: Good!"
+                  got_a_match = true
+                  container_data = (at_containers - [:no_data]).first
+                end
               end
 
-              DB.open do |db|
-
-                relationship = TopContainer.find_relationship(:top_container_link)
-
-                subcontainers = relationship.filter(:top_container_id => top_container.id).select(:sub_container_id)
-                instances = Instance.filter(:id => SubContainer.filter(:id => subcontainers).select(:instance_id))
-
-                got_a_match = false
-                container_data = nil
-
-                EXTERNAL_ID_MAPPING.each do |mapping|
-
-                  at_record_ids = db[:udf_mig_tc_to_extid].
-                                  filter(:top_container_id => top_container.id).
-                                  select(mapping[:aspace_column]).
-                                  map {|row| row[mapping[:aspace_column]]}
-
-                  next if at_record_ids.empty?
-
-                  at_containers = at.find_matching_containers(mapping[:at_column], at_record_ids, top_container)
-
-                  if at_containers.empty?
-                    true # No match, but maybe we'll get it in the next round.
-                  elsif (at_containers - [:no_data]).length > 1
-                    Log.error("Ambiguous containers for #{top_container.values.inspect}: #{at_containers.inspect}")
-
-                    # Still counts as getting a match for logging purposes, but it's a lousy match!
-                    got_a_match = true
-                  else
-                    # puts "#{top_container.id}: Good!"
-                    got_a_match = true
-                    container_data = (at_containers - [:no_data]).first
-                  end
+              if got_a_match
+                if container_data
+                  apply_update(top_container, container_data)
                 end
-
-                if got_a_match
-                  if container_data
-                    apply_update(top_container, container_data)
-                  end
+              else
+                if db[:udf_mig_tc_to_extid].
+                    filter(:top_container_id => top_container.id).
+                    where { Sequel.~(:accession_id => nil) }.
+                    count > 0
+                  # That's OK.  The top container is linked to an accession, so
+                  # not a huge problem that we didn't find a match.
+                  true
                 else
-                  if db[:udf_mig_tc_to_extid].
-                      filter(:top_container_id => top_container.id).
-                      where { Sequel.~(:accession_id => nil) }.
-                      count > 0
-                    # That's OK.  The top container is linked to an accession, so
-                    # not a huge problem that we didn't find a match.
-                    true
-                  else
-                    Log.error("No matching containers for #{top_container}: #{top_container.values.inspect}")
-                  end
+                  Log.error("No matching containers for #{top_container}: #{top_container.values.inspect}")
                 end
-
               end
             end
           end

@@ -176,6 +176,12 @@ Archivist's Toolkit.  To run this migration:
 
          AppConfig[:at_db_url] = 'jdbc:mysql://localhost:3306/archivists_toolkit?useUnicode=true&characterEncoding=UTF-8&user=at&password=at123'
 
+  * Set the `at_target_aspace_repo` configuration property to the repository
+    code *within ArchivesSpace* what will be receiving the information
+    from the Archivist's Toolkit database:
+
+         AppConfig[:at_target_aspace_repo] = 'MSSA'
+
   * Set the following configuration properties to trigger the
     migration process to run on startup:
 
