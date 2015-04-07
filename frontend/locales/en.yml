@@ -72,6 +72,10 @@ en:
         title: Bulk Operations
         collection_singular: Resource/Accession
         collection_plural: Resources/Accessions
+        collection_resource_singular: Resource
+        collection_resource_plural: Resources
+        collection_accession_singular: Accession
+        collection_accession_plural: Accessions
         series: Series
         current_location: Current Location
         keyword_criteria: Keyword

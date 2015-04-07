@@ -199,7 +199,10 @@ class TopContainersController < ApplicationController
                                                     })
 
     filters = []
-    filters.push({'collection_uri_u_sstr' => params['collection']['ref']}.to_json) if params['collection']
+
+    filters.push({'collection_uri_u_sstr' => params['collection_resource']['ref']}.to_json) if params['collection_resource']
+    filters.push({'collection_uri_u_sstr' => params['collection_accession']['ref']}.to_json) if params['collection_accession']
+
     filters.push({'container_profile_uri_u_sstr' => params['container_profile']['ref']}.to_json) if params['container_profile']
     filters.push({'location_uri_u_sstr' => params['location']['ref']}.to_json) if params['location']
     unless params['exported'].blank?
