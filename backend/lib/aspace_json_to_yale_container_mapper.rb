@@ -18,6 +18,12 @@ class AspaceJsonToYaleContainerMapper
         next
       end
 
+      if !instance['container']
+        # This instance must be empty.  No sub container, digital object or aspace container!
+        Log.warn("Empty instance found.  Skipped!")
+        next
+      end
+
       top_container = get_or_create_top_container(instance)
 
       ensure_harmonious_values(top_container, instance['container'])
