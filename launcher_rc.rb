@@ -1,6 +1,6 @@
 # This file is loaded when the launcher is initialized.
 
-BUFFER_SIZE_BYTES = 32 * 1024
+BUFFER_SIZE_BYTES = 2 * 1024 * 1024
 
 def increase_jetty_buffer_size(server, *)
   server.getConnectors.each do |connector|
