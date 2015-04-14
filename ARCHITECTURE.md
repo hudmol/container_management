@@ -299,15 +299,16 @@ directory, whose structure is as follows:
      ├── assets
      │   ├── box.png
      │   ├── container_profile.png
+     |   ├── extent_calculator.js
      │   ├── jquery.tablesorter.min.js
      │   ├── top_containers.bulk.css
      │   ├── top_containers.bulk.js
      │   ├── top_containers.crud.js
      │   ├── yale_container_loading.gif
-     │   ├── yale_containers.css
-     │   └── yale_containers.index.js
+     │   └── yale_containers.css
      ├── controllers
      │   ├── container_profiles_controller.rb
+     |   ├── extent_calculator_controller.rb
      │   └── top_containers_controller.rb
      ├── locales
      │   ├── enums
@@ -316,6 +317,10 @@ directory, whose structure is as follows:
      ├── plugin_init.rb
      ├── routes.rb
      └── views
+         ├── accessions
+             └── _toolbar.html.erb
+         ├── archival_objects
+             └── _edit_inline.html.erb
          ├── container_profiles
          │   ├── edit.html.erb
          │   ├── _form.html.erb
@@ -327,11 +332,23 @@ directory, whose structure is as follows:
          │   ├── show.html.erb
          │   ├── _sidebar.html.erb
          │   └── _toolbar.html.erb
+         ├── extent_calculator
+         |   ├── _no_object.html.erb
+         |   ├── _show_calculation.html.erb
+         |   ├── _show_calculation_template.html.erb
+         |   └── _toolbar_button.html.erb
          ├── instances
          │   ├── _show.html.erb
          │   ├── _subrecord_form_action.html.erb
          │   └── _template.html.erb
          ├── layout_head.html.erb
+         ├── notes
+         |   └── _template_override.html.erb
+         ├── resources
+         |   └── _edit_inline.html.erb
+         ├── shared
+         |   ├── _component_toolbar.html.erb
+         |   └── _resource_toolbar.html.erb
          ├── sub_containers
          │   ├── _show.html.erb
          │   └── _template.html.erb
