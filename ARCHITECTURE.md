@@ -408,8 +408,9 @@ directory, whose structure is as follows:
       - record browse listings
 
     Note here that any template that shares a name with a standard
-    ArchivesSpace template will override it.  In particular, the files
-    under the `instances` directory override their ArchivesSpace
+    ArchivesSpace template will override it.  In particular, files
+    under the `accessions`, `archival_objects`, `instances`,
+    `resources` and `shared` directories override their ArchivesSpace
     counterparts.
 
 
