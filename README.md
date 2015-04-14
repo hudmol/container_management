@@ -102,6 +102,8 @@ This plugin supports the following configuration options:
 
   * container_management_barcode_length
   * container_management_extent_calculator
+  * map_to_aspace_container_class
+  * map_to_yale_container_class
 
 All configuration is optional. Default values will be used if none are specified. Add these entries to your config/config.rb file if you wish to override the defaults.
 
@@ -134,6 +136,10 @@ The :report_volume option specifies whether the calculator should report a volum
 The :unit option specifies the unit to report. The default is whatever the dimension_units value is in the first container profile it encounters when performing the calculation. Supported values are: :feet, :inches, :meters, :centimeters.
 
 The :decimal_places option specifies the number of decimal places to show for extent values in the report. The default is 2.
+
+### map_to_aspace_container_class and map_to_yale_container_class
+
+Use these options to specify the names of classes you provide to override the default compatibility mapping to and from the original ArchivesSpace container model.
 
 
 ## Temporary workaround for "Full head" errors
