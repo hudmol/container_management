@@ -217,11 +217,11 @@ The backend changes are divided up as follows:
     
     also in the `lib` directory are two classes that support migration
     of existing ArchivesSpace container data.
-       - `container_management_migration.rb` implements some performance
-         optimizations for migrating regular AS containers to the new
-         model.
+      - `container_management_migration.rb` implements some performance
+        optimizations for migrating regular AS containers to the new
+        model.
       - `user_defined_field_migrator.rb` migrates Yale's user defined
-         field data from Archivists' Toolkit into the new container model.
+        field data from Archivists' Toolkit into the new container model.
 
   * The `model` directory contains the code responsible for storing
     and loading the new container model objects to and from the
@@ -233,17 +233,17 @@ The backend changes are divided up as follows:
         to "mix in" new functionality defined in the `mixins`
         directory.
 
-     - `top_container.rb`, `sub_container.rb`, `container_profile.rb`
-       'rights_restriction` and `rights_restriction_type.rb` contain
-       the code for saving, storing and
-       manipulating the new record types to/from/within the database.
-       `top_container.rb` is the most interesting: in
-       addition to the usual database mappings, it also contains the
-       logic for performing batch updates of Top Container records.
+      - `top_container.rb`, `sub_container.rb`, `container_profile.rb`,
+        `rights_restriction` and `rights_restriction_type.rb` contain
+        the code for saving, storing and
+        manipulating the new record types to/from/within the database.
+        `top_container.rb` is the most interesting: in
+        addition to the usual database mappings, it also contains the
+        logic for performing batch updates of Top Container records.
      
-     - `extent_calculator.rb` contains the logic for calculating the
-       extent of an object, or tree of objects, based on the profiles
-       of the containers that contain the parts of the object.
+      - `extent_calculator.rb` contains the logic for calculating the
+        extent of an object, or tree of objects, based on the profiles
+        of the containers that contain the parts of the object.
 
   * The `model/mixins` directory contains ruby modules that implement
     particular concerns of the new container model.  Working through
@@ -271,8 +271,8 @@ The backend changes are divided up as follows:
         whether a container should be marked as restricted based on
         its contents.
       
-     - `rights_restriction_notes.rb` implements special handling
-       for notes records involved in rights restriction calculations.
+      - `rights_restriction_notes.rb` implements special handling
+        for notes records involved in rights restriction calculations.
 
       - `sub_containers.rb` adds support for the new Subcontainer
         record to existing ArchivesSpace Instance records.
