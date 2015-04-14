@@ -318,9 +318,9 @@ directory, whose structure is as follows:
      ├── routes.rb
      └── views
          ├── accessions
-             └── _toolbar.html.erb
+         |   └── _toolbar.html.erb
          ├── archival_objects
-             └── _edit_inline.html.erb
+         |   └── _edit_inline.html.erb
          ├── container_profiles
          │   ├── edit.html.erb
          │   ├── _form.html.erb
