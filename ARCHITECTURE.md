@@ -163,25 +163,33 @@ The backend changes are divided up as follows:
 
      ├── controllers
      │   ├── container_profile.rb
-     │   └── container.rb
+     │   ├── container.rb
+     |   └── extent_calculator.rb
      ├── lib
      │   ├── aspace_json_to_yale_container_mapper.rb
-     │   └── subcontainer_to_aspace_json_mapper.rb
+     |   ├── container_management_migration.rb
+     │   ├── subcontainer_to_aspace_json_mapper.rb
+     |   └── user_defined_field_migrator.rb
      ├── model
      │   ├── accession_ext.rb
      │   ├── archival_object_ext.rb
      │   ├── container_profile.rb
+     |   ├── extent_calculator.rb
      │   ├── instance_ext.rb
      │   ├── resource_ext.rb
+     |   ├── resource_trees_ext.rb
+     |   ├── rights_restriction.rb
+     |   ├── rights_restriction_type.rb
      │   ├── sub_container.rb
-     │   └── top_container.rb
-     │   ├── mixins
-     │   │   ├── archival_object_series.rb
-     │   │   ├── map_to_aspace_container.rb
-     │   │   ├── reindex_top_containers.rb
-     │   │   ├── rights_statement_restrictions.rb
-     │   │   └── sub_containers.rb
-     ├── plugin_init.rb
+     │   ├── top_container.rb
+     │   └── mixins
+     │       ├── archival_object_series.rb
+     │       ├── map_to_aspace_container.rb
+     │       ├── reindex_top_containers.rb
+     │       ├── restriction_calculator.rb
+     |       ├── rights_restriction_notes.rb
+     │       └── sub_containers.rb
+     └── plugin_init.rb
 
 
   * the `controllers` directory contains the definitions of the REST
@@ -206,6 +214,14 @@ The backend changes are divided up as follows:
     ArchivesSpace container model and the new container model, so that
     code written in terms of the ArchivesSpace container model
     continues to function normally.
+    
+    also in the `lib` directory are two classes that support migration
+    of existing ArchivesSpace container data.
+       - `container_management_migration.rb` implements some performance
+         optimizations for migrating regular AS containers to the new
+         model.
+      - `user_defined_field_migrator.rb` migrates Yale's user defined
+         field data from Archivists' Toolkit into the new container model.
 
   * The `model` directory contains the code responsible for storing
     and loading the new container model objects to and from the
@@ -217,12 +233,17 @@ The backend changes are divided up as follows:
         to "mix in" new functionality defined in the `mixins`
         directory.
 
-     - `top_container.rb`, `sub_container.rb` and
-       `container_profile.rb` contain the code for saving, storing and
+     - `top_container.rb`, `sub_container.rb`, `container_profile.rb`
+       'rights_restriction` and `rights_restriction_type.rb` contain
+       the code for saving, storing and
        manipulating the new record types to/from/within the database.
-       Of the three, `top_container.rb` is the most interesting: in
+       `top_container.rb` is the most interesting: in
        addition to the usual database mappings, it also contains the
        logic for performing batch updates of Top Container records.
+     
+     - `extent_calculator.rb` contains the logic for calculating the
+       extent of an object, or tree of objects, based on the profiles
+       of the containers that contain the parts of the object.
 
   * The `model/mixins` directory contains ruby modules that implement
     particular concerns of the new container model.  Working through
@@ -246,10 +267,12 @@ The backend changes are divided up as follows:
         it's important that they get reindexed when those linkages
         change.
 
-      - `rights_statement_restrictions.rb` adds support for asking an
-        Accession, Resource or Archival Object record to determine
-        whether its ArchivesSpace rights records would cause it to be
-        marked as restricted.
+      - `restriction_calculator.rb` contains the logic for calculating
+        whether a container should be marked as restricted based on
+        its contents.
+      
+     - `rights_restriction_notes.rb` implements special handling
+       for notes records involved in rights restriction calculations.
 
       - `sub_containers.rb` adds support for the new Subcontainer
         record to existing ArchivesSpace Instance records.
