@@ -9,6 +9,10 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
+  class LocationMismatchException < ValidationException
+  end
+
+
   def call
     @json['instances'].each do |instance|
 
@@ -26,7 +30,25 @@ class AspaceJsonToYaleContainerMapper
 
       top_container = get_or_create_top_container(instance)
 
-      ensure_harmonious_values(top_container, instance['container'])
+      begin
+        ensure_harmonious_values(top_container, instance['container'])
+      rescue LocationMismatchException => e
+        if @json.is_a?(JSONModel(:accession))
+          # We handle this case specially because the AT migrator sends multiple
+          # locations attached to an accession as containers with identical
+          # indicator_1 values but differing locations.
+          #
+          # For an accession, match on indicator_1 but mismatch on location
+          # means we're really talking about different Top Containers.
+
+          container = instance['container']
+
+          top_container = create_top_container('indicator' => get_default_indicator(container['indicator_1']),
+                                               'container_locations' => container['container_locations'])
+        else
+          raise e
+        end
+      end
 
       subcontainer = {
         'top_container' => {'ref' => top_container.uri},
@@ -70,10 +92,9 @@ class AspaceJsonToYaleContainerMapper
         top_container
       else
         indicator = container['indicator_1'] || get_default_indicator
-        TopContainer.create_from_json(JSONModel(:top_container).from_hash('barcode' => barcode,
-                                                                          'indicator' => indicator,
-                                                                          'container_locations' => container['container_locations']
-                                                                         ))
+        create_top_container('barcode' => barcode,
+                             'indicator' => indicator,
+                             'container_locations' => container['container_locations'])
       end
     else
       nil
@@ -154,13 +175,13 @@ class AspaceJsonToYaleContainerMapper
       top_container.update_from_json(json)
       top_container.refresh
     else
-      raise ValidationException.new(:errors => {'container_locations' => ["Locations in ArchivesSpace container don't match locations in existing top container"]},
-                                    :object_context => {
-                                      :top_container => top_container,
-                                      :aspace_container => aspace_container,
-                                      :top_container_locations => top_container_locations,
-                                      :aspace_locations => aspace_locations,
-                                    })
+      raise LocationMismatchException.new(:errors => {'container_locations' => ["Locations in ArchivesSpace container don't match locations in existing top container"]},
+                                          :object_context => {
+                                            :top_container => top_container,
+                                            :aspace_container => aspace_container,
+                                            :top_container_locations => top_container_locations,
+                                            :aspace_locations => aspace_locations,
+                                          })
     end
 
   end
@@ -196,11 +217,15 @@ class AspaceJsonToYaleContainerMapper
     end
 
     Log.info("Creating a new Top Container for a container with no barcode")
+    create_top_container('indicator' => (container['indicator_1'] || get_default_indicator),
+                         'container_locations' => container['container_locations'])
+  end
 
-    created = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => (container['indicator_1'] || get_default_indicator),
-                                                                                'container_locations' => container['container_locations'],
-                                                                               ))
+
+  def create_top_container(values)
+    created = TopContainer.create_from_json(JSONModel(:top_container).from_hash(values))
     @new_top_containers << created
+
     created
   end
 
@@ -223,8 +248,8 @@ class AspaceJsonToYaleContainerMapper
   end
 
 
-  def get_default_indicator
-    "system_indicator_#{SecureRandom.hex}"
+  def get_default_indicator(prefix = 'system_indicator')
+    "#{prefix}_#{SecureRandom.hex}"
   end
 
 
