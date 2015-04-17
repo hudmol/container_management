@@ -17,6 +17,11 @@ end
 
 describe 'Managed Container compatibility' do
 
+  before(:each) do
+    stub_barcode_length(0, 255)
+  end
+
+
   describe "mapping managed containers to archivesspace containers" do
 
     it "maps a subcontainer/topcontainer/container profile to an ArchivesSpace instance record" do
