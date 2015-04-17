@@ -1,4 +1,4 @@
-# Take our record containing Yale containers and generate corresponding
+# Take our record containing managed containers and generate corresponding
 # ArchivesSpace container records.
 class SubContainerToAspaceJsonMapper
 

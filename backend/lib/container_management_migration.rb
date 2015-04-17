@@ -96,7 +96,7 @@ class ContainerManagementMigration
   # An extension of the standard mapper which gets handed hashes of all top
   # containers used in the current resource and series.  Uses those to avoid
   # expensive SQL queries to search back up the tree.
-  class MigrationMapper < AspaceJsonToYaleContainerMapper
+  class MigrationMapper < AspaceJsonToManagedContainerMapper
 
     def initialize(json, new_record, resource_top_containers)
       super(json, new_record)

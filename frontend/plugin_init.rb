@@ -2,14 +2,14 @@ my_routes = [File.join(File.dirname(__FILE__), "routes.rb")]
 ArchivesSpace::Application.config.paths['config/routes'].concat(my_routes)
 
 Rails.application.config.after_initialize do
-  require_relative "../yale_container_init"
+  require_relative "../managed_container_init"
 
   ApplicationController.class_eval do
 
-    alias_method :find_opts_pre_yale_container, :find_opts
+    alias_method :find_opts_pre_managed_container, :find_opts
 
     def find_opts
-      orig = find_opts_pre_yale_container
+      orig = find_opts_pre_managed_container
       orig.merge('resolve[]' => orig['resolve[]'] + ['top_container', 'container_profile'])
     end
 
@@ -18,11 +18,11 @@ Rails.application.config.after_initialize do
 
   SearchHelper.class_eval do
 
-    alias_method :can_edit_search_result_pre_yale_container?, :can_edit_search_result?
+    alias_method :can_edit_search_result_pre_managed_container?, :can_edit_search_result?
 
     def can_edit_search_result?(record)
       return user_can?('update_container_record', record['id']) if record['primary_type'] === "top_container"
-      can_edit_search_result_pre_yale_container?(record)
+      can_edit_search_result_pre_managed_container?(record)
     end
 
   end

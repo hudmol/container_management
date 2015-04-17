@@ -33,10 +33,10 @@ en:
     restricted: Restricted?
     parent: Parent Container
 
-    yale_container_2_type: Child Container Type
-    yale_container_2_indicator: Child Container Indicator
-    yale_container_3_type: Grandchild Container Type
-    yale_container_3_indicator: Grandchild Container Indicator
+    managed_container_2_type: Child Container Type
+    managed_container_2_indicator: Child Container Indicator
+    managed_container_3_type: Grandchild Container Type
+    managed_container_3_indicator: Grandchild Container Indicator
 
     barcode_length_for_this_repository: "Barcode length for this repository:"
     characters: characters

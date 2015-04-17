@@ -1,7 +1,7 @@
 require 'spec_helper'
 require_relative 'factories'
 
-describe 'Yale Container mixin' do
+describe 'Managed Container mixin' do
 
   it "can create an Accession with a Sub Container" do
     top_container = build(:json_top_container, {})

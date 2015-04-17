@@ -166,7 +166,7 @@ The backend changes are divided up as follows:
      │   ├── container.rb
      |   └── extent_calculator.rb
      ├── lib
-     │   ├── aspace_json_to_yale_container_mapper.rb
+     │   ├── aspace_json_to_managed_container_mapper.rb
      |   ├── container_management_migration.rb
      │   ├── subcontainer_to_aspace_json_mapper.rb
      |   └── user_defined_field_migrator.rb
@@ -200,7 +200,7 @@ The backend changes are divided up as follows:
     the mappings between the existing ArchivesSpace container model
     and the new container model:
 
-      - `aspace_json_to_yale_container_mapper.rb` takes the JSONModel
+      - `aspace_json_to_managed_container_mapper.rb` takes the JSONModel
         representation of an ArchivesSpace record (such as an
         Accession, Resource or Archival Object) and converts any
         embedded Container records into the equivalent configuration
@@ -220,8 +220,9 @@ The backend changes are divided up as follows:
       - `container_management_migration.rb` implements some performance
         optimizations for migrating regular AS containers to the new
         model.
-      - `user_defined_field_migrator.rb` migrates Yale's user defined
-        field data from Archivists' Toolkit into the new container model.
+      - `user_defined_field_migrator.rb` migrates user defined field
+        data for containers from Archivists' Toolkit into the new
+        container model.
 
   * The `model` directory contains the code responsible for storing
     and loading the new container model objects to and from the
@@ -304,8 +305,8 @@ directory, whose structure is as follows:
      │   ├── top_containers.bulk.css
      │   ├── top_containers.bulk.js
      │   ├── top_containers.crud.js
-     │   ├── yale_container_loading.gif
-     │   └── yale_containers.css
+     │   ├── managed_container_loading.gif
+     │   └── managed_containers.css
      ├── controllers
      │   ├── container_profiles_controller.rb
      |   ├── extent_calculator_controller.rb
