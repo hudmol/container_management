@@ -240,31 +240,48 @@ describe 'Yale Container compatibility' do
     TopContainer.to_jsonmodel(created.id)['container_locations'][0]['ref'].should eq(location.uri)
   end
 
-  it "checks for differences in location records when re-using top containers" do
+  it "creates new top containers when containers on an accession match indicators but not locations" do
     location_1 = create(:json_location)
     location_2 = create(:json_location)
 
-    container = TopContainer.create_from_json(JSONModel(:top_container).from_hash('indicator' => '1234',
-                                                                                  'barcode' => '12345678',
-                                                                                  "container_locations" => [
-                                                                                    JSONModel(:container_location).from_hash('status' => 'current',
-                                                                                                                             'start_date' => '2000-01-01',
-                                                                                                                             'ref' => location_1.uri)
-                                                                                  ]))
+    # Using a different location!
+    instances = [location_1, location_2].map {|location|
+      JSONModel(:instance).from_hash("instance_type" => "text",
+                                     "container" => {
+                                       "barcode_1" => '12345678',
+                                       "container_locations" => [
+                                         JSONModel(:container_location).from_hash('status' => 'current',
+                                                                                  'start_date' => '2000-01-01',
+                                                                                  'ref' => location.uri)
+                                       ]
+                                     })
+    }
+
+    accession = create_accession({"instances" => instances})
+
+    Accession.to_jsonmodel(accession.id)['instances'].map {|instance| instance['sub_container']['top_container']['ref']}.uniq.length.should eq(2)
+  end
+
+
+  it "detects differences in location and throws an error for non-accessions" do
+    location_1 = create(:json_location)
+    location_2 = create(:json_location)
 
     # Using a different location!
-    instance = JSONModel(:instance).from_hash("instance_type" => "text",
-                                              "container" => {
-                                                "barcode_1" => '12345678',
-                                                "container_locations" => [
-                                                  JSONModel(:container_location).from_hash('status' => 'current',
-                                                                                           'start_date' => '2000-01-01',
-                                                                                           'ref' => location_2.uri)
-                                                ]
-                                              })
+    instances = [location_1, location_2].map {|location|
+      JSONModel(:instance).from_hash("instance_type" => "text",
+                                     "container" => {
+                                       "barcode_1" => '12345678',
+                                       "container_locations" => [
+                                         JSONModel(:container_location).from_hash('status' => 'current',
+                                                                                  'start_date' => '2000-01-01',
+                                                                                  'ref' => location.uri)
+                                       ]
+                                     })
+    }
 
     expect {
-      accession = create_accession({"instances" => [instance]})
+      create_resource({"instances" => instances})
     }.to raise_error(ValidationException)
   end
 
