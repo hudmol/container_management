@@ -15,7 +15,7 @@ Permission.define("update_container_profile_record",
                   :implied_by => 'manage_container_profile_record',
                   :level => "global")
 
-require_relative "../yale_container_init"
+require_relative "../managed_container_init"
 
 Dir.glob(File.join(File.dirname(__FILE__), "lib", "*.rb")).sort.each do |file|
   require File.absolute_path(file)

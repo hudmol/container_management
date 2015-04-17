@@ -1,7 +1,7 @@
 require 'spec_helper'
 require_relative 'factories'
 
-describe 'Yale Container Profile model' do
+describe 'Managed Container Profile model' do
 
   it "can be created from a JSON module" do
     cp = ContainerProfile.create_from_json(build(:json_container_profile, :name => "Big black bag"))

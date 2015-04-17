@@ -1,4 +1,4 @@
-class AspaceJsonToYaleContainerMapper
+class AspaceJsonToManagedContainerMapper
 
   include JSONModel
 

@@ -1,7 +1,7 @@
 class ArchivesSpaceService < Sinatra::Base
 
   Endpoint.get('/repositories/:repo_id/top_containers/search')
-  .description("Search for yale containers")
+  .description("Search for top containers")
   .params(["repo_id", :repo_id],
           *BASE_SEARCH_PARAMS)
   .permissions([:view_repository])
@@ -26,7 +26,7 @@ class ArchivesSpaceService < Sinatra::Base
 
 
   Endpoint.post('/repositories/:repo_id/top_containers/:id')
-    .description("Update a yale container")
+    .description("Update a top container")
     .params(["id", :id],
             ["top_container", JSONModel(:top_container), "The updated record", :body => true],
             ["repo_id", :repo_id])
@@ -38,7 +38,7 @@ class ArchivesSpaceService < Sinatra::Base
 
 
   Endpoint.post('/repositories/:repo_id/top_containers')
-    .description("Create a yale container")
+    .description("Create a top container")
     .params(["top_container", JSONModel(:top_container), "The record to create", :body => true],
             ["repo_id", :repo_id])
     .permissions([:update_container_record])
@@ -60,7 +60,7 @@ class ArchivesSpaceService < Sinatra::Base
 
 
   Endpoint.get('/repositories/:repo_id/top_containers/:id')
-    .description("Get a yale container by ID")
+    .description("Get a top container by ID")
     .params(["id", :id],
             ["repo_id", :repo_id],
             ["resolve", :resolve])
@@ -74,7 +74,7 @@ class ArchivesSpaceService < Sinatra::Base
 
 
   Endpoint.delete('/repositories/:repo_id/top_containers/:id')
-    .description("Delete a yale container")
+    .description("Delete a top container")
     .params(["id", :id],
             ["repo_id", :repo_id])
     .permissions([:manage_container_record])
@@ -85,7 +85,7 @@ class ArchivesSpaceService < Sinatra::Base
 
 
   Endpoint.post('/repositories/:repo_id/top_containers/batch/ils_holding_id')
-    .description("Update ils_holding_id for a batch of yale containers")
+    .description("Update ils_holding_id for a batch of top containers")
     .params(["ids", [Integer]],
             ["ils_holding_id", String, "Value to set for ils_holding_id"],
             ["repo_id", :repo_id])
@@ -98,7 +98,7 @@ class ArchivesSpaceService < Sinatra::Base
 
 
   Endpoint.post('/repositories/:repo_id/top_containers/batch/container_profile')
-    .description("Update container profile for a batch of yale containers")
+    .description("Update container profile for a batch of top containers")
     .params(["ids", [Integer]],
             ["container_profile_uri", String, "The uri of the container profile"],
             ["repo_id", :repo_id])
@@ -111,7 +111,7 @@ class ArchivesSpaceService < Sinatra::Base
 
 
   Endpoint.post('/repositories/:repo_id/top_containers/batch/location')
-    .description("Update location for a batch of yale containers")
+    .description("Update location for a batch of top containers")
     .params(["ids", [Integer]],
             ["location_uri", String, "The uri of the location"],
             ["repo_id", :repo_id])

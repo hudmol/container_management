@@ -7,8 +7,8 @@ Sequel.migration do
     ## Start by dropping everything left over from the first prototype version
     ## (and any failed runs from this one)
 
-    target_tables = [:yale_container, :yale_container_instance_rlshp,
-                     :yale_container_housed_at_rlshp, :top_container, :sub_container,
+    target_tables = [:managed_container, :managed_container_instance_rlshp,
+                     :managed_container_housed_at_rlshp, :top_container, :sub_container,
                      :top_container_housed_at_rlshp, :top_container_link_rlshp,
                      :container_profile, :top_container_profile_rlshp]
 
@@ -45,7 +45,7 @@ Sequel.migration do
     end
 
     alter_table(:top_container) do
-      add_unique_constraint([:repo_id, :barcode], :name => "yale_uniq_barcode")
+      add_unique_constraint([:repo_id, :barcode], :name => "top_container_uniq_barcode")
     end
 
 

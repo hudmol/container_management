@@ -24,7 +24,7 @@ end
 
 
 
-describe 'Yale container restrictions' do
+describe 'managed container restrictions' do
 
   let (:box_json) { create(:json_top_container, :indicator => "1", :barcode => "123") }
   let (:box_record) { TopContainer[box_json.id] }

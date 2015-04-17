@@ -26,7 +26,7 @@ def build_container_location(location_uri, status = 'current')
 end
 
 
-describe 'Yale Container model' do
+describe 'Managed Container model' do
 
   before(:each) do
     # Permissive default!
@@ -41,14 +41,14 @@ describe 'Yale Container model' do
     exported_to_ils = Time.at(1234567890).iso8601
     legacy_restricted = false
 
-    yale_box_container = build(:json_top_container,
+    top_container = build(:json_top_container,
                                'barcode' => barcode,
                                'ils_holding_id' => ils_holding_id,
                                'ils_item_id' => ils_item_id,
                                'exported_to_ils' => exported_to_ils,
                                'legacy_restricted' => legacy_restricted)
 
-    box_id = TopContainer.create_from_json(yale_box_container, :repo_id => $repo_id).id
+    box_id = TopContainer.create_from_json(top_container, :repo_id => $repo_id).id
 
     box = TopContainer.to_jsonmodel(box_id)
     box.barcode.should eq(barcode)

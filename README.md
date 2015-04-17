@@ -1,4 +1,4 @@
-Yale Containers
+Managed Containers
 ===============
 
 ArchivesSpace plugin to add a new container type to ArchivesSpace.
@@ -10,15 +10,15 @@ http://campuspress.yale.edu/yalearchivesspace/2014/11/20/managing-content-managi
 To install, just activate the plugin in your config/config.rb file by
 including an entry such as:
 
-     # If you have other plugins loaded, just add 'yale_containers' to
+     # If you have other plugins loaded, just add 'managed_containers' to
      # the list
-     AppConfig[:plugins] = ['local', 'other_plugins', 'yale_containers']
+     AppConfig[:plugins] = ['local', 'other_plugins', 'managed_containers']
 
-And then clone the `yale_containers` repository into your
+And then clone the `managed_containers` repository into your
 ArchivesSpace plugins directory.  For example:
 
      cd /path/to/your/archivesspace/plugins
-     git clone https://github.com/hudmol/yale_containers.git yale_containers
+     git clone https://github.com/hudmol/managed_containers.git managed_containers
 
 
 ## Upgrading from a previous release
@@ -26,7 +26,7 @@ ArchivesSpace plugins directory.  For example:
 Each release of this plugin comes with some database schema changes
 that need to be applied.  To upgrade from a previous release:
 
-  1. Replace your `/path/to/archivesspace/plugins/yale_containers`
+  1. Replace your `/path/to/archivesspace/plugins/managed_containers`
      directory with the new release version
 
   2. Run the database setup script to update all tables to the latest
@@ -103,7 +103,7 @@ This plugin supports the following configuration options:
   * container_management_barcode_length
   * container_management_extent_calculator
   * map_to_aspace_container_class
-  * map_to_yale_container_class
+  * map_to_managed_container_class
 
 All configuration is optional. Default values will be used if none are specified. Add these entries to your config/config.rb file if you wish to override the defaults.
 
@@ -137,7 +137,7 @@ The :unit option specifies the unit to report. The default is whatever the dimen
 
 The :decimal_places option specifies the number of decimal places to show for extent values in the report. The default is 2.
 
-### map_to_aspace_container_class and map_to_yale_container_class
+### map_to_aspace_container_class and map_to_managed_container_class
 
 Use these options to specify the names of classes you provide to override the default compatibility mapping to and from the original ArchivesSpace container model.
 

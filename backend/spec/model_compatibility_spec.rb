@@ -10,14 +10,14 @@ def stub_default_indicator
   AppConfig.stub(:[]).and_call_original
   AppConfig.stub(:has_key?).and_call_original
 
-  AppConfig.stub(:has_key?).with(:yale_containers_default_indicator).and_return(true)
-  AppConfig.stub(:[]).with(:yale_containers_default_indicator).and_return(DEFAULT_INDICATOR)
+  AppConfig.stub(:has_key?).with(:managed_containers_default_indicator).and_return(true)
+  AppConfig.stub(:[]).with(:managed_containers_default_indicator).and_return(DEFAULT_INDICATOR)
 end
 
 
-describe 'Yale Container compatibility' do
+describe 'Managed Container compatibility' do
 
-  describe "mapping yale containers to archivesspace containers" do
+  describe "mapping managed containers to archivesspace containers" do
 
     it "maps a subcontainer/topcontainer/container profile to an ArchivesSpace instance record" do
       location = create(:json_location)
