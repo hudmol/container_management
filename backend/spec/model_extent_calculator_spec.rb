@@ -44,6 +44,10 @@ describe 'Extent Calculator model' do
   let (:a_bigbox) { create(:json_top_container, 'container_profile' => {'ref' => bigbox_profile.uri}) }
   let (:a_box_without_a_profile) { create(:json_top_container, 'container_profile' => nil) }
 
+  let (:big_box_name) { "big box [18d, 12h, 15w inches] extent measured by width" }
+  let (:tiny_box_name) { "tiny box [1.5d, 4.5h, 3w centimeters] extent measured by depth" }
+
+
   it "can calculate the total extent for a resource" do
     (resource, grandparent, parent, child) = create_tree(a_bigbox)
     ext_cal = ExtentCalculator.new(resource)
@@ -71,7 +75,7 @@ describe 'Extent Calculator model' do
   it "tells you how many of each kind of container it found" do
     (resource, grandparent, parent, child) = create_tree(a_bigbox)
     ext_cal = ExtentCalculator.new(resource)
-    ext_cal.containers("big box")[:count].should eq(1)
+    ext_cal.containers("big box [18d, 12h, 15w inches] extent measured by width")[:count].should eq(1)
   end
 
 
@@ -91,14 +95,14 @@ describe 'Extent Calculator model' do
     baby = create_ao_with_instances(resource, child, boxes)
     tiny_boxes = create_containers(tinybox_profile, 21)
     create_ao_with_instances(resource, baby, tiny_boxes)
-    
+
     ext_cal = ExtentCalculator.new(resource)
     ext_cal.units = :centimeters
     ext_cal.total_extent.should eq(bigbox_extent*11*inch_to_cm+21*1.5)
-    ext_cal.containers("big box")[:count].should eq(11)
-    ext_cal.containers("big box")[:extent].should eq(bigbox_extent*11*inch_to_cm)
-    ext_cal.containers("tiny box")[:count].should eq(21)
-    ext_cal.containers("tiny box")[:extent].should eq(21*1.5)
+    ext_cal.containers(big_box_name)[:count].should eq(11)
+    ext_cal.containers(big_box_name)[:extent].should eq(bigbox_extent*11*inch_to_cm)
+    ext_cal.containers(tiny_box_name)[:count].should eq(21)
+    ext_cal.containers(tiny_box_name)[:extent].should eq(21*1.5)
   end
 
 
