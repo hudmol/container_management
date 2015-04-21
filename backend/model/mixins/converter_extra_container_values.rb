@@ -47,6 +47,7 @@ module ConverterExtraContainerValues
 
           cont =  inst.container
           cont['barcode_1'] = barcode if barcode
+          cont['container_profile_key'] = att("altrender")
         end
 
         # now we fill it in
