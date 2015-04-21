@@ -1,5 +1,5 @@
-Managed Containers
-===============
+Container Management
+====================
 
 ArchivesSpace plugin to add a new container type to ArchivesSpace.
 More information on these at
@@ -10,15 +10,15 @@ http://campuspress.yale.edu/yalearchivesspace/2014/11/20/managing-content-managi
 To install, just activate the plugin in your config/config.rb file by
 including an entry such as:
 
-     # If you have other plugins loaded, just add 'managed_containers' to
+     # If you have other plugins loaded, just add 'container_management' to
      # the list
-     AppConfig[:plugins] = ['local', 'other_plugins', 'managed_containers']
+     AppConfig[:plugins] = ['local', 'other_plugins', 'container_management']
 
-And then clone the `managed_containers` repository into your
+And then clone the `container_management` repository into your
 ArchivesSpace plugins directory.  For example:
 
      cd /path/to/your/archivesspace/plugins
-     git clone https://github.com/hudmol/managed_containers.git managed_containers
+     git clone https://github.com/hudmol/container_management.git container_management
 
 
 ## Upgrading from a previous release
@@ -26,7 +26,7 @@ ArchivesSpace plugins directory.  For example:
 Each release of this plugin comes with some database schema changes
 that need to be applied.  To upgrade from a previous release:
 
-  1. Replace your `/path/to/archivesspace/plugins/managed_containers`
+  1. Replace your `/path/to/archivesspace/plugins/container_management`
      directory with the new release version
 
   2. Run the database setup script to update all tables to the latest
