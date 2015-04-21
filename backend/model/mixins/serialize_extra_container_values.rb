@@ -29,6 +29,12 @@ module SerializeExtraContainerValues
           atts[:label] << " [#{inst['container']['barcode_1']}]"
         end
       end
+
+      container_profile = inst['sub_container']['top_container']['_resolved']['container_profile']['_resolved'] rescue nil
+      if container_profile
+        atts[:altrender] = container_profile['url'] || container_profile['name']
+      end
+
       xml.container(atts) {
         sanitize_mixed_content(text, xml, fragments)
       }
