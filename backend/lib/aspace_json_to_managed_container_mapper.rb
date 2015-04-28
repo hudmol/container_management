@@ -43,8 +43,9 @@ class AspaceJsonToManagedContainerMapper
 
           container = instance['container']
 
-          top_container = create_top_container('indicator' => get_default_indicator(container['indicator_1']),
-                                               'container_locations' => container['container_locations'])
+          top_container = create_top_container({'indicator' => get_default_indicator(container['indicator_1']),
+                                                'container_locations' => container['container_locations']},
+                                               find_container_profile(container))
         else
           raise e
         end
@@ -92,9 +93,10 @@ class AspaceJsonToManagedContainerMapper
         top_container
       else
         indicator = container['indicator_1'] || get_default_indicator
-        create_top_container('barcode' => barcode,
-                             'indicator' => indicator,
-                             'container_locations' => container['container_locations'])
+        create_top_container({'barcode' => barcode,
+                              'indicator' => indicator,
+                              'container_locations' => container['container_locations']},
+                             find_container_profile(container))
       end
     else
       nil
@@ -217,12 +219,21 @@ class AspaceJsonToManagedContainerMapper
     end
 
     Log.info("Creating a new Top Container for a container with no barcode")
-    create_top_container('indicator' => (container['indicator_1'] || get_default_indicator),
-                         'container_locations' => container['container_locations'])
+    create_top_container({'indicator' => (container['indicator_1'] || get_default_indicator),
+                          'container_locations' => container['container_locations']},
+                         find_container_profile(container))
   end
 
 
-  def create_top_container(values)
+  def create_top_container(values, container_profile = nil)
+    if container_profile
+      values = {
+                  'container_profile' => {
+                    'ref' => container_profile.uri
+                  }
+                }.merge(values)
+    end
+
     created = TopContainer.create_from_json(JSONModel(:top_container).from_hash(values))
     @new_top_containers << created
 
@@ -286,6 +297,14 @@ class AspaceJsonToManagedContainerMapper
 
     TopContainer[:indicator => indicator,
                  :id => top_containers_for_subcontainers]
+  end
+
+
+  def find_container_profile(container)
+    key = container['container_profile_key']
+    if key
+      ContainerProfile.filter(:name => key).or(:url => key).first
+    end
   end
 
 end
