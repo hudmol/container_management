@@ -23,16 +23,17 @@ module SerializeExtraContainerValues
 
       atts[:type] = inst['container']["type_#{n}"]
       text = inst['container']["indicator_#{n}"]
+
       if n == 1 && inst['instance_type']
         atts[:label] = I18n.t("enumerations.instance_instance_type.#{inst['instance_type']}", :default => inst['instance_type'])
         if inst['container']['barcode_1']
           atts[:label] << " [#{inst['container']['barcode_1']}]"
         end
-      end
 
-      container_profile = inst['sub_container']['top_container']['_resolved']['container_profile']['_resolved'] rescue nil
-      if container_profile
-        atts[:altrender] = container_profile['url'] || container_profile['name']
+        container_profile = inst['sub_container']['top_container']['_resolved']['container_profile']['_resolved'] rescue nil
+        if container_profile
+          atts[:altrender] = container_profile['url'] || container_profile['name']
+        end
       end
 
       xml.container(atts) {
