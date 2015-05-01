@@ -339,4 +339,102 @@ describe 'Managed Container compatibility' do
   end
 
 
+  it "detects differences in container profile and throws an error" do
+    barcode = '12345678'
+    container_profile_a = create(:json_container_profile,
+                               'name' => 'Flat Grey 16x20x3')
+
+    container_profile_b_key = 'A different profile'
+    container_profile_b = create(:json_container_profile,
+                               'name' => container_profile_b_key)
+
+    container_json = JSONModel(:top_container).from_hash({
+                                                           'indicator' => '123',
+                                                           'barcode' => barcode,
+                                                           'container_profile' => {
+                                                             'ref' => container_profile_a.uri
+                                                           }
+                                                         })
+    container = TopContainer.create_from_json(container_json)
+
+    instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                              "container" => {
+                                                "barcode_1" => barcode,
+                                                "indicator_1" => '123',
+                                                "type_2" => 'folder',
+                                                "indicator_2" => 'ind2',
+                                                "type_3" => 'reel',
+                                                "indicator_3" => 'ind3'
+                                              }).to_hash
+
+    instance['container']['container_profile_key'] = container_profile_b_key
+
+    expect {
+      create_resource({"instances" => [instance]})
+    }.to raise_error(ValidationException)
+  end
+
+
+  it "maps incoming container profile if matching top container doesn't already have one" do
+    barcode = '12345678'
+    container_profile_key = 'Flat Grey 16x20x3'
+    container_profile = create(:json_container_profile,
+                                 'name' => container_profile_key)
+
+    container_json = JSONModel(:top_container).from_hash({
+                                                           'indicator' => '123',
+                                                           'barcode' => barcode
+                                                         })
+    container = TopContainer.create_from_json(container_json)
+
+    instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                              "container" => {
+                                                "barcode_1" => barcode,
+                                                "indicator_1" => '123',
+                                                "type_2" => 'folder',
+                                                "indicator_2" => 'ind2',
+                                                "type_3" => 'reel',
+                                                "indicator_3" => 'ind3'
+                                              }).to_hash
+
+    instance['container']['container_profile_key'] = container_profile_key
+
+    create_resource({"instances" => [instance]})
+
+    container_json = TopContainer.to_jsonmodel(container.id)
+    container_json['container_profile']['ref'].should eq(container_profile.uri)
+  end
+
+
+  it "lets it slide if the incoming ArchivesSpace container has no profile" do
+    barcode = '12345678'
+    container_profile_a = create(:json_container_profile,
+                                 'name' => 'Flat Grey 16x20x3')
+
+    container_json = JSONModel(:top_container).from_hash({
+                                                           'indicator' => '123',
+                                                           'barcode' => barcode,
+                                                           'container_profile' => {
+                                                             'ref' => container_profile_a.uri
+                                                           }
+                                                         })
+    container = TopContainer.create_from_json(container_json)
+
+    instance = JSONModel(:instance).from_hash("instance_type" => "text",
+                                              "container" => {
+                                                "barcode_1" => barcode,
+                                                "indicator_1" => '123',
+                                                "type_2" => 'folder',
+                                                "indicator_2" => 'ind2',
+                                                "type_3" => 'reel',
+                                                "indicator_3" => 'ind3'
+                                              }).to_hash
+
+    instance['container']['container_profile_key'] = 'I do not exist'
+
+    expect {
+      create_resource({"instances" => [instance]})
+    }.to_not raise_error(ValidationException)
+  end
+
 end
