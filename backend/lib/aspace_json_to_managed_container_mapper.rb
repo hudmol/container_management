@@ -195,11 +195,13 @@ class AspaceJsonToManagedContainerMapper
       top_container_profile = top_container.related_records(:top_container_profile)
       if !top_container_profile
         # no profile? let's set the incoming profile on the top container
-        top_container.refresh
-        json = TopContainer.to_jsonmodel(top_container, :skip_restrictions => true)
-        json['container_profile'] = {'ref' => incoming_container_profile.uri}
-        top_container.update_from_json(json)
-        top_container.refresh
+        TopContainer.find_relationship(:top_container_profile).relate(top_container,
+                                                                      incoming_container_profile,
+                                                                      {
+                                                                        :aspace_relationship_position => 0,
+                                                                        :system_mtime => Time.now,
+                                                                        :user_mtime => Time.now
+                                                                      })
       elsif incoming_container_profile.id != top_container_profile.id
         # mismatch with existing profile
         raise ContainerProfileMismatchException.new(:errors => {'container_profile' => ["Container Profile in ArchivesSpace container (#{aspace_container['container_profile_key']}) doesn't match profile in existing top container (#{top_container_profile.name})"]},
