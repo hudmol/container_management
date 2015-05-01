@@ -13,6 +13,10 @@ class AspaceJsonToManagedContainerMapper
   end
 
 
+  class ContainerProfileMismatchException < ValidationException
+  end
+
+
   def call
     @json['instances'].each do |instance|
 
@@ -44,8 +48,7 @@ class AspaceJsonToManagedContainerMapper
           container = instance['container']
 
           top_container = create_top_container({'indicator' => get_default_indicator(container['indicator_1']),
-                                                'container_locations' => container['container_locations']},
-                                               find_container_profile(container))
+                                                'container_locations' => container['container_locations']})
         else
           raise e
         end
@@ -95,8 +98,7 @@ class AspaceJsonToManagedContainerMapper
         indicator = container['indicator_1'] || get_default_indicator
         create_top_container({'barcode' => barcode,
                               'indicator' => indicator,
-                              'container_locations' => container['container_locations']},
-                             find_container_profile(container))
+                              'container_locations' => container['container_locations']})
       end
     else
       nil
@@ -186,6 +188,31 @@ class AspaceJsonToManagedContainerMapper
                                           })
     end
 
+
+    # check the container profile if a profile 'container_profile_key' was provided
+    incoming_container_profile = find_container_profile(aspace_container)
+    if incoming_container_profile
+      top_container_profile = top_container.related_records(:top_container_profile)
+      if !top_container_profile
+        # no profile? let's set the incoming profile on the top container
+        top_container.refresh
+        json = TopContainer.to_jsonmodel(top_container, :skip_restrictions => true)
+        json['container_profile'] = {'ref' => incoming_container_profile.uri}
+        top_container.update_from_json(json)
+        top_container.refresh
+      elsif incoming_container_profile.id != top_container_profile.id
+        # mismatch with existing profile
+        raise ContainerProfileMismatchException.new(:errors => {'container_profile' => ["Container Profile in ArchivesSpace container (#{aspace_container['container_profile_key']}) doesn't match profile in existing top container (#{top_container_profile.name})"]},
+                                                    :object_context => {
+                                                      :top_container => top_container,
+                                                      :aspace_container => aspace_container,
+                                                      :incoming_container_profile => incoming_container_profile,
+                                                      :top_container_profile => top_container_profile,
+                                                    })
+      else
+        # matchy match!
+      end
+    end
   end
 
 
@@ -220,20 +247,11 @@ class AspaceJsonToManagedContainerMapper
 
     Log.info("Creating a new Top Container for a container with no barcode")
     create_top_container({'indicator' => (container['indicator_1'] || get_default_indicator),
-                          'container_locations' => container['container_locations']},
-                         find_container_profile(container))
+                          'container_locations' => container['container_locations']})
   end
 
 
-  def create_top_container(values, container_profile = nil)
-    if container_profile
-      values = {
-                  'container_profile' => {
-                    'ref' => container_profile.uri
-                  }
-                }.merge(values)
-    end
-
+  def create_top_container(values)
     created = TopContainer.create_from_json(JSONModel(:top_container).from_hash(values))
     @new_top_containers << created
 
