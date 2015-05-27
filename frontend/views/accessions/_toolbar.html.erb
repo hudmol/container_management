@@ -70,7 +70,7 @@
                     <%= button_confirm_action I18n.t("actions.unsuppress"),
                                               url_for(:controller => :accessions, :action => :unsuppress, :id => @accession.id),
                                               {
-                                                :class => "btn btn-sm unsuppress-record",
+                                                :class => "btn btn-sm btn-default unsuppress-record",
                                                 :"data-title" => I18n.t("actions.unsuppress_confirm_title"),
                                                 :"data-message" => I18n.t("actions.unsuppress_confirm_message"),
                                                 :"data-confirm-btn-label" => "#{I18n.t("actions.unsuppress")}"

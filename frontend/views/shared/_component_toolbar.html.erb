@@ -18,7 +18,7 @@
         <% end %>
         <% if ['edit', 'update'].include?(controller.action_name) %>
           <div class="pull-left revert-changes">
-            <%= link_to I18n.t("actions.revert"), parent_link, :class => "btn btn-sm" %>
+            <%= link_to I18n.t("actions.revert"), parent_link, :class => "btn btn-sm btn-default" %>
             <%= I18n.t("actions.toolbar_disabled_message") %>
           </div>
         <% end %>
@@ -40,7 +40,7 @@
                 <%= button_confirm_action I18n.t("actions.unsuppress"),
                                           url_for(:action => :unsuppress, :id => record.id),
                                           {
-                                            :class => "btn btn-sm unsuppress-record",
+                                            :class => "btn btn-sm btn-default unsuppress-record",
                                             :"data-title" => I18n.t("actions.unsuppress_confirm_title"),
                                             :"data-message" => I18n.t("actions.unsuppress_confirm_message"),
                                             :"data-confirm-btn-label" => "#{I18n.t("actions.unsuppress")}"
