@@ -10,7 +10,13 @@ $(function () {
 
       extent_form.find("[id$=__portion_]").val($('#extent_portion_').val());
       extent_form.find("[id$=__number_]").val($('#extent_number_').val());
-      extent_form.find("[id$=__extent_type_]").val($('#extent_extent_type_').val());
+      var extent_form_type_select = extent_form.find("[id$=__extent_type_]");
+      if (extent_form_type_select.data("combobox")) {
+        extent_form_type_select.data("combobox").$element.val($('#extent_extent_type_').val());
+        extent_form_type_select.data("combobox").$target.val($('#extent_extent_type_').val());
+      } else {
+        extent_form_type_select.val($('#extent_extent_type_').val());
+      }
       extent_form.find("[id$=__container_summary_]").val($('#extent_container_summary_').val());
       extent_form.find("[id$=__physical_details_]").val($('#extent_physical_details_').val());
       extent_form.find("[id$=__dimensions_]").val($('#extent_dimensions_').val());
