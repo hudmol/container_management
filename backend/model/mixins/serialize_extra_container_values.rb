@@ -1,6 +1,25 @@
 module SerializeExtraContainerValues
 
 
+  class AltRenderCalculator
+
+    def initialize
+      @lookup_cache = Rufus::Lru::Hash.new(128)
+    end
+
+    def for_top_container_uri(uri)
+      @lookup_cache.fetch(uri) {
+        top_container_id = JSONModel::JSONModel(:top_container).id_for(uri)
+        profile = TopContainer.any_repo[top_container_id].related_records(:top_container_profile)
+
+        if profile
+          @lookup_cache[uri] = (profile.url || profile.name)
+        end
+      }
+    end
+
+  end
+
   def self.included(base)
     base.class_eval do
       def serialize_container(inst, xml, fragments)
@@ -9,6 +28,11 @@ module SerializeExtraContainerValues
     end
   end
 
+  def altrender_calculator
+    # Each EAD export gets its own serializer instance, so we can safely store
+    # state between calls here.
+    @altrender_calculator ||= AltRenderCalculator.new
+  end
 
   def manage_containers_serialize_container(inst, xml, fragments)
     @parent_id = nil
@@ -30,9 +54,10 @@ module SerializeExtraContainerValues
           atts[:label] << " [#{inst['container']['barcode_1']}]"
         end
 
-        container_profile = inst['sub_container']['top_container']['_resolved']['container_profile']['_resolved'] rescue nil
-        if container_profile
-          atts[:altrender] = container_profile['url'] || container_profile['name']
+        if inst['sub_container'] && inst['sub_container']['top_container']
+          if (altrender = altrender_calculator.for_top_container_uri(inst['sub_container']['top_container']['ref']))
+            atts[:altrender] = altrender
+          end
         end
       end
 
