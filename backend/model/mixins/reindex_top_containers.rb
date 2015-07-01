@@ -1,6 +1,43 @@
 module ReindexTopContainers
 
   def reindex_top_containers(extra_ids = [])
+
+    if !DB.respond_to?(:supports_join_updates?) || !DB.supports_join_updates?
+      Log.warn("Invoking slow path for reindexing top containers")
+      return reindex_top_containers_by_any_means_necessary(extra_ids)
+    end
+
+    # Find any relationships between a top container and any instance within the current tree.
+    root_record = if self.class == ArchivalObject
+                    self.root_record_id ? self.class.root_model[self.root_record_id] : self.topmost_archival_object
+                  else
+                    self
+                  end
+
+    if !extra_ids.empty?
+      TopContainer.filter(:id => extra_ids).update(:system_mtime => Time.now)
+    end
+
+    if root_record.is_a?(Resource)
+      TopContainer.linked_instance_ds.
+        join(:archival_object, :archival_object__id => :instance__archival_object_id).
+        filter(:archival_object__root_record_id => root_record.id).
+        update(:top_container__system_mtime => Time.now)
+    elsif root_record.is_a?(ArchivalObject)
+      Log.warn("Invoking slow path for reindexing top containers")
+      reindex_top_containers_by_any_means_necessary(extra_ids)
+    elsif root_record.is_a?(Accession)
+      TopContainer.linked_instance_ds.
+        join(:accession, :accession__id => :instance__accession_id).
+        filter(:accession__id => root_record.id).
+        update(:top_container__system_mtime => Time.now)
+    end
+
+  end
+
+
+  # Slow path for weird data or DBs that don't support updates on joins (like derby/h2)
+  def reindex_top_containers_by_any_means_necessary(extra_ids)
     # Find any relationships between a top container and any instance within the current tree.
     root_record = if self.class == ArchivalObject
                     self.root_record_id ? self.class.root_model[self.root_record_id] : self.topmost_archival_object
