@@ -20,6 +20,9 @@ class AspaceJsonToManagedContainerMapper
   def call
     @json['instances'].each do |instance|
 
+      # Make sure we're dealing with a hash, not a JSONModel
+      instance = instance.is_a?(JSONModelType) ? instance.to_hash(:raw) : instance
+
       if instance['sub_container'] || instance['digital_object']
         # Just need to make sure there are no conflicting ArchivesSpace containers
         instance.delete('container')
