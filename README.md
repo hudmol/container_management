@@ -5,6 +5,9 @@ ArchivesSpace plugin to add a new container type to ArchivesSpace.
 More information on these at
 http://campuspress.yale.edu/yalearchivesspace/2014/11/20/managing-content-managing-containers-managing-access/.
 
+This plugin is compatible with ArchivesSpace v1.1.x.
+
+
 ## Installing it
 
 To install, just activate the plugin in your config/config.rb file by
