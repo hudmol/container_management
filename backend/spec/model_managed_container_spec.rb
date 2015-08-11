@@ -386,7 +386,57 @@ describe 'Managed Container model' do
       container1.refresh.system_mtime.should be > container1_original_mtime
       container2.refresh.system_mtime.should be > container2_original_mtime
     end
+
+
+    it "reindexes linked archival object when top container is updated" do
+      (resource, grandparent, parent, child) = create_tree(top_container_json)
+
+      ao = ArchivalObject[child.id]
+      original_mtime = ao.system_mtime
+
+      json = TopContainer.to_jsonmodel(top_container_json.id)
+      json.barcode = "1122334455"
+
+      top_container.refresh.update_from_json(json)
+
+      ao.refresh.system_mtime.should be > original_mtime
+    end
+
+
+    it "reindexes linked archival object when top container is changed via container profile bulk update" do
+      (resource, grandparent, parent, child) = create_tree(top_container_json)
+
+      ao = ArchivalObject[child.id]
+      original_mtime = ao.system_mtime
+
+      json = TopContainer.to_jsonmodel(top_container_json.id)
+
+      container_profile = create(:json_container_profile)
+      TopContainer.bulk_update_container_profile([json.id],
+                                                 container_profile.uri)
+
+      ao.refresh.system_mtime.should be > original_mtime
+    end
+
+
+    it "reindexes linked archival object when top container is changed via barcode bulk update" do
+      (resource, grandparent, parent, child) = create_tree(top_container_json)
+
+      ao = ArchivalObject[child.id]
+      original_mtime = ao.system_mtime
+
+      json = TopContainer.to_jsonmodel(top_container_json.id)
+
+      barcode_data = {}
+      barcode_data[json.uri] = "987654321"
+
+      TopContainer.bulk_update_barcodes(barcode_data)
+
+      ao.refresh.system_mtime.should be > original_mtime
+    end
+
   end
+
 
 
   describe "bulk action" do
