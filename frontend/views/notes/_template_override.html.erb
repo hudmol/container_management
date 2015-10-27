@@ -9,9 +9,9 @@
 <% define_template "rights_restriction", jsonmodel_definition(:rights_restriction) do |form| %>
   <%= form.label_and_date("begin") %>
   <%= form.label_and_date("end") %>
-  <div class="control-group">
-    <%= form.label("local_access_restriction_type") %>
-    <div class="controls">
+  <div class="form-group">
+    <%= form.label("local_access_restriction_type", {:class => "col-sm-2"}) %>
+    <div class="controls col-sm-8">
       <% if form.readonly? %>
         <ul>
           <% Array.wrap(form.obj['local_access_restriction_type']).
@@ -26,7 +26,7 @@
                        {
                          :id => form.id_for("local_access_restriction_type"),
                          :multiple => "multiple",
-                         :class => "span12",
+                         :class => "col-md-12 form-control",
                          :size => local_access_restriction_types_for_options.length
                        })
         %>
@@ -70,7 +70,7 @@
         <h5 class="subrecord-form-heading">
           <%= I18n.t("note_multipart.sub_notes") %>
           <% if not form.readonly? %>
-            <button class="btn btn-small add-sub-note-btn pull-right"><%= I18n.t("note._frontend.action.add_sub_note") %></button>
+            <button class="btn btn-sm btn-default add-sub-note-btn pull-right"><%= I18n.t("note._frontend.action.add_sub_note") %></button>
           <% end %>
         </h5>
         <div class="subrecord-form-container">

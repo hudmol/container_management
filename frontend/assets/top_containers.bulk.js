@@ -23,7 +23,7 @@ BulkContainerSearch.prototype.setup_form = function() {
 BulkContainerSearch.prototype.perform_search = function(data) {
   var self = this;
 
-  self.$results_container.closest(".row-fluid").show();
+  self.$results_container.closest(".row").show();
   self.$results_container.html(AS.renderTemplate("template_bulk_operation_loading"));
 
   $.ajax({
@@ -395,9 +395,10 @@ BulkActionBarcodeRapidEntry.prototype.setup_keyboard_handling = function($modal)
   $(":input", $modal).
     on("focus",
     function() {
-      $(this).ScrollTo({
-        duration: 0,
-        offsetTop: 400
+      $.scrollTo($(this), 0, {
+        offset: {
+          top: 400
+        }
       });
     }).
     on("keypress",
@@ -432,9 +433,9 @@ BulkActionBarcodeRapidEntry.prototype.setup_form_submission = function($modal) {
     error: function(jqXHR, textStatus, errorThrown) {
       var error = $("<div>").attr("id", "alertBucket").html(jqXHR.responseText);
       $('#alertBucket').replaceWith(error);
-      var uri = $('.alert-error:first', '#alertBucket').data("uri");
+      var uri = $('.alert-danger:first', '#alertBucket').data("uri");
       if (uri) {
-        $(":input[value='"+uri+"']", $form).closest("td").addClass("control-group").addClass("error");
+        $(":input[value='"+uri+"']", $form).closest("td").addClass("form-group").addClass("error");
       }
       $form.find(":submit").removeClass("disabled").removeAttr("disabled");
     }

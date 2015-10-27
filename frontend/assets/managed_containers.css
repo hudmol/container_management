@@ -3,6 +3,11 @@
 .token-list .top_container .icon-token {
     background-image: url(box.png);
     background-position: 0px 2px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    background-repeat: no-repeat;
+    vertical-align: middle;
 }
 
 .token-input-dropdown .container_profile .icon-token,
@@ -10,4 +15,9 @@
 .token-list .container_profile .icon-token {
     background-image: url(container_profile.png);
     background-position: 0px 2px;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    background-repeat: no-repeat;
+    vertical-align: middle;
 }
