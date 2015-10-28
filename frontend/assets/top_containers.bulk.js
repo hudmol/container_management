@@ -14,6 +14,8 @@ function BulkContainerSearch($search_form, $results_container, $toolbar) {
 BulkContainerSearch.prototype.setup_form = function() {
   var self = this;
 
+  $(document).trigger("loadedrecordsubforms.aspace", this.$search_form);
+
   this.$search_form.on("submit", function(event) {
     event.preventDefault();
     self.perform_search(self.$search_form.serializeArray());
@@ -237,7 +239,7 @@ BulkActionContainerProfileUpdate.prototype.setup_update_form = function($modal) 
 
   var $form = $modal.find("form");
 
-  $(document).trigger("loadedrecordform.aspace", [$form]);
+  $(document).trigger("loadedrecordsubforms.aspace", [$form]);
 
   $form.on("submit", function(event) {
     event.preventDefault();
@@ -303,7 +305,7 @@ BulkActionLocationUpdate.prototype.setup_update_form = function($modal) {
 
   var $form = $modal.find("form");
 
-  $(document).trigger("loadedrecordform.aspace", [$form]);
+  $(document).trigger("loadedrecordsubforms.aspace", [$form]);
 
   $form.on("submit", function(event) {
     event.preventDefault();

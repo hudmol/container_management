@@ -6,3 +6,6 @@
 <% end %>
 
 <script src="<%= "#{AppConfig[:frontend_prefix]}assets/form.js" %>"></script>
+<script>
+  $(document).trigger("loadedrecordsubforms.aspace", [$("#new_top_container")]);
+</script>
