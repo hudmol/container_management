@@ -15,9 +15,9 @@ $(document).ready(function() {
           var $restrictionTypeInput = $restriction_fields.find("select[id*='_local_access_restriction_type_']");
           if (noteType == "accessrestrict") {
             $restrictionTypeInput.removeAttr("disabled");
-            $restrictionTypeInput.closest(".control-group").show();
+            $restrictionTypeInput.closest(".form-group").show();
           } else {
-            $restrictionTypeInput.closest(".control-group").hide();
+            $restrictionTypeInput.closest(".form-group").hide();
             $restrictionTypeInput.attr("disabled", "disabled");
           }
         } else {
