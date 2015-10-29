@@ -27,3 +27,8 @@
 
 <script src="<%= "#{AppConfig[:frontend_prefix]}assets/subrecord.crud.js" %>"></script>
 <script src="<%= "#{AppConfig[:frontend_prefix]}assets/form.js" %>"></script>
+<script>
+  $(function() {
+    $(document).trigger("loadedrecordsubforms.aspace", [$("#new_top_container_form")]);
+  });
+</script>
